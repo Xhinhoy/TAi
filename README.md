@@ -2,7 +2,7 @@
 
 ![Status](https://img.shields.io/badge/status-in_progress-yellow)
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Stack](https://img.shields.io/badge/stack-Node.js%20%7C%20React%20Native%20%7C%20MongoDB-green)
+![Stack](https://img.shields.io/badge/stack-Node.js%20%7C%20React%20Native%20%7C%PostgreSQL-green)
 
 ## 📖 Descripción
 **TAi** es una aplicación híbrida desarrollada como parte del **Proyecto CAPSTONE 2025 - DUOC UC (Ingeniería en Informática)**.  
