@@ -24,10 +24,10 @@ El objetivo es **optimizar la experiencia de viaje**, ofreciendo rutas dinámica
 ## 🛠️ Tecnologías
 - **Frontend:** React Native / Ionic  
 - **Backend:** Node.js + Express  
-- **Base de Datos:** MongoDB o PostgreSQL  
+- **Base de Datos:** PostgreSQL  
 - **APIs:** Google Places, TripAdvisor  
 - **IA:** Algoritmos de recomendación (filtrado colaborativo + basado en contenido)  
-- **Gestión del Proyecto:** Scrum (Jira, GitHub Projects)  
+- **Gestión del Proyecto:** Scrum (Jira)  
 
 ---
 
