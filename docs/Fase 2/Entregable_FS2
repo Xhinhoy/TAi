@@ -1,0 +1,53 @@
+# TAi — Fase 2: Desarrollo del Proyecto APT
+
+> En esta fase se reporta **avance técnico**, **evidencias** y **ajustes** al plan, incluyendo integración de APIs, diseño de BD y prototipo funcional.
+
+## 1. Resumen ejecutivo
+Se alcanzó un prototipo navegable con: búsqueda de lugares, detalle con horarios/ratings y generación inicial de itinerario en base a intereses. Se integró Google Places y se definió el modelo de datos inicial.
+
+## 2. Arquitectura y diseño
+- **Frontend (RN/Ionic):** navegación, vistas: _Home_, _Search_, _PlaceDetail_, _Itinerary_.  
+- **Backend (Node/Express):** endpoints `/places/search`, `/places/:id`, `/itinerary`.  
+- **Datos (PostgreSQL):** tablas `users`, `preferences`, `places_cache`, `itineraries`, `itinerary_items`.  
+- **IA (Reglas iniciales):** puntuación = afinidad_intereses + ventana_horaria + distancia (normalizada).
+
+> Relacionado con competencias de desarrollo, integración y datos. :contentReference[oaicite:12]{index=12}
+
+## 3. Integración de APIs
+- **Google Places:** búsqueda por categoría/ubicación; caché con TTL.  
+- **TripAdvisor (si aplica):** enriquecimiento de reseñas.  
+- **Gestión de keys:** variables de entorno (`.env`).
+
+## 4. Funcionalidades entregadas (DoD)
+- [x] Búsqueda por interés  
+- [x] Detalle de lugar (horarios, ubicación)  
+- [x] Generación inicial de itinerario (3–6 paradas/día)  
+- [x] Persistencia de itinerarios por usuario  
+- [x] Tests unitarios básicos (servicios/formatters)
+
+## 5. Evidencias de avance
+- Capturas de pantallas (subir a `project/evidencias/`).  
+- Commits/PRs relevantes (listar).  
+- Diagrama actual de BD.  
+- Postman Collection para endpoints.
+
+## 6. Plan de pruebas
+**Unitarias:** servicios de ranking, formateo y parsers.  
+**Integración:** endpoints REST con mock de APIs externas.  
+**Criterios de aceptación:** tiempos de respuesta < 1.5s en búsqueda; itinerario con lugares abiertos en la franja seleccionada; persistencia correcta.  
+(La rúbrica considera calidad y pruebas como indicadores). :contentReference[oaicite:13]{index=13}
+
+## 7. Gestión y seguimiento
+- **Sprints:** 2 semanas, daily breve, review y retro.  
+- **Riesgos y mitigación:** límites de cuotas → caché, backoff; cambios de API → wrapper/adapter.
+
+## 8. Ajustes al plan
+- Se reprograma integración de TripAdvisor para posterior a estabilizar Places.  
+- Se añade historia para feedback del usuario (like/dislike por lugar).
+
+## 9. Próximos pasos (hacia Fase 3)
+- Algoritmo de recomendación híbrido (contenido + retroalimentación).  
+- Test de integración end-to-end.  
+- Preparar presentación de avance y paquete de evidencias.
+
+> Recordatorio: la institución pide evidencias de avance y luego informe final en Fase 2 (según matriz de evidencias). Adjuntar planillas si el docente lo requiere.
