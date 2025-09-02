@@ -1,0 +1,127 @@
+# TAi — Fase 1: Definición del Proyecto APT
+
+> Asignatura: Capstone (DUOC UC) · Equipo: Nicolás Sabando · José Eskenazi · Nicolás Soto  
+> Documento alineado a la guía y rúbrica: Abstract ES/EN, objetivos, metodología, plan de trabajo, evidencias, conclusiones/reflect en inglés.  
+
+## 1. Portada
+**Proyecto**: TAi — Generador Inteligente de Itinerarios Turísticos Personalizados  
+**Carrera**: Ingeniería en Informática · **Sede**: Antonio Varas  
+**Integrantes**: (completar RUT)  
+**Fecha**: (dd/mm/aaaa)
+
+## 2. Índice
+1. Abstract (ES / EN)  
+2. Descripción y relevancia  
+3. Relación con competencias del perfil de egreso  
+4. Intereses profesionales  
+5. Factibilidad  
+6. Objetivo general y objetivos específicos  
+7. Metodología  
+8. Plan de trabajo  
+9. Carta Gantt (anexo)  
+10. Evidencias (acordadas)  
+11. Conclusiones individuales (EN)  
+12. Reflexión (EN)  
+13. Referencias  
+
+---
+
+## 3. Abstract
+**ES.** TAi es una aplicación híbrida que genera itinerarios turísticos personalizados combinando IA y datos de APIs (Google Places, TripAdvisor). El sistema aprende de los intereses del usuario y considera horarios/afluencia para optimizar tiempo y experiencia. Este proyecto aplica competencias de desarrollo de software, integración de sistemas, modelado de datos, QA y gestión ágil.
+
+**EN.** TAi is a hybrid app that builds personalized travel itineraries using AI and external APIs (Google Places, TripAdvisor). It learns user interests and considers opening hours/crowd levels to optimize time and experience. The project applies software development, system integration, data modeling, QA, and agile project management competencies.
+
+> (La guía exige Abstract en ES/EN, conclusiones y reflexión en inglés. ) :contentReference[oaicite:3]{index=3}
+
+---
+
+## 4. Descripción y relevancia
+**Problema.** La mayoría de apps entregan listados genéricos sin ajustar dinámicamente gustos, horarios ni afluencia.  
+**Solución.** TAi genera rutas personalizadas, ponderando intereses (gastronomía, cultura, vida nocturna, deportes), tiempos de traslado y ventanas de atención, integrando IA + APIs.  
+**Relevancia laboral.** Refuerza competencias clave en la industria: integración de servicios, diseño de datos y desarrollo basado en datos. (La guía pide justificar relevancia.) 
+
+---
+
+## 5. Relación con competencias del perfil de egreso
+- **Desarrollo de software:** construcción de una solución y sus componentes (4.1–4.3).  
+- **Integración de sistemas:** consumo de APIs y orquestación (4.2).  
+- **Modelado/BD:** esquemas escalables para usuarios, lugares e itinerarios (3.1–3.2).  
+- **Gestión de proyectos:** planificación, control y toma de decisiones (2.1–2.2).  
+- **Pruebas/QA:** diseño y aplicación de validaciones con buenas prácticas (1.1–1.3). 
+
+---
+
+## 6. Intereses profesionales
+El proyecto fortalece el perfil en **backend**, **APIs**, **arquitectura**, **bases de datos** e **IA aplicada**, sumando evidencia para portafolio y empleabilidad (desarrollo e integración).
+
+---
+
+## 7. Factibilidad
+- **Tiempo/semestre** y **horas de asignatura** permiten 3 fases (definición, desarrollo, validación).  
+- **Recursos**: frameworks libres, cuentas gratuitas y datasets locales para pruebas.  
+- **Riesgos externos**: límites de uso de APIs y cambios de políticas → mitigación con caché y pruebas offline. 
+
+---
+
+## 8. Objetivos
+**General.** Desarrollar una aplicación híbrida que entregue itinerarios turísticos personalizados mediante IA y APIs, con validación técnica y de usuario.
+
+**Específicos.**
+1. Integrar Google Places y TripAdvisor para obtener datos en tiempo real.  
+2. Diseñar el modelo de datos para usuarios, preferencias e itinerarios.  
+3. Implementar un motor de recomendación (híbrido: contenido + reglas).  
+4. Construir prototipo navegable con vistas de búsqueda, detalle y plan diario.  
+5. Definir y ejecutar pruebas (unitarias/integración) y criterios de aceptación.
+
+> La guía solicita objetivos claros y en infinitivo. :contentReference[oaicite:7]{index=7}
+
+---
+
+## 9. Metodología
+**Enfoque:** Scrum con sprints de 2 semanas; tableros en GitHub Projects/Jira; PRs con code review.  
+**Roles:** PO (prioriza), Dev (implementa), QA (pruebas/automatización).  
+**Prácticas:** control de versiones (GitHub), issues/epics, CI básico para tests.  
+**Responsabilidades por integrante:** definir funciones, tareas y responsables (completar). :contentReference[oaicite:8]{index=8}
+
+---
+
+## 10. Plan de trabajo (resumen)
+| Competencia | Actividad | Descripción | Recursos | Duración | Responsable | Observaciones |
+|---|---|---|---|---|---|---|
+| Desarrollo SW | Prototipo UI | Pantallas base + navegación | React Native/Ionic | 2 sem |  |  |
+| Integración | Conectar Google Places | Búsqueda/Detalle lugares | API Key | 1 sem |  |  |
+| Datos | Modelo BD | Esquemas y persistencia | PostgreSQL | 1 sem |  |  |
+| IA | Recomendador | Reglas + afinidad intereses | Node/TS | 2 sem |  |  |
+| QA | Pruebas | Unitarias e integración | Jest/Supertest | 2 sem |  |  |
+
+> La guía exige tabla de plan y posterior Gantt. :contentReference[oaicite:9]{index=9}
+
+---
+
+## 11. Carta Gantt
+Exportar imagen a `project/carta_gantt_fase1.png`. (Plantilla semanal S1–S18 según guía). :contentReference[oaicite:10]{index=10}
+
+---
+
+## 12. Evidencias acordadas
+| Tipo | Nombre | Descripción | Justificación |
+|---|---|---|---|
+| Avance | Prototipo navegable | Flujo básico búsqueda → detalle → itinerario | Evidencia de integración UI |
+| Avance | Diagrama BD | Entidades/relaciones clave | Sustenta almacenaje |
+| Final | Demo APIs | Listado y detalle de lugares | Prueba de integración |
+| Final | Suite tests | Unitarias/integración | Calidad y regresión |
+
+> La guía pide determinar evidencias y justificar. :contentReference[oaicite:11]{index=11}
+
+---
+
+## 13. Conclusiones individuales (In English)
+- **Student 1:** _Write your personal conclusion (impact, learning, limitations, next steps)._  
+- **Student 2:** _…_  
+- **Student 3:** _…_
+
+## 14. Reflection (In English)
+_What worked, what didn’t, how the team adapted, and how the project could scale._
+
+## 15. Referencias
+- Google Places API docs, TripAdvisor Docs, artículos técnicos (añadir).

@@ -1,0 +1,49 @@
+# TAi — Fase 3: Validación y Cierre
+
+> Informe final, resultados, QA, conclusiones y reflexión (EN), y material de presentación final.
+
+## 1. Abstract (ES/EN)
+**ES.** Presentamos TAi, una app que genera itinerarios personalizados con IA y datos externos. Evaluamos el sistema con pruebas funcionales y de integración, y medimos satisfacción de usuario en un piloto acotado.  
+**EN.** We present TAi, an AI-assisted itinerary builder. We validated functionality and integration, and measured user satisfaction in a small pilot.
+
+## 2. Introducción
+Contexto, problema, objetivos y alcance final del proyecto.
+
+## 3. Metodología y arquitectura final
+- Proceso ágil (Scrum) y pipeline de desarrollo.  
+- Arquitectura final (diagramas) y decisiones de diseño.  
+- Esquema final de BD y políticas de caché.
+
+## 4. Resultados
+- **Funcionales:** búsqueda, detalle, itinerario, persistencia, edición.  
+- **No funcionales:** tiempos promedio, errores/timeout, uso de caché.  
+- **IA/Recomendación:** reglas + afinidad; (si aplica) feedback implícito.
+
+## 5. Pruebas y validación
+- **Unitarias**: % de cobertura y casos críticos superados.  
+- **Integración**: flujos end-to-end con mocks de APIs.  
+- **Aceptación**: checklist DoD por historia.  
+- **Levantamiento de bugs** y su resolución.
+
+> El estándar pide indicadores de calidad y validación del sistema. :contentReference[oaicite:14]{index=14}
+
+## 6. Limitaciones y trabajo futuro
+Límites de cuotas, calidad de datos, cold-start, ranking multi-objetivo; ideas de mejora (aprendizaje de preferencias, clustering, offline).
+
+## 7. Conclusiones individuales (EN)
+- **Student 1:** _Personal conclusion about learning outcomes and impact._  
+- **Student 2:** _…_  
+- **Student 3:** _…_  
+> La entrega final exige conclusiones y reflexión en inglés. :contentReference[oaicite:15]{index=15}
+
+## 8. Reflexión (EN)
+_Team reflection about collaboration, decision-making, and professional growth._
+
+## 9. Manual de despliegue y uso (resumen)
+- Requisitos, variables de entorno, scripts de instalación y ejecución.  
+- Cómo obtener API keys y correr tests.  
+
+## 10. Presentación y anexos
+- `project/evidencias/` (capturas, video demo).  
+- Presentación final (`/project/presentacion_final_es.pptx` y opcional EN).  
+- Planillas de evaluación firmadas (si el docente lo solicita).
