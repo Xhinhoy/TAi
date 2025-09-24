@@ -1,14 +1,15 @@
 ﻿import React, { useState } from "react";
 import { View, TextInput, FlatList, Text, TouchableOpacity } from "react-native";
 import { searchPlaces } from "../../api/places.api";
+import { geoPointToCoords } from "../../database";
 export default function Search(){
   const [q,setQ] = useState("");
   const [data,setData] = useState<any[]>([]);
   const onChange = async (text:string)=>{
     setQ(text);
     if(text.length<2){ setData([]); return; }
-    const res = await searchPlaces();
-    setData(res.filter(x => x.name.toLowerCase().includes(text.toLowerCase())));
+    const res = await searchPlaces(text);
+    setData(res);
   };
   return (
     <View style={{ flex:1, padding:16 }}>

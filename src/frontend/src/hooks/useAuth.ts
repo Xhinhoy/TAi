@@ -7,15 +7,15 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("🔄 useAuth: suscribiendo a Firebase Auth...");
+    console.log("useAuth: suscribiendo a Firebase Auth...");
     const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-      console.log("👤 Estado de autenticación cambió:", firebaseUser);
+      console.log("Estado de autenticación cambió:", firebaseUser);
       setUser(firebaseUser);
       setLoading(false);
     });
 
     return () => {
-      console.log("🧹 useAuth: limpiando suscripción a Firebase Auth");
+      console.log("useAuth: limpiando suscripción a Firebase Auth");
       unsub();
     };
   }, []);

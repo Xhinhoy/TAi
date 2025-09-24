@@ -1,15 +1,58 @@
-﻿import React, { useState } from "react";
-import { View, Text, TextInput, Button, Alert } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView
+} from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../services/firebase";
+import { MailIcon, LockIcon, EyeIcon, EyeOffIcon } from "../../components/icons";
+import { colors } from "../../styles/colors";
+import { commonStyles } from "../../styles/common";
 
 export default function Login({ navigation }: any) {
   const [email, setEmail] = useState("");
-  const [pass, setPass] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({ email: "", password: "" });
+
+  const validateForm = () => {
+    const newErrors = { email: "", password: "" };
+    let isValid = true;
+
+    if (!email) {
+      newErrors.email = "El email es requerido";
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = "Email inválido";
+      isValid = false;
+    }
+
+    if (!password) {
+      newErrors.password = "La contraseña es requerida";
+      isValid = false;
+    } else if (password.length < 6) {
+      newErrors.password = "La contraseña debe tener al menos 6 caracteres";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
 
   const onLogin = async () => {
+    if (!validateForm()) return;
+
+    setLoading(true);
     try {
-      const userCred = await signInWithEmailAndPassword(auth, email, pass);
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
 
       if (!userCred.user.emailVerified) {
         Alert.alert("Correo no verificado", "Revisa tu bandeja de entrada y confirma tu correo antes de ingresar.");
@@ -20,24 +63,152 @@ export default function Login({ navigation }: any) {
       navigation.replace("Home");
     } catch (e: any) {
       Alert.alert("Error en login", e.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <View style={{ padding: 16, gap: 12 }}>
-      <Text style={{ fontSize: 24, fontWeight: "700" }}>Iniciar sesión</Text>
+    <KeyboardAvoidingView
+      style={commonStyles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={commonStyles.title}>Bienvenido de vuelta</Text>
+            <Text style={commonStyles.caption}>Inicia sesión en tu cuenta</Text>
+          </View>
 
-      <TextInput placeholder="Email" value={email} onChangeText={setEmail} />
-      <TextInput placeholder="Contraseña" value={pass} onChangeText={setPass} secureTextEntry />
+          <View style={styles.form}>
+            <View style={styles.inputContainer}>
+              <View style={styles.inputWrapper}>
+                <MailIcon size={20} color={colors.neutral[500]} />
+                <TextInput
+                  style={[
+                    styles.input,
+                    errors.email ? commonStyles.inputError : {},
+                  ]}
+                  placeholder="Correo electrónico"
+                  placeholderTextColor={colors.neutral[400]}
+                  value={email}
+                  onChangeText={(text) => {
+                    setEmail(text);
+                    if (errors.email) setErrors({ ...errors, email: "" });
+                  }}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                />
+              </View>
+              {errors.email ? <Text style={commonStyles.errorText}>{errors.email}</Text> : null}
+            </View>
 
-      <Button title="Entrar" onPress={onLogin} />
+            <View style={styles.inputContainer}>
+              <View style={styles.inputWrapper}>
+                <LockIcon size={20} color={colors.neutral[500]} />
+                <TextInput
+                  style={[
+                    styles.input,
+                    errors.password ? commonStyles.inputError : {},
+                  ]}
+                  placeholder="Contraseña"
+                  placeholderTextColor={colors.neutral[400]}
+                  value={password}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    if (errors.password) setErrors({ ...errors, password: "" });
+                  }}
+                  secureTextEntry={!showPassword}
+                  autoComplete="password"
+                />
+                <TouchableOpacity
+                  onPress={() => setShowPassword(!showPassword)}
+                  style={styles.eyeIcon}
+                >
+                  {showPassword ? (
+                    <EyeOffIcon size={20} color={colors.neutral[500]} />
+                  ) : (
+                    <EyeIcon size={20} color={colors.neutral[500]} />
+                  )}
+                </TouchableOpacity>
+              </View>
+              {errors.password ? <Text style={commonStyles.errorText}>{errors.password}</Text> : null}
+            </View>
 
-      <Text>
-        ¿Sin cuenta?{" "}
-        <Text style={{ color: "blue" }} onPress={() => navigation.replace("Register")}>
-          Regístrate
-        </Text>
-      </Text>
-    </View>
+            <TouchableOpacity
+              style={[
+                commonStyles.button,
+                loading || (!email || !password) ? commonStyles.buttonDisabled : {},
+              ]}
+              onPress={onLogin}
+              disabled={loading || (!email || !password)}
+            >
+              <Text style={commonStyles.buttonText}>
+                {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.footer}>
+            <Text style={commonStyles.caption}>
+              ¿No tienes cuenta?{" "}
+              <Text
+                style={commonStyles.link}
+                onPress={() => navigation.replace("Register")}
+              >
+                Regístrate aquí
+              </Text>
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 24,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 32,
+  },
+  form: {
+    marginBottom: 32,
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.neutral[300],
+    borderRadius: 12,
+    backgroundColor: colors.neutral.white,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.neutral[900],
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderWidth: 0,
+  },
+  eyeIcon: {
+    padding: 4,
+  },
+  footer: {
+    alignItems: 'center',
+  },
+});
