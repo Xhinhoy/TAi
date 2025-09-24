@@ -6,7 +6,7 @@ const client = new QueryClient();
 
 export default function App() {
   useEffect(() => {
-    console.log("✅ App.tsx cargado correctamente");
+    console.log("App.tsx cargado correctamente");
   }, []);
 
   return (

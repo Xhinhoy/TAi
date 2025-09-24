@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { View, Text, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -9,13 +9,17 @@ import Login from "../screens/Auth/Login";
 import Register from "../screens/Auth/Register";
 import Search from "../screens/Search/Search";
 import Builder from "../screens/Itinerary/Builder";
+import { HomeIcon, SearchIcon, StarIcon, MapIcon, UserIcon } from "../components/icons";
+import { colors } from "../styles/colors";
+import { commonStyles } from "../styles/common";
 
 const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-const Screen = (t: string) => () => (
-  <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-    <Text>{t}</Text>
+const Screen = (title: string) => () => (
+  <View style={commonStyles.centerContainer}>
+    <Text style={commonStyles.subtitle}>{title}</Text>
+    <Text style={commonStyles.body}>Próximamente disponible</Text>
   </View>
 );
 
@@ -24,8 +28,11 @@ export default function RootNav() {
 
   if (loading) {
     return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size="large" />
+      <View style={commonStyles.centerContainer}>
+        <ActivityIndicator size="large" color={colors.primary.main} />
+        <Text style={[commonStyles.caption, { marginTop: 16 }]}>
+          Cargando...
+        </Text>
       </View>
     );
   }
@@ -33,15 +40,100 @@ export default function RootNav() {
   return (
     <NavigationContainer>
       {user ? (
-        <Tabs.Navigator>
-          <Tabs.Screen name="Home" component={Screen("Home")} />
-          <Tabs.Screen name="Buscar" component={Search} />
-          <Tabs.Screen name="Recs" component={Screen("Recs")} />
-          <Tabs.Screen name="Itinerario" component={Builder} />
-          <Tabs.Screen name="Perfil" component={Screen("Perfil")} />
+        <Tabs.Navigator
+          screenOptions={{
+            tabBarActiveTintColor: colors.primary.main,
+            tabBarInactiveTintColor: colors.neutral[500],
+            tabBarStyle: {
+              backgroundColor: colors.neutral.white,
+              borderTopWidth: 1,
+              borderTopColor: colors.neutral[200],
+              paddingTop: 8,
+              paddingBottom: 8,
+              height: 60,
+            },
+            tabBarLabelStyle: {
+              fontSize: 12,
+              fontWeight: "500",
+              marginTop: 4,
+            },
+            headerStyle: {
+              backgroundColor: colors.neutral.white,
+              elevation: 0,
+              shadowOpacity: 0,
+              borderBottomWidth: 1,
+              borderBottomColor: colors.neutral[100],
+            },
+            headerTitleStyle: {
+              fontSize: 18,
+              fontWeight: "600",
+              color: colors.neutral[900],
+            },
+          }}
+        >
+          <Tabs.Screen
+            name="Home"
+            component={Screen("Inicio")}
+            options={{
+              title: "Inicio",
+              headerTitle: "TAi",
+              tabBarIcon: ({ color, size }) => (
+                <HomeIcon size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="Buscar"
+            component={Search}
+            options={{
+              title: "Buscar",
+              headerTitle: "Buscar lugares",
+              tabBarIcon: ({ color, size }) => (
+                <SearchIcon size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="Recs"
+            component={Screen("Recomendaciones")}
+            options={{
+              title: "Recs",
+              headerTitle: "Recomendaciones",
+              tabBarIcon: ({ color, size }) => (
+                <StarIcon size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="Itinerario"
+            component={Builder}
+            options={{
+              title: "Itinerario",
+              headerTitle: "Mi Itinerario",
+              tabBarIcon: ({ color, size }) => (
+                <MapIcon size={size} color={color} />
+              ),
+            }}
+          />
+          <Tabs.Screen
+            name="Perfil"
+            component={Screen("Perfil")}
+            options={{
+              title: "Perfil",
+              headerTitle: "Mi Perfil",
+              tabBarIcon: ({ color, size }) => (
+                <UserIcon size={size} color={color} />
+              ),
+            }}
+          />
         </Tabs.Navigator>
       ) : (
-        <Stack.Navigator>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: colors.neutral.white },
+          }}
+        >
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Register" component={Register} />
         </Stack.Navigator>
