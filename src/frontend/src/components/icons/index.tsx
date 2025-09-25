@@ -37,7 +37,7 @@ export const SearchIcon = ({ size = 24, color = "#000" }: IconProps) => (
       strokeLinejoin="round"
     />
     <Path
-      d="21 21L16.65 16.65"
+      d="M21 21L16.65 16.65"
       stroke={color}
       strokeWidth="2"
       strokeLinecap="round"
@@ -174,7 +174,7 @@ export const MailIcon = ({ size = 24, color = "#000" }: IconProps) => (
       strokeLinejoin="round"
     />
     <Path
-      d="L22 6L12 13L2 6"
+      d="M22 6L12 13L2 6"
       stroke={color}
       strokeWidth="2"
       strokeLinecap="round"

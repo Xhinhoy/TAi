@@ -1,6 +1,7 @@
 ﻿import React, { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import RootNav from "./navigation";
+import { PreferencesProvider } from "./contexts/PreferencesContext";
 
 const client = new QueryClient();
 
@@ -11,7 +12,9 @@ export default function App() {
 
   return (
     <QueryClientProvider client={client}>
-      <RootNav />
+      <PreferencesProvider>
+        <RootNav />
+      </PreferencesProvider>
     </QueryClientProvider>
   );
 }
