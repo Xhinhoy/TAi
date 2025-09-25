@@ -10,7 +10,10 @@
       "Bash(findstr:*)",
       "Bash(tasklist)",
       "Bash(taskkill:*)",
-      "Bash(npx kill-port:*)"
+      "Bash(npx kill-port:*)",
+      "Bash(timeout:*)",
+      "Bash(npx tsc:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []

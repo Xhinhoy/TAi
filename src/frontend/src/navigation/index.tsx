@@ -9,6 +9,8 @@ import Login from "../screens/Auth/Login";
 import Register from "../screens/Auth/Register";
 import Search from "../screens/Search/Search";
 import Builder from "../screens/Itinerary/Builder";
+import Profile from "../screens/Profile/Profile";
+import Home from "../screens/Home/Home";
 import { HomeIcon, SearchIcon, StarIcon, MapIcon, UserIcon } from "../components/icons";
 import { colors } from "../styles/colors";
 import { commonStyles } from "../styles/common";
@@ -73,10 +75,10 @@ export default function RootNav() {
         >
           <Tabs.Screen
             name="Home"
-            component={Screen("Inicio")}
+            component={Home}
             options={{
               title: "Inicio",
-              headerTitle: "TAi",
+              headerShown: false,
               tabBarIcon: ({ color, size }) => (
                 <HomeIcon size={size} color={color} />
               ),
@@ -117,10 +119,10 @@ export default function RootNav() {
           />
           <Tabs.Screen
             name="Perfil"
-            component={Screen("Perfil")}
+            component={Profile}
             options={{
               title: "Perfil",
-              headerTitle: "Mi Perfil",
+              headerShown: false,
               tabBarIcon: ({ color, size }) => (
                 <UserIcon size={size} color={color} />
               ),
