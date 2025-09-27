@@ -1,60 +1,111 @@
-import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, SafeAreaView, Pressable, Alert, ActivityIndicator } from 'react-native';
-import InterestTile from '../../components/InterestTile';
-import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../services/firebase';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, SafeAreaView, Pressable, ActivityIndicator } from 'react-native';
+import InterestSelector from '../../components/ui/InterestSelector';
+import { InterestKey } from '../../constants/interests';
+import { usePreferences } from '../../contexts/PreferencesContext';
 import { useAuth } from '../../hooks/useAuth';
-
-const INTERESTS = [
-  { id: 'museos', label: 'Museos' },
-  { id: 'restaurantes', label: 'Restaurantes' },
-  { id: 'parques', label: 'Parques' },
-  { id: 'miradores', label: 'Miradores' },
-  { id: 'senderismo', label: 'Senderismo' },
-  { id: 'vida-nocturna', label: 'Vida nocturna' },
-  { id: 'bares', label: 'Bares' },
-  { id: 'playa', label: 'Playas' },
-  { id: 'historia', label: 'Historia' },
-  { id: 'arte-urbano', label: 'Arte urbano' },
-  { id: 'compras', label: 'Compras' },
-  { id: 'deportes', label: 'Deportes' },
-];
+import { theme } from '../../styles/theme';
+import { useLogger } from '../../utils/logger';
+import DebugOverlay from '../../components/dev/DebugOverlay';
 
 export default function InterestOnboarding({ navigation }: any) {
+  const logger = useLogger('InterestOnboarding');
   const { user } = useAuth();
-  const [selected, setSelected] = useState<string[]>([]);
+  const { preferences, updateInterests, loading } = usePreferences();
+  const [selected, setSelected] = useState<InterestKey[]>([]);
   const [saving, setSaving] = useState(false);
 
-  const toggle = (id: string) => {
-    setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  logger.info('component render', {
+    userExists: !!user,
+    userId: user?.uid,
+    preferencesLoading: loading,
+    currentInterests: preferences.interests,
+    selectedCount: selected.length,
+    selected,
+    saving
+  });
+
+  useEffect(() => {
+    // Cargar intereses existentes del usuario
+    logger.debug('useEffect preferences.interests', {
+      preferencesInterests: preferences.interests,
+      currentSelected: selected
+    });
+
+    if (preferences.interests) {
+      const interestsArray = preferences.interests as InterestKey[];
+      logger.info('loading existing interests', {
+        fromPreferences: interestsArray,
+        settingSelected: true
+      });
+      setSelected(interestsArray);
+    }
+  }, [preferences.interests]);
+
+  const handleInterestChange = (interests: InterestKey[]) => {
+    logger.info('handleInterestChange', {
+      oldSelected: selected,
+      newInterests: interests,
+      changeType: interests.length > selected.length ? 'added' : 'removed'
+    });
+
+    setSelected(interests);
+
+    logger.info('setSelected called', {
+      newSelected: interests
+    });
   };
 
   const onContinue = async () => {
+    logger.info('onContinue started', {
+      userExists: !!user,
+      selectedCount: selected.length,
+      selected,
+      minimumRequired: 3
+    });
+
     if (!user) {
-      Alert.alert('Sesión', 'Debes iniciar sesión.');
+      logger.warn('onContinue aborted - no user', { user });
       return;
     }
     if (selected.length < 3) {
-      Alert.alert('Selecciona intereses', 'Elige al menos 3 intereses para continuar.');
+      logger.warn('onContinue aborted - insufficient interests', {
+        selectedCount: selected.length,
+        required: 3
+      });
       return;
     }
-    try {
-      setSaving(true);
-      // guarda en Firestore
-      await updateDoc(doc(db, 'users', user.uid), {
-        interests: selected,
-        updatedAt: serverTimestamp(),
-      });
 
-      // navega al stack autenticado principal
+    try {
+      logger.info('starting save process', { selected });
+      setSaving(true);
+
+      logger.info('calling updateInterests', { selected });
+      await updateInterests(selected);
+      logger.info('updateInterests completed successfully');
+
+      // Navegar al stack principal
+      logger.info('navigating to MainTabs');
       navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
-    } catch (e: any) {
-      console.error('onContinue error:', e);
-      Alert.alert('Error', e?.message ?? 'No se pudieron guardar tus intereses.');
+      logger.info('navigation completed');
+    } catch (error) {
+      logger.error('Error saving interests', error, { selected });
     } finally {
       setSaving(false);
+      logger.info('saving state reset to false');
     }
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={theme.colors.primary.main} />
+          <Text style={styles.loadingText}>Cargando tus preferencias...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -65,21 +116,10 @@ export default function InterestOnboarding({ navigation }: any) {
         </Text>
       </View>
 
-      <FlatList
-        data={INTERESTS}
-        keyExtractor={(i) => i.id}
-        numColumns={2}
-        columnWrapperStyle={{ gap: 12 }}
-        contentContainerStyle={{ padding: 16, gap: 12 }}
-        renderItem={({ item }) => (
-          <View style={{ flex: 1 }}>
-            <InterestTile
-              label={item.label}
-              selected={selected.includes(item.id)}
-              onPress={() => toggle(item.id)}
-            />
-          </View>
-        )}
+      <InterestSelector
+        selected={selected}
+        onChange={handleInterestChange}
+        testID="onboarding-interest-selector"
       />
 
       <View style={styles.footer}>
@@ -90,21 +130,73 @@ export default function InterestOnboarding({ navigation }: any) {
             styles.btn,
             (saving || selected.length < 3) && styles.btnDisabled
           ]}
+          testID="continue-button"
         >
-          {saving ? <ActivityIndicator /> : <Text style={styles.btnText}>Continuar</Text>}
+          {saving ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.btnText}>Continuar</Text>
+          )}
         </Pressable>
       </View>
+
+      <DebugOverlay />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: '#fff' },
-  header: { paddingHorizontal: 20, paddingTop: 24 },
-  title: { fontSize: 24, fontWeight: '700', color: '#111827' },
-  subtitle: { marginTop: 6, fontSize: 14, color: '#6b7280' },
-  footer: { padding: 16, borderTopWidth: 1, borderTopColor: '#e5e7eb' },
-  btn: { backgroundColor: '#2563eb', paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
-  btnDisabled: { opacity: 0.45 },
-  btnText: { color: '#fff', fontWeight: '600', fontSize: 16 },
+  safe: {
+    flex: 1,
+    backgroundColor: theme.colors.background.primary
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.xl,
+  },
+  loadingText: {
+    marginTop: theme.spacing.md,
+    fontSize: theme.typography.fontSizes.base,
+    color: theme.colors.text.secondary,
+  },
+  header: {
+    paddingHorizontal: theme.spacing.xl,
+    paddingTop: theme.spacing.xl,
+    paddingBottom: theme.spacing.md,
+  },
+  title: {
+    fontSize: theme.typography.fontSizes['3xl'],
+    fontWeight: theme.typography.fontWeights.bold,
+    color: theme.colors.text.primary,
+  },
+  subtitle: {
+    marginTop: theme.spacing.sm,
+    fontSize: theme.typography.fontSizes.sm,
+    color: theme.colors.text.secondary,
+    lineHeight: theme.typography.lineHeights.relaxed * theme.typography.fontSizes.sm,
+  },
+  footer: {
+    padding: theme.spacing.xl,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border.primary,
+    backgroundColor: theme.colors.surface.primary,
+  },
+  btn: {
+    backgroundColor: theme.colors.primary.main,
+    paddingVertical: theme.spacing.md,
+    borderRadius: theme.radius.md,
+    alignItems: 'center',
+    ...theme.shadows.sm,
+  },
+  btnDisabled: {
+    opacity: 0.6,
+    backgroundColor: theme.colors.neutral[300],
+  },
+  btnText: {
+    color: theme.colors.neutral.white,
+    fontWeight: theme.typography.fontWeights.semiBold,
+    fontSize: theme.typography.fontSizes.base,
+  },
 });

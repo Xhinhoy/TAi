@@ -8,6 +8,9 @@ import {
 } from 'firebase/firestore';
 import { onAuthStateChanged, User as FirebaseUser } from 'firebase/auth';
 import { auth, db } from '../services/firebase';
+import { mapFirebaseErrorToEs } from '../utils/mapFirebaseErrorToEs';
+import { useErrorNotice } from './useErrorNotice';
+import { useLogger } from '../utils/logger';
 
 export interface UserPreferences {
   interests: string[];
@@ -56,10 +59,20 @@ const DEFAULT_PREFERENCES: UserPreferences = {
 const PREFERENCES_STORAGE_KEY = '@tai_user_preferences';
 
 export const useUserPreferences = () => {
+  const logger = useLogger('useUserPreferences');
   const [preferences, setPreferences] = useState<UserPreferences>(DEFAULT_PREFERENCES);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const { showError, showSuccess } = useErrorNotice();
+
+  logger.debug('hook state', {
+    preferencesInterests: preferences.interests,
+    loading,
+    userExists: !!user,
+    userId: user?.uid,
+    error
+  });
 
   // Initialize preferences from storage and Firebase
   useEffect(() => {
@@ -103,7 +116,9 @@ export const useUserPreferences = () => {
       },
       (error) => {
         console.error('Error listening to preferences:', error);
-        setError('Error al cargar las preferencias');
+        const errorMessage = mapFirebaseErrorToEs(error);
+        setError(errorMessage);
+        showError(errorMessage);
         setLoading(false);
       }
     );
@@ -150,9 +165,11 @@ export const useUserPreferences = () => {
         setPreferences(firebasePrefs);
         await savePreferencesToStorage(firebasePrefs);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error loading preferences from Firebase:', error);
-      setError('Error al cargar las preferencias del servidor');
+      const errorMessage = mapFirebaseErrorToEs(error);
+      setError(errorMessage);
+      showError(errorMessage);
       // Fallback to local storage
       await loadPreferencesFromStorage();
     } finally {
@@ -161,15 +178,29 @@ export const useUserPreferences = () => {
   };
 
   const updatePreferences = async (updates: Partial<UserPreferences>) => {
+    logger.info('updatePreferences called', {
+      updates,
+      currentPreferences: preferences,
+      userExists: !!user,
+      userId: user?.uid
+    });
+
     const newPreferences = { ...preferences, ...updates };
+    logger.info('calculated newPreferences', { newPreferences });
+
+    // Optimistic update
     setPreferences(newPreferences);
+    logger.info('setPreferences called with newPreferences');
 
     try {
       // Save to local storage immediately
+      logger.info('saving to local storage');
       await savePreferencesToStorage(newPreferences);
+      logger.info('local storage save completed');
 
       // Save to Firebase if user is authenticated
       if (user) {
+        logger.info('user authenticated, saving to Firebase', { userId: user.uid });
         const userDocRef = doc(db, 'users', user.uid);
         const updateData: any = {
           interests: newPreferences.interests,
@@ -183,27 +214,44 @@ export const useUserPreferences = () => {
           updateData.preferences = preferencesWithoutInterests;
         }
 
+        logger.info('Firebase updateData', { updateData });
         await updateDoc(userDocRef, updateData);
+        logger.info('Firebase update completed successfully');
+      } else {
+        logger.warn('user not authenticated, skipping Firebase save');
       }
 
       setError(null);
-    } catch (error) {
-      console.error('Error updating preferences:', error);
-      setError('Error al guardar las preferencias');
+      logger.info('updatePreferences completed successfully');
+    } catch (error: any) {
+      logger.error('updatePreferences failed', error, { updates, newPreferences });
+      const errorMessage = mapFirebaseErrorToEs(error);
+      setError(errorMessage);
+      showError(errorMessage);
 
       // Revert optimistic update
+      logger.info('reverting optimistic update', { revertingTo: preferences });
       setPreferences(preferences);
       throw error;
     }
   };
 
   const updateInterests = async (interests: string[]) => {
-    console.log('useUserPreferences - updateInterests called with:', interests);
+    logger.info('updateInterests called', {
+      interests,
+      currentPreferencesInterests: preferences.interests,
+      userExists: !!user,
+      userId: user?.uid
+    });
+
     try {
+      logger.info('calling updatePreferences', { interests });
       await updatePreferences({ interests });
-      console.log('useUserPreferences - updateInterests completed successfully');
+      logger.info('updatePreferences completed, showing success');
+      showSuccess('Intereses guardados correctamente');
+      logger.info('updateInterests completed successfully');
     } catch (error) {
-      console.error('useUserPreferences - updateInterests error:', error);
+      logger.error('updateInterests failed', error, { interests });
       throw error;
     }
   };

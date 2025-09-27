@@ -65,6 +65,62 @@ El proyecto se organiza en 3 fases:
 
 ---
 
+## Registro de Usuario con Email/Contraseña
+
+### Configuración Inicial
+
+1. **Variables de entorno:** Copia `.env.example` a `.env` y completa con tus credenciales de Firebase
+2. **Firebase Console:**
+   - Crea un proyecto en [Firebase Console](https://console.firebase.google.com/)
+   - Habilita **Authentication > Sign-in method > Email/Password**
+   - Crea una base de datos **Firestore**
+   - Aplica las reglas de seguridad desde `firestore.rules`
+3. **Instalación:** `cd src/frontend && npm install`
+4. **Ejecutar:** `npm start`
+
+### Funcionalidades Implementadas
+
+- ✅ **Registro completo** con validación en tiempo real
+- ✅ **Medidor de fuerza de contraseña** con criterios específicos
+- ✅ **Validación con Zod** (email, contraseña, confirmación, términos)
+- ✅ **Manejo de errores** localizados al español
+- ✅ **Bootstrap automático** de perfil en Firestore
+- ✅ **Navegación post-registro** hacia onboarding o home
+- ✅ **UI accesible** con labels, roles y hints
+- ✅ **Tests unitarios e integración** con Jest
+
+### Flujo de Usuario
+
+1. **Registro:** Email + contraseña + aceptar términos
+2. **Validación:** Cumplir criterios de seguridad (8+ chars, mayús/minús, número, especial)
+3. **Creación:** Usuario en Firebase Auth + perfil en Firestore
+4. **Redirección:** A selección de intereses o pantalla principal
+
+### Pruebas
+
+```bash
+# Tests unitarios (esquemas, validaciones)
+npm test tests/unit/auth.test.ts
+
+# Tests de integración (componente Register)
+npm test tests/integration/register.test.tsx
+```
+
+### Emuladores Firebase (Desarrollo)
+
+```bash
+# Instalar CLI de Firebase
+npm install -g firebase-tools
+
+# Inicializar emuladores
+firebase init emulators
+
+# Ejecutar emuladores locales
+firebase emulators:start
+```
+
+---
+
 ## Evidencias
 - [Documentos de definición y rúbricas](./docs)
 - [Plan de trabajo y carta Gantt](./project)

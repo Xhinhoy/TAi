@@ -41,8 +41,11 @@ import {
 
 // Import Firebase services
 import { auth, db } from '../../services/firebase';
-import InterestSelector, { TOURIST_INTERESTS } from '../../components/ui/InterestSelector';
+import InterestSelector from '../../components/ui/InterestSelector';
+import { INTERESTS, InterestKey } from '../../constants/interests';
 import { usePreferences } from '../../contexts/PreferencesContext';
+import { theme as appTheme } from '../../styles/theme';
+import InterestTag from '../../components/InterestTag';
 
 // TypeScript interfaces
 interface UserProfileDoc {
@@ -196,14 +199,14 @@ const ProfileScreen: React.FC = () => {
   const [editLanguage, setEditLanguage] = useState('');
   const [editTimezone, setEditTimezone] = useState('');
   const [interestsModalVisible, setInterestsModalVisible] = useState(false);
-  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<InterestKey[]>([]);
 
   // Use centralized preferences system
   const { preferences, updateInterests } = usePreferences();
 
   // Sync selectedInterests with preferences.interests
   useEffect(() => {
-    setSelectedInterests(preferences.interests);
+    setSelectedInterests(preferences.interests as InterestKey[]);
   }, [preferences.interests]);
 
   useEffect(() => {
@@ -275,15 +278,9 @@ const ProfileScreen: React.FC = () => {
     }
   };
 
-  const handleInterestToggle = (interestId: string) => {
-    console.log('Toggling interest:', interestId);
-    setSelectedInterests(prev => {
-      const updated = prev.includes(interestId)
-        ? prev.filter(id => id !== interestId)
-        : [...prev, interestId];
-      console.log('Updated selectedInterests:', updated);
-      return updated;
-    });
+  const handleInterestChange = (interests: InterestKey[]) => {
+    console.log('Interests changed to:', interests);
+    setSelectedInterests(interests);
   };
 
   const handleSaveInterests = async () => {
@@ -422,19 +419,17 @@ const ProfileScreen: React.FC = () => {
             {preferences.interests && preferences.interests.length > 0 ? (
               <View style={styles.interestsPreview}>
                 <View style={styles.selectedInterestsGrid}>
-                  {preferences.interests.slice(0, 6).map((interestId) => {
-                    const interest = TOURIST_INTERESTS.find(i => i.id === interestId);
+                  {preferences.interests.slice(0, 6).map((interestKey) => {
+                    const interest = INTERESTS.find(i => i.key === interestKey);
                     if (!interest) return null;
 
                     return (
-                      <View key={interestId} style={styles.interestBadge}>
-                        <MaterialCommunityIcons
-                          name={interest.icon as any}
-                          size={16}
-                          color={theme.colors.primary.main}
-                        />
-                        <Text style={styles.interestBadgeText}>{interest.name}</Text>
-                      </View>
+                      <InterestTag
+                        key={interestKey}
+                        label={interest.label}
+                        selected={true}
+                        testID={`profile-interest-${interestKey}`}
+                      />
                     );
                   })}
                   {preferences.interests.length > 6 && (
@@ -611,9 +606,9 @@ const ProfileScreen: React.FC = () => {
 
             <View style={styles.interestsModalBody}>
               <InterestSelector
-                selectedInterests={selectedInterests}
-                onInterestToggle={handleInterestToggle}
-                showCategories={true}
+                selected={selectedInterests}
+                onChange={handleInterestChange}
+                testID="profile-interest-selector"
               />
             </View>
 
@@ -627,7 +622,7 @@ const ProfileScreen: React.FC = () => {
                 <Pressable
                   style={[styles.interestsModalButton, styles.interestsModalButtonSecondary]}
                   onPress={() => {
-                    setSelectedInterests(preferences.interests);
+                    setSelectedInterests(preferences.interests as InterestKey[]);
                     setInterestsModalVisible(false);
                   }}
                 >

@@ -38,8 +38,9 @@ import { auth, db } from '../../services/firebase';
 import { theme } from '../../styles/theme';
 import { AnimatedPressable } from '../../components/ui/AnimatedPressable';
 import { usePreferences } from '../../contexts/PreferencesContext';
+import { INTERESTS, InterestKey } from '../../constants/interests';
+import InterestTag from '../../components/InterestTag';
 import { recommendationsService, PlaceRecommendation } from '../../services/recommendations.service';
-import { TOURIST_INTERESTS } from '../../components/ui/InterestSelector';
 
 // TypeScript interfaces
 
@@ -58,88 +59,6 @@ interface Favorite {
   placeId: string;
   createdAt: Timestamp;
 }
-
-
-// Use the same tourist interests system as in the profile
-const getDisplayableInterests = (userInterests: string[]) => {
-  return TOURIST_INTERESTS.filter(interest => userInterests.includes(interest.id));
-};
-
-// Components for displaying user interests
-interface InterestBadgeProps {
-  interest: typeof TOURIST_INTERESTS[0];
-}
-
-const InterestBadge: React.FC<InterestBadgeProps> = ({ interest }) => {
-  return (
-    <View style={styles.interestBadge}>
-      <MaterialCommunityIcons
-        name={interest.icon as any}
-        size={16}
-        color={theme.colors.primary.main}
-      />
-      <Text style={styles.interestBadgeText}>{interest.name}</Text>
-    </View>
-  );
-};
-
-interface RecommendationCardProps {
-  recommendation: PlaceRecommendation;
-  onPress: () => void;
-}
-
-const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation, onPress }) => {
-  const getPriceText = (priceLevel?: number) => {
-    if (!priceLevel) return 'Precio no disponible';
-    return '€'.repeat(priceLevel) + '€'.repeat(4 - priceLevel);
-  };
-
-  return (
-    <AnimatedPressable
-      style={styles.recommendationCard}
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`Recommendation for ${recommendation.name}`}
-    >
-      <View style={styles.recommendationContent}>
-        <View style={styles.recommendationHeader}>
-          <Text style={styles.recommendationName} numberOfLines={1}>
-            {recommendation.name}
-          </Text>
-          <View style={styles.recommendationRating}>
-            <MaterialCommunityIcons
-              name="star"
-              size={14}
-              color="#FFD700"
-            />
-            <Text style={styles.ratingText}>{recommendation.rating.toFixed(1)}</Text>
-          </View>
-        </View>
-
-        <Text style={styles.recommendationDescription} numberOfLines={2}>
-          {recommendation.description}
-        </Text>
-
-        <View style={styles.recommendationFooter}>
-          <Text style={styles.recommendationReason} numberOfLines={1}>
-            {recommendation.reason}
-          </Text>
-          {recommendation.priceLevel && (
-            <Text style={styles.priceLevel}>
-              {getPriceText(recommendation.priceLevel)}
-            </Text>
-          )}
-        </View>
-
-        <View style={styles.matchScoreBadge}>
-          <Text style={styles.matchScoreText}>
-            {Math.round(recommendation.matchScore * 100)}% match
-          </Text>
-        </View>
-      </View>
-    </AnimatedPressable>
-  );
-};
 
 interface CardItinerarioProps {
   itinerary: Itinerary;
@@ -201,7 +120,6 @@ const HomeScreen: React.FC = () => {
   const [user, setUser] = useState<FirebaseUser | null>(null);
   const [itineraries, setItineraries] = useState<Itinerary[]>([]);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
-  const [recommendations, setRecommendations] = useState<PlaceRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Use new preferences system
@@ -220,20 +138,6 @@ const HomeScreen: React.FC = () => {
     return unsubscribeAuth;
   }, []);
 
-  // Generate recommendations when preferences change
-  useEffect(() => {
-    const generateRecommendations = async () => {
-      try {
-        const recs = await recommendationsService.generateRecommendations(preferences);
-        setRecommendations(recs);
-      } catch (error) {
-        console.error('Error generating recommendations:', error);
-        setRecommendations([]);
-      }
-    };
-
-    generateRecommendations();
-  }, [preferences.interests]);
 
   const setupUserData = async (user: FirebaseUser) => {
     try {
@@ -354,9 +258,26 @@ const HomeScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>Tus intereses turísticos</Text>
           {preferences.interests.length > 0 ? (
             <View style={styles.interestsGrid}>
-              {getDisplayableInterests(preferences.interests).map((interest) => (
-                <InterestBadge key={interest.id} interest={interest} />
-              ))}
+              {preferences.interests.slice(0, 6).map((interestKey) => {
+                const interest = INTERESTS.find(i => i.key === interestKey);
+                if (!interest) return null;
+
+                return (
+                  <InterestTag
+                    key={interestKey}
+                    label={interest.label}
+                    selected={true}
+                    testID={`home-interest-${interestKey}`}
+                  />
+                );
+              })}
+              {preferences.interests.length > 6 && (
+                <View style={styles.moreInterestsBadge}>
+                  <Text style={styles.moreInterestsText}>
+                    +{preferences.interests.length - 6} más
+                  </Text>
+                </View>
+              )}
             </View>
           ) : (
             <View style={styles.noInterestsHome}>
@@ -367,45 +288,6 @@ const HomeScreen: React.FC = () => {
               />
               <Text style={styles.noInterestsText}>
                 Ve a tu perfil para seleccionar tus intereses turísticos
-              </Text>
-            </View>
-          )}
-        </View>
-
-        {/* Personalized Recommendations */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Recomendaciones para ti</Text>
-          {recommendations.length > 0 ? (
-            <>
-              <Text style={styles.recommendationsSubtitle}>
-                Basado en tus intereses turísticos seleccionados
-              </Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                style={styles.horizontalList}
-              >
-                {recommendations.map((recommendation) => (
-                  <RecommendationCard
-                    key={recommendation.id}
-                    recommendation={recommendation}
-                    onPress={() => console.log('Open recommendation:', recommendation.id)}
-                  />
-                ))}
-              </ScrollView>
-            </>
-          ) : (
-            <View style={styles.noRecommendations}>
-              <MaterialCommunityIcons
-                name="heart-outline"
-                size={48}
-                color={theme.colors.text.tertiary}
-              />
-              <Text style={styles.noRecommendationsTitle}>
-                Selecciona tus intereses
-              </Text>
-              <Text style={styles.noRecommendationsSubtitle}>
-                Ve a tu perfil y elige tus preferencias turísticas para obtener recomendaciones personalizadas
               </Text>
             </View>
           )}
@@ -611,23 +493,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.lg,
     marginHorizontal: -theme.spacing.xs,
   },
-  interestBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: theme.colors.primary[50],
+  moreInterestsBadge: {
+    backgroundColor: theme.colors.neutral[100],
     borderRadius: theme.radius.full,
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.sm,
-    marginHorizontal: theme.spacing.xs,
-    marginBottom: theme.spacing.sm,
-    borderWidth: 1,
-    borderColor: theme.colors.primary.main,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    margin: theme.spacing.xs,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  interestBadgeText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: theme.colors.primary.main,
-    marginLeft: theme.spacing.xs,
+  moreInterestsText: {
+    fontSize: theme.typography.fontSizes.sm,
+    color: theme.colors.text.secondary,
+    fontWeight: theme.typography.fontWeights.medium,
   },
   noInterestsHome: {
     alignItems: 'center',

@@ -1,0 +1,106 @@
+// Reglas de seguridad para Cloud Firestore
+// TAi - Generador Inteligente de Itinerarios Turísticos
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ====================
+    // COLECCIÓN USERS
+    // ====================
+
+    // Reglas para documentos de usuarios
+    match /users/{userId} {
+      // Lectura: Solo el propietario puede leer su propio documento
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Creación: Solo usuarios autenticados pueden crear su propio documento
+      // durante el registro inicial
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && isValidUserCreation(request.resource.data);
+
+      // Actualización: Solo el propietario puede actualizar ciertos campos
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && isValidUserUpdate(request.resource.data, resource.data);
+
+      // Eliminación: Denegada por ahora (se puede implementar según necesidades)
+      allow delete: if false;
+    }
+
+    // ====================
+    // COLECCIÓN ITINERARIOS (futuro)
+    // ====================
+
+    // Reglas para itinerarios de usuarios
+    match /itineraries/{itineraryId} {
+      // Solo el propietario puede leer/escribir sus itinerarios
+      allow read, write: if request.auth != null
+        && request.auth.uid == resource.data.userId;
+
+      // Creación de nuevos itinerarios
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.userId;
+    }
+
+    // ====================
+    // FUNCIONES DE VALIDACIÓN
+    // ====================
+
+    // Validación para creación inicial de usuario
+    function isValidUserCreation(data) {
+      return data.keys().hasAll(['email', 'role', 'status', 'createdAt'])
+        && data.role == 'user'
+        && data.status == 'active'
+        && data.email is string
+        && data.email.size() > 0
+        && data.email.size() <= 254
+        && (
+          !data.keys().hasAny(['displayName'])
+          || (data.displayName is string && data.displayName.size() <= 50)
+        )
+        && (
+          !data.keys().hasAny(['interests'])
+          || (data.interests is list && data.interests.size() <= 20)
+        )
+        && (
+          !data.keys().hasAny(['preferences'])
+          || data.preferences is map
+        );
+    }
+
+    // Validación para actualización de usuario
+    function isValidUserUpdate(newData, currentData) {
+      // Campos que NO se pueden modificar después de la creación
+      let immutableFields = ['email', 'role', 'status', 'createdAt'];
+
+      // Verificar que los campos inmutables no han cambiado
+      return immutableFields.toSet().isDisjointFrom(
+        newData.diff(currentData).affectedKeys()
+      )
+      // Validar campos modificables
+      && (
+        !newData.keys().hasAny(['displayName'])
+        || (newData.displayName is string && newData.displayName.size() <= 50)
+      )
+      && (
+        !newData.keys().hasAny(['interests'])
+        || (newData.interests is list && newData.interests.size() <= 20)
+      )
+      && (
+        !newData.keys().hasAny(['preferences'])
+        || newData.preferences is map
+      );
+    }
+
+    // ====================
+    // REGLAS POR DEFECTO
+    // ====================
+
+    // Denegar acceso a cualquier otra colección no especificada
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
