@@ -15,6 +15,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { ensureUserProfile } from '../../utils/profile';
+import { serverTimestamp } from 'firebase/firestore';
 
 // Firebase imports - SDK modular v9+
 import {
@@ -218,46 +220,34 @@ const ProfileScreen: React.FC = () => {
   }, []);
 
   const setupUserData = async (user: FirebaseUser) => {
-    try {
-      // Setup profile document
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
+  try {
+    // 1) Normaliza/crea el perfil con defaults consistentes
+    await ensureUserProfile({
+      uid: user.uid,
+      email: user.email || "",
+      displayName: user.displayName,
+      language: "es",
+      location: "Santiago",
+      timezone: "America/Santiago",
+    });
 
-      let profileData: UserProfileDoc;
-      if (!userDoc.exists()) {
-        // Create initial profile - only include photoURL if it exists
-        profileData = {
-          uid: user.uid,
-          displayName: user.displayName || 'Usuario',
-          email: user.email || '',
-          location: 'Santiago, Providencia',
-          language: 'es',
-          timezone: 'America/Santiago',
-          interests: [],
-          createdAt: Timestamp.now(),
-        };
+    // 2) Ahora lee el documento ya normalizado
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
 
-        // Only add photoURL if it exists and is not null/undefined
-        if (user.photoURL) {
-          profileData.photoURL = user.photoURL;
-        }
+    const profileData = userDoc.data() as any;
+    setProfile(profileData);
+    setEditLocation(profileData.location);
+    setEditLanguage(profileData.language);
+    setEditTimezone(profileData.timezone);
+    setSelectedInterests(profileData.interests || []);
 
-        await setDoc(userDocRef, profileData);
-      } else {
-        profileData = userDoc.data() as UserProfileDoc;
-      }
-      setProfile(profileData);
-      setEditLocation(profileData.location);
-      setEditLanguage(profileData.language);
-      setEditTimezone(profileData.timezone);
-      setSelectedInterests(profileData.interests || []);
-
-      setLoading(false);
-    } catch (error) {
-      console.error('Error setting up user data:', error);
-      setLoading(false);
-    }
-  };
+    setLoading(false);
+  } catch (error) {
+    console.error('Error setting up user data:', error);
+    setLoading(false);
+  }
+};
 
 
   const handleEditProfile = async () => {
