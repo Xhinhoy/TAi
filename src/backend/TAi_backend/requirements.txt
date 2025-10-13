@@ -1,0 +1,26 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+
+# LangChain y LLM (solo Groq)
+langchain
+langchain-groq
+
+# Firebase
+firebase-admin
+
+# APIs externas
+googlemaps
+requests
+
+# Utils
+python-dotenv
+python-jose[cryptography]
+python-multipart
+aiofiles
+
+# Testing
+pytest
+pytest-asyncio
+httpx
