@@ -4,12 +4,14 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Alert,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
   ScrollView
 } from "react-native";
-import { useAuth } from "../../hooks/useAuth";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../services/firebase";
 import { MailIcon, LockIcon, EyeIcon, EyeOffIcon } from "../../components/icons";
 import { colors } from "../../styles/colors";
 import { commonStyles } from "../../styles/common";
@@ -18,8 +20,8 @@ export default function Login({ navigation }: any) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
-  const { signInWithEmail, loading } = useAuth();
 
   const validateForm = () => {
     const newErrors = { email: "", password: "" };
@@ -48,11 +50,21 @@ export default function Login({ navigation }: any) {
   const onLogin = async () => {
     if (!validateForm()) return;
 
+    setLoading(true);
     try {
-      await signInWithEmail(email, password);
-      // El error/éxito ya se maneja en useAuth con notificaciones
-    } catch (error: any) {
-      // El error ya se maneja en useAuth con notificaciones
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+
+      if (!userCred.user.emailVerified) {
+        Alert.alert("Correo no verificado", "Revisa tu bandeja de entrada y confirma tu correo antes de ingresar.");
+        return;
+      }
+
+      Alert.alert("Bienvenido", `Hola ${userCred.user.displayName || "usuario"}`);
+      navigation.replace("Home");
+    } catch (e: any) {
+      Alert.alert("Error en login", e.message);
+    } finally {
+      setLoading(false);
     }
   };
 

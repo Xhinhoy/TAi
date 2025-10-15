@@ -1,0 +1,28 @@
+# Environment
+.env
+.venv/
+test/
+pytest.ini
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+waszxqw3ewsdawqefdsweqertfgrewsdvb nb-ountKey.json
+proyectotai-cb31a-firebase-adminsdk-fbsvc-ecc5309b12.json
+test.json
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/_Ñlkiop
+.coverage
+htmlcov/
+
+# Logs
+*.log
+logs/
+

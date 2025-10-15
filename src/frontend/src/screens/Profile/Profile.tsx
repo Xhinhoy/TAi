@@ -15,8 +15,6 @@ import {
   Dimensions,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { ensureUserProfile } from '../../utils/profile';
-import { serverTimestamp } from 'firebase/firestore';
 
 // Firebase imports - SDK modular v9+
 import {
@@ -41,11 +39,8 @@ import {
 
 // Import Firebase services
 import { auth, db } from '../../services/firebase';
-import InterestSelector from '../../components/ui/InterestSelector';
-import { INTERESTS, InterestKey } from '../../constants/interests';
+import InterestSelector, { TOURIST_INTERESTS } from '../../components/ui/InterestSelector';
 import { usePreferences } from '../../contexts/PreferencesContext';
-import { theme as appTheme } from '../../styles/theme';
-import InterestTag from '../../components/InterestTag';
 
 // TypeScript interfaces
 interface UserProfileDoc {
@@ -199,14 +194,14 @@ const ProfileScreen: React.FC = () => {
   const [editLanguage, setEditLanguage] = useState('');
   const [editTimezone, setEditTimezone] = useState('');
   const [interestsModalVisible, setInterestsModalVisible] = useState(false);
-  const [selectedInterests, setSelectedInterests] = useState<InterestKey[]>([]);
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
   // Use centralized preferences system
   const { preferences, updateInterests } = usePreferences();
 
   // Sync selectedInterests with preferences.interests
   useEffect(() => {
-    setSelectedInterests(preferences.interests as InterestKey[]);
+    setSelectedInterests(preferences.interests);
   }, [preferences.interests]);
 
   useEffect(() => {
@@ -223,34 +218,46 @@ const ProfileScreen: React.FC = () => {
   }, []);
 
   const setupUserData = async (user: FirebaseUser) => {
-  try {
-    // 1) Normaliza/crea el perfil con defaults consistentes
-    await ensureUserProfile({
-      uid: user.uid,
-      email: user.email || "",
-      displayName: user.displayName,
-      language: "es",
-      location: "Santiago",
-      timezone: "America/Santiago",
-    });
+    try {
+      // Setup profile document
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
 
-    // 2) Ahora lee el documento ya normalizado
-    const userDocRef = doc(db, 'users', user.uid);
-    const userDoc = await getDoc(userDocRef);
+      let profileData: UserProfileDoc;
+      if (!userDoc.exists()) {
+        // Create initial profile - only include photoURL if it exists
+        profileData = {
+          uid: user.uid,
+          displayName: user.displayName || 'Usuario',
+          email: user.email || '',
+          location: 'Santiago, Providencia',
+          language: 'es',
+          timezone: 'America/Santiago',
+          interests: [],
+          createdAt: Timestamp.now(),
+        };
 
-    const profileData = userDoc.data() as any;
-    setProfile(profileData);
-    setEditLocation(profileData.location);
-    setEditLanguage(profileData.language);
-    setEditTimezone(profileData.timezone);
-    setSelectedInterests(profileData.interests || []);
+        // Only add photoURL if it exists and is not null/undefined
+        if (user.photoURL) {
+          profileData.photoURL = user.photoURL;
+        }
 
-    setLoading(false);
-  } catch (error) {
-    console.error('Error setting up user data:', error);
-    setLoading(false);
-  }
-};
+        await setDoc(userDocRef, profileData);
+      } else {
+        profileData = userDoc.data() as UserProfileDoc;
+      }
+      setProfile(profileData);
+      setEditLocation(profileData.location);
+      setEditLanguage(profileData.language);
+      setEditTimezone(profileData.timezone);
+      setSelectedInterests(profileData.interests || []);
+
+      setLoading(false);
+    } catch (error) {
+      console.error('Error setting up user data:', error);
+      setLoading(false);
+    }
+  };
 
 
   const handleEditProfile = async () => {
@@ -278,9 +285,15 @@ const ProfileScreen: React.FC = () => {
     }
   };
 
-  const handleInterestChange = (interests: InterestKey[]) => {
-    console.log('Interests changed to:', interests);
-    setSelectedInterests(interests);
+  const handleInterestToggle = (interestId: string) => {
+    console.log('Toggling interest:', interestId);
+    setSelectedInterests(prev => {
+      const updated = prev.includes(interestId)
+        ? prev.filter(id => id !== interestId)
+        : [...prev, interestId];
+      console.log('Updated selectedInterests:', updated);
+      return updated;
+    });
   };
 
   const handleSaveInterests = async () => {
@@ -419,17 +432,19 @@ const ProfileScreen: React.FC = () => {
             {preferences.interests && preferences.interests.length > 0 ? (
               <View style={styles.interestsPreview}>
                 <View style={styles.selectedInterestsGrid}>
-                  {preferences.interests.slice(0, 6).map((interestKey) => {
-                    const interest = INTERESTS.find(i => i.key === interestKey);
+                  {preferences.interests.slice(0, 6).map((interestId) => {
+                    const interest = TOURIST_INTERESTS.find(i => i.id === interestId);
                     if (!interest) return null;
 
                     return (
-                      <InterestTag
-                        key={interestKey}
-                        label={interest.label}
-                        selected={true}
-                        testID={`profile-interest-${interestKey}`}
-                      />
+                      <View key={interestId} style={styles.interestBadge}>
+                        <MaterialCommunityIcons
+                          name={interest.icon as any}
+                          size={16}
+                          color={theme.colors.primary.main}
+                        />
+                        <Text style={styles.interestBadgeText}>{interest.name}</Text>
+                      </View>
                     );
                   })}
                   {preferences.interests.length > 6 && (
@@ -606,9 +621,9 @@ const ProfileScreen: React.FC = () => {
 
             <View style={styles.interestsModalBody}>
               <InterestSelector
-                selected={selectedInterests}
-                onChange={handleInterestChange}
-                testID="profile-interest-selector"
+                selectedInterests={selectedInterests}
+                onInterestToggle={handleInterestToggle}
+                showCategories={true}
               />
             </View>
 
@@ -622,7 +637,7 @@ const ProfileScreen: React.FC = () => {
                 <Pressable
                   style={[styles.interestsModalButton, styles.interestsModalButtonSecondary]}
                   onPress={() => {
-                    setSelectedInterests(preferences.interests as InterestKey[]);
+                    setSelectedInterests(preferences.interests);
                     setInterestsModalVisible(false);
                   }}
                 >

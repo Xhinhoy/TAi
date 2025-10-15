@@ -1,12 +1,15 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "TAi",
+    "slug": "tai-travel",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "extra": {
+      "apiUrl": "http://localhost:8080/api/v1"
+    },
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",

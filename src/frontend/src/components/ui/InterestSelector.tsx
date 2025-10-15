@@ -5,121 +5,156 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
-  FlatList,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { theme } from '../../styles/theme';
-import { INTERESTS, InterestKey } from '../../constants/interests';
-import { useLogger } from '../../utils/logger';
+
+export interface TouristInterest {
+  id: string;
+  name: string;
+  icon: string;
+  description: string;
+  category: 'cultura' | 'naturaleza' | 'gastronomia' | 'aventura' | 'entretenimiento' | 'historia';
+}
+
+export const TOURIST_INTERESTS: TouristInterest[] = [
+  {
+    id: 'museos',
+    name: 'Museos',
+    icon: 'bank',
+    description: 'Explora arte, historia y cultura',
+    category: 'cultura',
+  },
+  {
+    id: 'monumentos',
+    name: 'Monumentos',
+    icon: 'chess-rook',
+    description: 'Descubre arquitectura histórica',
+    category: 'historia',
+  },
+  {
+    id: 'parques',
+    name: 'Parques',
+    icon: 'tree',
+    description: 'Disfruta de espacios naturales',
+    category: 'naturaleza',
+  },
+  {
+    id: 'restaurantes',
+    name: 'Restaurantes',
+    icon: 'silverware',
+    description: 'Saborea la gastronomía local',
+    category: 'gastronomia',
+  },
+  {
+    id: 'bares',
+    name: 'Bares y Cafés',
+    icon: 'coffee',
+    description: 'Relájate en ambientes únicos',
+    category: 'gastronomia',
+  },
+  {
+    id: 'playa',
+    name: 'Playas',
+    icon: 'beach',
+    description: 'Disfruta del sol y el mar',
+    category: 'naturaleza',
+  },
+  {
+    id: 'senderismo',
+    name: 'Senderismo',
+    icon: 'hiking',
+    description: 'Explora rutas naturales',
+    category: 'aventura',
+  },
+  {
+    id: 'vida-nocturna',
+    name: 'Vida Nocturna',
+    icon: 'music-note',
+    description: 'Vive la noche de la ciudad',
+    category: 'entretenimiento',
+  },
+  {
+    id: 'compras',
+    name: 'Compras',
+    icon: 'shopping',
+    description: 'Encuentra productos únicos',
+    category: 'entretenimiento',
+  },
+  {
+    id: 'arquitectura',
+    name: 'Arquitectura',
+    icon: 'city',
+    description: 'Admira edificios emblemáticos',
+    category: 'cultura',
+  },
+  {
+    id: 'mercados',
+    name: 'Mercados',
+    icon: 'store',
+    description: 'Descubre productos locales',
+    category: 'gastronomia',
+  },
+  {
+    id: 'deportes',
+    name: 'Deportes',
+    icon: 'basketball',
+    description: 'Actividades deportivas',
+    category: 'aventura',
+  },
+];
 
 interface InterestSelectorProps {
-  selected: InterestKey[];
-  onChange: (next: InterestKey[]) => void;
-  multi?: boolean;
-  testID?: string;
+  selectedInterests: string[];
+  onInterestToggle: (interestId: string) => void;
+  maxSelections?: number;
+  showCategories?: boolean;
 }
 
 const InterestSelector: React.FC<InterestSelectorProps> = ({
-  selected,
-  onChange,
-  multi = true,
-  testID,
+  selectedInterests,
+  onInterestToggle,
+  maxSelections,
+  showCategories = false,
 }) => {
-  const logger = useLogger('InterestSelector');
+  const isSelected = (interestId: string) => selectedInterests.includes(interestId);
 
-  logger.debug('render', {
-    selectedCount: selected.length,
-    selected,
-    multi,
-    testID,
-    onChangeExists: !!onChange,
-    interestsTotal: INTERESTS.length
-  });
-
-  const isSelected = (interestKey: InterestKey) => {
-    const result = selected.includes(interestKey);
-    logger.debug('isSelected', { interestKey, result, selected });
-    return result;
+  const canSelect = (interestId: string) => {
+    if (isSelected(interestId)) return true;
+    if (!maxSelections) return true;
+    return selectedInterests.length < maxSelections;
   };
 
-  const handleToggle = (interestKey: InterestKey) => {
-    logger.info('handleToggle start', {
-      interestKey,
-      currentSelected: selected,
-      isCurrentlySelected: isSelected(interestKey),
-      multi
-    });
-
-    let newSelected: InterestKey[];
-
-    if (isSelected(interestKey)) {
-      // Deseleccionar
-      newSelected = selected.filter(key => key !== interestKey);
-      logger.info('deselecting', { interestKey, newSelected });
-    } else {
-      // Seleccionar
-      if (multi) {
-        newSelected = [...selected, interestKey];
-        logger.info('selecting (multi)', { interestKey, newSelected });
-      } else {
-        newSelected = [interestKey];
-        logger.info('selecting (single)', { interestKey, newSelected });
-      }
-    }
-
-    logger.info('calling onChange', {
-      oldSelected: selected,
-      newSelected,
-      interestKey
-    });
-
-    try {
-      onChange(newSelected);
-      logger.info('onChange called successfully', { newSelected });
-    } catch (error) {
-      logger.error('onChange failed', error, { newSelected });
-    }
-  };
-
-  const renderInterest = ({ item: interest }: { item: typeof INTERESTS[0] }) => {
-    const isInterestSelected = isSelected(interest.key);
-
-    logger.debug('renderInterest', {
-      interestKey: interest.key,
-      interestLabel: interest.label,
-      isInterestSelected
-    });
-
-    const handleInterestPress = () => {
-      logger.info('interest pressed', {
-        interestKey: interest.key,
-        interestLabel: interest.label,
-        isCurrentlySelected: isInterestSelected
-      });
-      handleToggle(interest.key);
-    };
+  const renderInterest = (interest: TouristInterest) => {
+    const selected = isSelected(interest.id);
+    const disabled = !canSelect(interest.id);
 
     return (
       <Pressable
-        style={({ pressed }) => [
+        key={interest.id}
+        style={[
           styles.interestCard,
-          isInterestSelected && styles.interestCardSelected,
-          pressed && styles.interestCardPressed,
+          selected && styles.interestCardSelected,
+          disabled && styles.interestCardDisabled,
         ]}
-        onPress={handleInterestPress}
+        onPress={() => {
+          console.log('InterestSelector - Interest pressed:', interest.id, 'canSelect:', canSelect(interest.id));
+          canSelect(interest.id) && onInterestToggle(interest.id);
+        }}
+        disabled={disabled}
         accessibilityRole="button"
-        accessibilityLabel={`${interest.label}`}
-        accessibilityState={{ selected: isInterestSelected }}
-        testID={`interest-${interest.key}`}
-        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        accessibilityLabel={`${interest.name}: ${interest.description}`}
+        accessibilityState={{ selected }}
       >
         <View style={styles.interestIcon}>
           <MaterialCommunityIcons
-            name={interest.icon as any || 'help-circle'}
-            size={24}
+            name={interest.icon as any}
+            size={20}
             color={
-              isInterestSelected
+              selected
                 ? theme.colors.primary.main
+                : disabled
+                ? theme.colors.neutral[400]
                 : theme.colors.neutral[600]
             }
           />
@@ -127,16 +162,26 @@ const InterestSelector: React.FC<InterestSelectorProps> = ({
         <Text
           style={[
             styles.interestName,
-            isInterestSelected && styles.interestNameSelected,
+            selected && styles.interestNameSelected,
+            disabled && styles.interestNameDisabled,
           ]}
         >
-          {interest.label}
+          {interest.name}
         </Text>
-        {isInterestSelected && (
+        <Text
+          style={[
+            styles.interestDescription,
+            selected && styles.interestDescriptionSelected,
+            disabled && styles.interestDescriptionDisabled,
+          ]}
+        >
+          {interest.description}
+        </Text>
+        {selected && (
           <View style={styles.checkmark}>
             <MaterialCommunityIcons
               name="check-circle"
-              size={16}
+              size={18}
               color={theme.colors.primary.main}
             />
           </View>
@@ -145,18 +190,46 @@ const InterestSelector: React.FC<InterestSelectorProps> = ({
     );
   };
 
+  if (showCategories) {
+    const categorizedInterests = TOURIST_INTERESTS.reduce((acc, interest) => {
+      if (!acc[interest.category]) {
+        acc[interest.category] = [];
+      }
+      acc[interest.category].push(interest);
+      return acc;
+    }, {} as Record<string, TouristInterest[]>);
+
+    const categoryNames = {
+      cultura: 'Cultura',
+      naturaleza: 'Naturaleza',
+      gastronomia: 'Gastronomía',
+      aventura: 'Aventura',
+      entretenimiento: 'Entretenimiento',
+      historia: 'Historia',
+    };
+
+    return (
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {Object.entries(categorizedInterests).map(([category, interests]) => (
+          <View key={category} style={styles.categorySection}>
+            <Text style={styles.categoryTitle}>
+              {categoryNames[category as keyof typeof categoryNames]}
+            </Text>
+            <View style={styles.interestsGrid}>
+              {interests.map(renderInterest)}
+            </View>
+          </View>
+        ))}
+      </ScrollView>
+    );
+  }
+
   return (
-    <View style={styles.container} testID={testID}>
-      <FlatList
-        data={INTERESTS}
-        renderItem={renderInterest}
-        keyExtractor={(item) => item.key}
-        numColumns={3}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.contentContainer}
-        columnWrapperStyle={styles.row}
-      />
-    </View>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.interestsGrid}>
+        {TOURIST_INTERESTS.map(renderInterest)}
+      </View>
+    </ScrollView>
   );
 };
 
@@ -164,22 +237,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  contentContainer: {
-    padding: theme.spacing.md,
-    paddingBottom: theme.spacing.xl,
+  categorySection: {
+    marginBottom: theme.spacing.xxl,
   },
-  row: {
-    justifyContent: 'space-between',
+  categoryTitle: {
+    fontSize: theme.typography.fontSizes.lg,
+    fontWeight: theme.typography.fontWeights.semiBold,
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.md,
+    paddingHorizontal: theme.spacing.md,
+  },
+  interestsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: theme.spacing.sm,
+    marginHorizontal: -theme.spacing.xs,
   },
   interestCard: {
-    width: '30%',
+    width: '31%',
     backgroundColor: theme.colors.surface.primary,
     borderRadius: theme.radius.md,
     padding: theme.spacing.sm,
-    marginBottom: theme.spacing.md,
+    marginHorizontal: theme.spacing.xs,
+    marginBottom: theme.spacing.sm,
     borderWidth: 1,
     borderColor: theme.colors.border.primary,
-    minHeight: 90,
+    minHeight: 100,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
@@ -190,9 +273,10 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.primary.main,
     borderWidth: 2,
   },
-  interestCardPressed: {
-    opacity: 0.8,
-    transform: [{ scale: 0.98 }],
+  interestCardDisabled: {
+    backgroundColor: theme.colors.neutral[100],
+    borderColor: theme.colors.neutral[200],
+    opacity: 0.6,
   },
   interestIcon: {
     marginBottom: theme.spacing.xs,
@@ -202,15 +286,31 @@ const styles = StyleSheet.create({
     fontWeight: theme.typography.fontWeights.medium,
     color: theme.colors.text.primary,
     textAlign: 'center',
+    marginBottom: theme.spacing.xs,
   },
   interestNameSelected: {
     color: theme.colors.primary.main,
     fontWeight: theme.typography.fontWeights.semiBold,
   },
+  interestNameDisabled: {
+    color: theme.colors.neutral[400],
+  },
+  interestDescription: {
+    fontSize: 10,
+    color: theme.colors.text.secondary,
+    textAlign: 'center',
+    lineHeight: 12,
+  },
+  interestDescriptionSelected: {
+    color: theme.colors.primary[700],
+  },
+  interestDescriptionDisabled: {
+    color: theme.colors.neutral[400],
+  },
   checkmark: {
     position: 'absolute',
-    top: theme.spacing.xs,
-    right: theme.spacing.xs,
+    top: theme.spacing.sm,
+    right: theme.spacing.sm,
   },
 });
 

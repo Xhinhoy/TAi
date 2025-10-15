@@ -1,19 +1,5 @@
 import { UserPreferences } from '../hooks/useUserPreferences';
-import { INTERESTS, InterestKey } from '../constants/interests';
-
-// Define TouristInterest type for backward compatibility
-type TouristInterest = {
-  id: string;
-  name: string;
-  icon?: string;
-};
-
-// Map INTERESTS to TOURIST_INTERESTS format for backward compatibility
-const TOURIST_INTERESTS: TouristInterest[] = INTERESTS.map(interest => ({
-  id: interest.key,
-  name: interest.label,
-  icon: interest.icon
-}));
+import { TOURIST_INTERESTS, TouristInterest } from '../components/ui/InterestSelector';
 
 export interface PlaceRecommendation {
   id: string;
