@@ -5,6 +5,7 @@ from app.core.config import settings
 from .tools import (
     SearchPlacesTool,
     GetPlaceDetailsTool,
+    GetReviewsTool,
     FilterPlacesByInterestsTool,
     OptimizeRouteTool
 )
@@ -23,7 +24,7 @@ class TravelAgent:
         # Usar solo Groq
         self.llm = ChatGroq(
             model=settings.GROQ_MODEL,
-            groq_api_key=settings.GROQ_API_KEY,
+            groq_api_key=settings.GROQ_API_KEY, # type: ignore
             temperature=settings.GROQ_TEMPERATURE,
             max_tokens=settings.GROQ_MAX_TOKENS
         )
@@ -66,7 +67,7 @@ class TravelAgent:
             response = await self.llm.ainvoke(prompt)
             
             try:
-                result = json.loads(response.content)
+                result = json.loads(response.content) # type: ignore
                 return result
             except json.JSONDecodeError:
                 logger.warning("Respuesta no es JSON válido")
@@ -102,7 +103,7 @@ class TravelAgent:
             response = await self.llm.ainvoke(prompt)
             
             try:
-                result = json.loads(response.content)
+                result = json.loads(response.content) # type: ignore
                 return result
             except json.JSONDecodeError:
                 logger.warning("Respuesta no es JSON válido")

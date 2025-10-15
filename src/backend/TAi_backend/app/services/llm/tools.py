@@ -3,7 +3,7 @@ from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Type
 from app.services.external.google_places import GooglePlacesFacade
-#from app.services.external.tripadvisor import tripadvisor_facade
+from app.services.external.tripadvisor import tripadvisor_facade
 import json
 
 class SearchPlacesInput(BaseModel):
@@ -53,7 +53,7 @@ class GetPlaceDetailsTool(BaseTool):
 class GetReviewsInput(BaseModel):
     location_id: str = Field(description="ID de la ubicación en TripAdvisor")
     limit: int = Field(default=5, description="Número de reviews")
-''' 
+
 class GetReviewsTool(BaseTool):
     name: str = "get_reviews"
     description: str = """Obtiene reviews de TripAdvisor.
@@ -66,7 +66,7 @@ class GetReviewsTool(BaseTool):
     
     async def _arun(self, *args, **kwargs):
         return self._run(*args, **kwargs)
-'''
+    
 class FilterPlacesByInterestsInput(BaseModel):
     places_json: str = Field(description="JSON string con lista de lugares")
     user_interests: List[str] = Field(description="Intereses del usuario")
