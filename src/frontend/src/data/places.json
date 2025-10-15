@@ -1,0 +1,122 @@
+[
+  {
+    "id": "1",
+    "name": "Museo de Bellas Artes",
+    "category": "cultura",
+    "lat": -33.4349,
+    "lng": -70.6416,
+    "rating": 4.6,
+    "address": "José Miguel de la Barra 650, Santiago",
+    "openNow": true
+  },
+  {
+    "id": "2",
+    "name": "Mercado Central",
+    "category": "comida",
+    "lat": -33.4345,
+    "lng": -70.6502,
+    "rating": 4.3,
+    "address": "San Pablo 967, Santiago",
+    "openNow": true
+  },
+  {
+    "id": "3",
+    "name": "Cerro San Cristóbal",
+    "category": "naturaleza",
+    "lat": -33.4256,
+    "lng": -70.6344,
+    "rating": 4.7,
+    "address": "Pío Nono, Santiago",
+    "openNow": true
+  },
+  {
+    "id": "4",
+    "name": "Barrio Lastarria",
+    "category": "cultura",
+    "lat": -33.4372,
+    "lng": -70.6380,
+    "rating": 4.5,
+    "address": "José Victorino Lastarria, Santiago",
+    "openNow": true
+  },
+  {
+    "id": "5",
+    "name": "La Piojera",
+    "category": "comida",
+    "lat": -33.4396,
+    "lng": -70.6506,
+    "rating": 4.1,
+    "address": "Aillavilú 1030, Santiago",
+    "openNow": false
+  },
+  {
+    "id": "6",
+    "name": "Patio Bellavista",
+    "category": "vida_nocturna",
+    "lat": -33.4336,
+    "lng": -70.6311,
+    "rating": 4.2,
+    "address": "Constitución 30, Santiago",
+    "openNow": true
+  },
+  {
+    "id": "7",
+    "name": "Parque Forestal",
+    "category": "naturaleza",
+    "lat": -33.4367,
+    "lng": -70.6429,
+    "rating": 4.6,
+    "address": "Parque Forestal, Santiago",
+    "openNow": true
+  },
+  {
+    "id": "8",
+    "name": "Museo de la Memoria",
+    "category": "cultura",
+    "lat": -33.4403,
+    "lng": -70.6506,
+    "rating": 4.8,
+    "address": "Matucana 501, Santiago",
+    "openNow": true
+  },
+  {
+    "id": "9",
+    "name": "Restaurante Boragó",
+    "category": "comida",
+    "lat": -33.4167,
+    "lng": -70.6077,
+    "rating": 4.9,
+    "address": "Nueva Costanera 3467, Vitacura",
+    "openNow": false
+  },
+  {
+    "id": "10",
+    "name": "Sky Costanera",
+    "category": "cultura",
+    "lat": -33.4172,
+    "lng": -70.6066,
+    "rating": 4.7,
+    "address": "Avenida Andrés Bello 2425, Providencia",
+    "openNow": true
+  },
+  {
+    "id": "11",
+    "name": "Club Fauna",
+    "category": "vida_nocturna",
+    "lat": -33.4390,
+    "lng": -70.6345,
+    "rating": 4.4,
+    "address": "Santa Isabel 0155, Santiago",
+    "openNow": false
+  },
+  {
+    "id": "12",
+    "name": "Cerro Santa Lucía",
+    "category": "naturaleza",
+    "lat": -33.4408,
+    "lng": -70.6438,
+    "rating": 4.5,
+    "address": "Santa Lucía, Santiago Centro",
+    "openNow": true
+  }
+]

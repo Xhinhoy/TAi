@@ -13,7 +13,9 @@
       "Bash(npx kill-port:*)",
       "Bash(timeout:*)",
       "Bash(npx tsc:*)",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(cat:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

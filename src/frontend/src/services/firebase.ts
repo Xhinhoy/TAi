@@ -13,8 +13,20 @@ const firebaseConfig = {
   measurementId: "G-GVFPPMC6VD"
 };
 
-// Evita inicializar varias veces en hot-reload
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+let app;
+let auth;
+let db;
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+try {
+  console.log("Inicializando Firebase...");
+  // Evita inicializar varias veces en hot-reload
+  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  db = getFirestore(app);
+  console.log("Firebase inicializado correctamente");
+} catch (error) {
+  console.error("Error inicializando Firebase:", error);
+  throw error;
+}
+
+export { auth, db };
