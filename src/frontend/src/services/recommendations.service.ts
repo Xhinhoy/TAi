@@ -1,5 +1,7 @@
 import { UserPreferences } from '../hooks/useUserPreferences';
 import { TOURIST_INTERESTS, TouristInterest } from '../components/ui/InterestSelector';
+import { recommendationsService, itinerariesService } from '../api/services';
+import { Place } from '../types/domain';
 
 export interface PlaceRecommendation {
   id: string;
@@ -50,6 +52,33 @@ export class RecommendationsService {
       RecommendationsService.instance = new RecommendationsService();
     }
     return RecommendationsService.instance;
+  }
+
+  /**
+   * Convert Place to PlaceRecommendation format
+   */
+  private convertToPlaceRecommendation(
+    place: Place,
+    score: number = 0,
+    reason: string = ''
+  ): PlaceRecommendation {
+    return {
+      id: place.id,
+      name: place.name,
+      description: place.description || '',
+      category: place.categories?.[0] || 'other',
+      location: {
+        latitude: place.coords?.latitude || 0,
+        longitude: place.coords?.longitude || 0,
+        address: place.address || '',
+      },
+      rating: place.rating || 0,
+      priceLevel: place.priceLevel as 1 | 2 | 3 | 4,
+      photos: place.photos || [],
+      types: place.categories || [],
+      matchScore: score,
+      reason: reason,
+    };
   }
 
   /**
@@ -149,15 +178,42 @@ export class RecommendationsService {
 
   /**
    * Generate recommendations based on user preferences
+   * Now using the backend AI-powered recommendation engine
    */
   public async generateRecommendations(
     preferences: UserPreferences,
+    userId: string,
     location?: { latitude: number; longitude: number },
     limit: number = 10
   ): Promise<PlaceRecommendation[]> {
-    // In a real implementation, this would call external APIs like Google Places
-    // For now, we'll return mock data based on interests
+    try {
+      // Call the backend API for personalized recommendations
+      const recommendations = await recommendationsService.getPersonalized({
+        user_id: userId,
+        location,
+        limit,
+        categories: preferences.interests,
+      });
 
+      // Convert to PlaceRecommendation format
+      return recommendations.map(rec =>
+        this.convertToPlaceRecommendation(rec.place, rec.score, rec.reasoning)
+      );
+    } catch (error) {
+      console.error('Error getting personalized recommendations:', error);
+
+      // Fallback to local mock data if backend fails
+      return this.getFallbackRecommendations(preferences, limit);
+    }
+  }
+
+  /**
+   * Fallback recommendations using local mock data
+   */
+  private getFallbackRecommendations(
+    preferences: UserPreferences,
+    limit: number = 10
+  ): PlaceRecommendation[] {
     const mockPlaces = this.getMockPlaces();
 
     // Calculate match scores for each place
@@ -335,13 +391,67 @@ export class RecommendationsService {
 
   /**
    * Create a personalized itinerary based on user preferences
+   * Now using the backend AI-powered itinerary generator
    */
   public async createItinerary(
+    userId: string,
     preferences: UserPreferences,
+    destination: string,
+    startDate: string,
+    endDate: string,
     duration: number, // in hours
     location?: { latitude: number; longitude: number }
   ): Promise<ItineraryRecommendation> {
-    const places = await this.generateRecommendations(preferences, location, 8);
+    try {
+      // Call the backend API to generate an AI-powered itinerary
+      const itinerary = await itinerariesService.generate({
+        user_id: userId,
+        destination,
+        start_date: startDate,
+        end_date: endDate,
+        preferences: {
+          budget: preferences.budget,
+          interests: preferences.interests,
+          pace: 'moderate' as const,
+        },
+      });
+
+      // Convert to ItineraryRecommendation format
+      return {
+        id: itinerary.id,
+        title: itinerary.title,
+        description: itinerary.description || 'Itinerario generado por IA',
+        duration,
+        places: itinerary.places?.map(place =>
+          this.convertToPlaceRecommendation(place, 1.0, 'Recomendado por IA')
+        ) || [],
+        totalDistance: 0, // TODO: Calculate from itinerary data
+        estimatedCost: {
+          min: 15000,
+          max: 50000,
+          currency: 'CLP'
+        },
+        difficulty: 'moderate',
+        tags: preferences.interests.slice(0, 3)
+      };
+    } catch (error) {
+      console.error('Error generating itinerary:', error);
+
+      // Fallback to local generation
+      return this.createFallbackItinerary(userId, preferences, duration, location);
+    }
+  }
+
+  /**
+   * Fallback itinerary creation using local logic
+   */
+  private async createFallbackItinerary(
+    userId: string,
+    preferences: UserPreferences,
+    duration: number,
+    location?: { latitude: number; longitude: number }
+  ): Promise<ItineraryRecommendation> {
+    const places = await this.generateRecommendations(preferences, userId, location, 8);
 
     // Simple itinerary creation logic
     const selectedPlaces = places.slice(0, Math.min(5, places.length));
@@ -349,7 +459,7 @@ export class RecommendationsService {
     return {
       id: `itinerary-${Date.now()}`,
       title: 'Tu itinerario personalizado',
-      description: 'Itinerario creado basado en tus intereses turísticos',
+      description: 'Itinerary creado basado en tus intereses turísticos',
       duration,
       places: selectedPlaces,
       totalDistance: 5.2, // Mock distance
@@ -362,6 +472,39 @@ export class RecommendationsService {
       tags: preferences.interests.slice(0, 3)
     };
   }
+
+  /**
+   * Get trending places from the backend
+   */
+  public async getTrendingPlaces(limit: number = 10): Promise<PlaceRecommendation[]> {
+    try {
+      const places = await recommendationsService.getTrending(limit);
+      return places.map(place =>
+        this.convertToPlaceRecommendation(place, 1.0, 'Trending ahora')
+      );
+    } catch (error) {
+      console.error('Error getting trending places:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get recommendations by category
+   */
+  public async getRecommendationsByCategory(
+    category: string,
+    limit: number = 10
+  ): Promise<PlaceRecommendation[]> {
+    try {
+      const places = await recommendationsService.getByCategory(category, limit);
+      return places.map(place =>
+        this.convertToPlaceRecommendation(place, 1.0, `Recomendado en ${category}`)
+      );
+    } catch (error) {
+      console.error('Error getting category recommendations:', error);
+      return [];
+    }
+  }
 }
 
-export const recommendationsService = RecommendationsService.getInstance();
+export const localRecommendationsService = RecommendationsService.getInstance();
