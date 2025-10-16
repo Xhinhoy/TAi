@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # TAi – Generador Inteligente de Itinerarios Turísticos
 
 ![Status](https://img.shields.io/badge/status-en%20desarrollo-yellow)  
@@ -9,6 +10,8 @@
 
 ## Descripción
 =======
+=======
+>>>>>>> origin/NSoto
 # 🗺️ TAi – Generador Inteligente de Itinerarios Turísticos
 
 ![Status](https://img.shields.io/badge/status-en%20desarrollo-yellow)  
@@ -18,7 +21,10 @@
 ---
 
 ## 📖 Descripción
+<<<<<<< HEAD
 >>>>>>> origin/Nsoto
+=======
+>>>>>>> origin/NSoto
 **TAi** es un proyecto académico desarrollado en el marco de la asignatura **Capstone 2025 – Ingeniería en Informática (DUOC UC)**.  
 El sistema genera **itinerarios turísticos personalizados** mediante un motor de recomendación basado en **IA ligera** e integra **APIs externas** como *Google Places* y *TripAdvisor*.  
 
@@ -27,10 +33,14 @@ La aplicación considera **preferencias del usuario, ubicación actual, horarios
 ---
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Objetivos
 =======
 ## 🎯 Objetivos
 >>>>>>> origin/Nsoto
+=======
+## 🎯 Objetivos
+>>>>>>> origin/NSoto
 - **General:**  
   Desarrollar una aplicación móvil híbrida que genere itinerarios turísticos personalizados integrando APIs externas y un motor de recomendación.  
 
@@ -38,26 +48,36 @@ La aplicación considera **preferencias del usuario, ubicación actual, horarios
   - Integrar Google Places y TripAdvisor para obtener datos en tiempo real.  
   - Implementar un motor de recomendación flexible usando el patrón **Strategy**.  
 <<<<<<< HEAD
+<<<<<<< HEAD
   - Diseñar modelos de datos escalables en **Firebase Firestore**.  
 =======
   - Diseñar modelos de datos escalables en **MongoDB**.  
 >>>>>>> origin/Nsoto
+=======
+  - Diseñar modelos de datos escalables en **MongoDB**.  
+>>>>>>> origin/NSoto
   - Aplicar pruebas de validación bajo buenas prácticas de la industria.  
   - Gestionar el proyecto bajo metodología **Scrum**, con planificación en fases y evidencias de avance.  
 
 ---
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Tecnologías
 - **Frontend:** React Native (TypeScript, Expo, React Query, Zustand).  
 - **Backend:** Python (Flask, Pydantic).
 - **Base de Datos:** Firebase Firestore (con consultas geoespaciales).  
 =======
+=======
+>>>>>>> origin/NSoto
 ## 🛠️ Tecnologías
 - **Frontend:** React Native (TypeScript, Expo, React Query, Zustand).  
 - **Backend:** Python (Flask, Pydantic, Flask-PyMongo).  
 - **Base de Datos:** MongoDB (con índices geoespaciales 2dsphere).  
+<<<<<<< HEAD
 >>>>>>> origin/Nsoto
+=======
+>>>>>>> origin/NSoto
 - **APIs externas:** Google Places, TripAdvisor.  
 - **IA / Algoritmos:** Estrategias de recomendación (greedy, cultural, gastronómica).  
 - **Gestión del Proyecto:** Scrum (Jira / GitHub Projects).  
@@ -65,18 +85,24 @@ La aplicación considera **preferencias del usuario, ubicación actual, horarios
 ---
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Arquitectura
 El sistema se implementa con **Clean Architecture ligera**:  
 - **Presentación (UI):** Pantallas y componentes en React Native.  
 - **Aplicación (Casos de uso):** Hooks en frontend y servicios en backend.  
 - **Datos (Infraestructura):** Repositorios en Firebase Firestore y adaptadores para APIs externas.  
 =======
+=======
+>>>>>>> origin/NSoto
 ## 🏗️ Arquitectura
 El sistema se implementa con **Clean Architecture ligera**:  
 - **Presentación (UI):** Pantallas y componentes en React Native.  
 - **Aplicación (Casos de uso):** Hooks en frontend y servicios en backend.  
 - **Datos (Infraestructura):** Repositorios en MongoDB y adaptadores para APIs externas.  
+<<<<<<< HEAD
 >>>>>>> origin/Nsoto
+=======
+>>>>>>> origin/NSoto
 - **Dominio (opcional):** Entidades puras como *Usuario*, *Lugar*, *Itinerario*.  
 
 Patrones de diseño aplicados: **Strategy, Repository, Adapter/Facade, Chain of Responsibility (pipeline de filtros), Observer (eventos)**.
@@ -84,10 +110,14 @@ Patrones de diseño aplicados: **Strategy, Repository, Adapter/Facade, Chain of 
 ---
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Plan de Trabajo (Capstone)
 =======
 ## 📅 Plan de Trabajo (Capstone)
 >>>>>>> origin/Nsoto
+=======
+## 📅 Plan de Trabajo (Capstone)
+>>>>>>> origin/NSoto
 El proyecto se organiza en 3 fases:  
 1. **Definición (Semanas 1–4):** Propuesta, objetivos, plan de trabajo y diseño de arquitectura.  
 2. **Desarrollo (Semanas 5–12):** Prototipo funcional con integración de APIs y base de datos.  
@@ -98,16 +128,21 @@ El proyecto se organiza en 3 fases:
 ---
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 ## Equipo
 =======
 ## 👥 Equipo
 >>>>>>> origin/Nsoto
+=======
+## 👥 Equipo
+>>>>>>> origin/NSoto
 - Nicolás Sabando  
 - José Eskenazi  
 - Nicolás Soto  
 
 ---
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 ## Registro de Usuario con Email/Contraseña
 
@@ -175,6 +210,8 @@ firebase emulators:start
 
 ## Licencia
 =======
+=======
+>>>>>>> origin/NSoto
 ## 📂 Evidencias
 - [📄 Documentos de definición y rúbricas](./docs)  
 - [🗓️ Plan de trabajo y carta Gantt](./project)  
@@ -184,6 +221,9 @@ firebase emulators:start
 ---
 
 ## 📜 Licencia
+<<<<<<< HEAD
 >>>>>>> origin/Nsoto
+=======
+>>>>>>> origin/NSoto
 Este proyecto se desarrolla con fines **académicos** dentro de la asignatura **Capstone 2025 – DUOC UC**.  
 Licencia: [MIT](./LICENSE).  

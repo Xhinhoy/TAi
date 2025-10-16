@@ -6,8 +6,12 @@
     "lat": -33.4349,
     "lng": -70.6416,
     "rating": 4.6,
+<<<<<<< HEAD
     "address": "José Miguel de la Barra 650, Santiago",
     "openNow": true
+=======
+    "address": "José Miguel de la Barra 650, Santiago"
+>>>>>>> origin/NSoto
   },
   {
     "id": "2",
@@ -16,8 +20,12 @@
     "lat": -33.4345,
     "lng": -70.6502,
     "rating": 4.3,
+<<<<<<< HEAD
     "address": "San Pablo 967, Santiago",
     "openNow": true
+=======
+    "address": "San Pablo 967, Santiago"
+>>>>>>> origin/NSoto
   },
   {
     "id": "3",
@@ -26,8 +34,12 @@
     "lat": -33.4256,
     "lng": -70.6344,
     "rating": 4.7,
+<<<<<<< HEAD
     "address": "Pío Nono, Santiago",
     "openNow": true
+=======
+    "address": "Pío Nono, Santiago"
+>>>>>>> origin/NSoto
   },
   {
     "id": "4",
@@ -36,8 +48,12 @@
     "lat": -33.4372,
     "lng": -70.6380,
     "rating": 4.5,
+<<<<<<< HEAD
     "address": "José Victorino Lastarria, Santiago",
     "openNow": true
+=======
+    "address": "José Victorino Lastarria, Santiago"
+>>>>>>> origin/NSoto
   },
   {
     "id": "5",
@@ -46,8 +62,12 @@
     "lat": -33.4396,
     "lng": -70.6506,
     "rating": 4.1,
+<<<<<<< HEAD
     "address": "Aillavilú 1030, Santiago",
     "openNow": false
+=======
+    "address": "Aillavilú 1030, Santiago"
+>>>>>>> origin/NSoto
   },
   {
     "id": "6",
@@ -56,8 +76,12 @@
     "lat": -33.4336,
     "lng": -70.6311,
     "rating": 4.2,
+<<<<<<< HEAD
     "address": "Constitución 30, Santiago",
     "openNow": true
+=======
+    "address": "Constitución 30, Santiago"
+>>>>>>> origin/NSoto
   },
   {
     "id": "7",
@@ -66,8 +90,12 @@
     "lat": -33.4367,
     "lng": -70.6429,
     "rating": 4.6,
+<<<<<<< HEAD
     "address": "Parque Forestal, Santiago",
     "openNow": true
+=======
+    "address": "Parque Forestal, Santiago"
+>>>>>>> origin/NSoto
   },
   {
     "id": "8",
@@ -76,8 +104,12 @@
     "lat": -33.4403,
     "lng": -70.6506,
     "rating": 4.8,
+<<<<<<< HEAD
     "address": "Matucana 501, Santiago",
     "openNow": true
+=======
+    "address": "Matucana 501, Santiago"
+>>>>>>> origin/NSoto
   },
   {
     "id": "9",
@@ -86,8 +118,12 @@
     "lat": -33.4167,
     "lng": -70.6077,
     "rating": 4.9,
+<<<<<<< HEAD
     "address": "Nueva Costanera 3467, Vitacura",
     "openNow": false
+=======
+    "address": "Nueva Costanera 3467, Vitacura"
+>>>>>>> origin/NSoto
   },
   {
     "id": "10",
@@ -96,8 +132,12 @@
     "lat": -33.4172,
     "lng": -70.6066,
     "rating": 4.7,
+<<<<<<< HEAD
     "address": "Avenida Andrés Bello 2425, Providencia",
     "openNow": true
+=======
+    "address": "Avenida Andrés Bello 2425, Providencia"
+>>>>>>> origin/NSoto
   },
   {
     "id": "11",
@@ -106,8 +146,12 @@
     "lat": -33.4390,
     "lng": -70.6345,
     "rating": 4.4,
+<<<<<<< HEAD
     "address": "Santa Isabel 0155, Santiago",
     "openNow": false
+=======
+    "address": "Santa Isabel 0155, Santiago"
+>>>>>>> origin/NSoto
   },
   {
     "id": "12",
@@ -116,7 +160,11 @@
     "lat": -33.4408,
     "lng": -70.6438,
     "rating": 4.5,
+<<<<<<< HEAD
     "address": "Santa Lucía, Santiago Centro",
     "openNow": true
+=======
+    "address": "Santa Lucía, Santiago Centro"
+>>>>>>> origin/NSoto
   }
 ]
