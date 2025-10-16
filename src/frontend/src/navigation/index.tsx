@@ -11,10 +11,12 @@ import Search from "../screens/Search/Search";
 import Builder from "../screens/Itinerary/Builder";
 import Profile from "../screens/Profile/Profile";
 import Home from "../screens/Home/Home";
+import Chat from "../screens/Chat/Chat";
 import PreferencesPage from "../preferences/PreferencesPage";
 import { HomeIcon, SearchIcon, StarIcon, MapIcon, UserIcon } from "../components/icons";
 import { colors } from "../styles/colors";
 import { commonStyles } from "../styles/common";
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -82,13 +84,13 @@ function TabsNavigator() {
         }}
       />
       <Tabs.Screen
-        name="Recs"
-        component={Screen("Recomendaciones")}
+        name="Chat"
+        component={Chat}
         options={{
-          title: "Recs",
-          headerTitle: "Recomendaciones",
+          title: "Chat IA",
+          headerShown: false,
           tabBarIcon: ({ color, size }) => (
-            <StarIcon size={size} color={color} />
+            <MaterialCommunityIcons name="robot" size={size} color={color} />
           ),
         }}
       />
