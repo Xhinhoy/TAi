@@ -95,7 +95,7 @@ class GooglePlacesFacade:
 ) -> List[Dict]:
         """🔍 Busca lugares por texto con Google Places API (textsearch) y obtiene detalles."""
         cache_params = {
-            "query": query,
+            "query": query, 
             "location": location,
             "radius": radius
         }
