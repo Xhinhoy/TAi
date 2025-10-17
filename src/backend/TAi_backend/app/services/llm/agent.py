@@ -124,35 +124,58 @@ class TravelAgent:
     async def chat(self, message: str) -> dict:
         """Conversación natural con el agente"""
         try:
-            system_prompt = TRAVEL_AGENT_SYSTEM_PROMPT.format(
-                user_profile=json.dumps(self.user_profile, indent=2)
-            )
-            
-            logger.info(f"Chat con Groq ({settings.GROQ_MODEL})...")
-            
-            agent = initialize_agent(
-                tools=self.tools,
-                llm=self.llm,
-                agent=AgentType.CHAT_CONVERSATIONAL_REACT_DESCRIPTION,
-                memory=self.memory,
-                verbose=True,
-                handle_parsing_errors=True,
-                max_iterations=3
-            )
-            
-            full_prompt = f"{system_prompt}\n\nUsuario: {message}"
-            response = await agent.arun(full_prompt)
-            
+            # Obtener historial de conversación
+            history = self.memory.load_memory_variables({})
+            history_text = ""
+            if history.get('chat_history'):
+                history_text = "\n".join([f"{msg.type}: {msg.content}" for msg in history['chat_history'][-5:]])
+
+            # Crear prompt con contexto del usuario
+            interests_str = ', '.join(self.user_profile.get('interests', ['turismo', 'cultura']))
+            budget = self.user_profile.get('budget', 'medium')
+
+            system_prompt = f"""Eres un asistente experto en viajes y turismo en Chile.
+
+Perfil del usuario:
+- Intereses: {interests_str}
+- Presupuesto: {budget}
+
+Tu trabajo es:
+1. Recomendar lugares turísticos reales en Chile (especialmente Santiago y Providencia)
+2. Sugerir actividades según los intereses del usuario
+3. Dar consejos prácticos sobre transporte, horarios, costos
+4. Ser amigable, informativo y preciso
+
+Historial reciente:
+{history_text}
+
+Responde de forma conversacional y útil."""
+
+            full_prompt = f"{system_prompt}\n\nUsuario: {message}\n\nAsistente:"
+
+            logger.info(f"💬 Chat con Groq ({settings.GROQ_MODEL})...")
+
+            # Usar el LLM directamente (sin agent/tools para evitar errores)
+            response = await self.llm.ainvoke(full_prompt)
+            response_text = response.content if hasattr(response, 'content') else str(response)
+
+            # Guardar en memoria
+            from langchain.schema import HumanMessage, AIMessage
+            self.memory.chat_memory.add_message(HumanMessage(content=message))
+            self.memory.chat_memory.add_message(AIMessage(content=response_text))
+
+            logger.info(f"✅ Respuesta generada: {len(response_text)} caracteres")
+
             return {
-                'response': response,
+                'response': response_text,
                 'actions': [],
                 'places': []
             }
-            
+
         except Exception as e:
-            logger.error(f"Error en chat: {str(e)}")
+            logger.error(f"❌ Error en chat: {str(e)}", exc_info=True)
             return {
-                'response': f'Lo siento, hubo un error: {str(e)}',
+                'response': f'Lo siento, hubo un error procesando tu mensaje. Por favor, intenta reformular tu pregunta.',
                 'actions': [],
                 'places': []
             }
