@@ -33,6 +33,7 @@ export default function Search() {
     lat: -33.4489,
     lng: -70.6693,
   });
+  const [mapZoom, setMapZoom] = useState(13);
   const [showMap, setShowMap] = useState(!isMobile);
 
   useEffect(() => {
@@ -101,6 +102,7 @@ export default function Search() {
     const place = results.find((p) => p.id === id);
     if (place) {
       setUserLocation({ lat: place.lat, lng: place.lng });
+      setMapZoom(16); // Zoom más cercano al seleccionar un lugar
     }
   };
 
@@ -153,7 +155,7 @@ export default function Search() {
           <View style={[styles.mapSection, isMobile && styles.mapSectionMobile]}>
             <MapContainer
               center={userLocation}
-              zoom={13}
+              zoom={mapZoom}
               markers={results.map((p) => ({
                 id: p.id,
                 lat: p.lat,
@@ -161,6 +163,7 @@ export default function Search() {
                 name: p.name,
                 rating: p.rating,
               }))}
+              selectedMarkerId={selectedId}
             />
           </View>
         )}
