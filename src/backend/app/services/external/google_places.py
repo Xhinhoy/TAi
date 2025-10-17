@@ -88,38 +88,65 @@ class GooglePlacesFacade:
     # INSERTAR AQUÍ el NUEVO MÉTODO text_search()
     # ================================================================
     def text_search(
-        self,
-        query: str,
-        location: Optional[Dict[str, float]] = None,
-        radius: int = 5000
-    ) -> List[Dict]:
-        """
-        Búsqueda de lugares por texto libre (ejemplo: 'restaurantes en Santiago')
-        Usa la API oficial 'places' de googlemaps.
-        """
-        cache_params = {'query': query, 'location': location, 'radius': radius}
-        cache_key = self._generate_cache_key('text_search', cache_params)
+    self,
+    query: str,
+    location: Optional[Dict[str, float]] = None,
+    radius: int = 5000
+) -> List[Dict]:
+        """🔍 Busca lugares por texto con Google Places API (textsearch) y obtiene detalles."""
+        cache_params = {
+            "query": query,
+            "location": location,
+            "radius": radius
+        }
+        cache_key = self._generate_cache_key("text_search", cache_params)
 
         cached_result = firebase_cache.get(self.cache_prefix, cache_key)
         if cached_result:
-            logger.info("Google Places text_search obtenido del caché")
+            logger.info(f"Google Places text_search obtenido del caché")
             return cached_result
 
         try:
             self._rate_limit_check()
 
-            params = {'query': query}
+            params = {"query": query}
             if location:
-                params['location'] = (location['latitude'], location['longitude'])
-                params['radius'] = radius
+                params["location"] = (location["latitude"], location["longitude"])
+                params["radius"] = radius
 
+            # Buscar lugares
             results = self.client.places(**params)
-            formatted_results = self._format_results(results.get('results', []))
+            places = results.get("results", [])
 
-            firebase_cache.set(self.cache_prefix, cache_key, formatted_results, self.cache_ttl)
-            logger.info("Google Places text_search guardado en caché")
+            # Obtener detalles para cada lugar (incluye horarios)
+            detailed_results = []
+            for p in places:
+                place_id = p.get("place_id")
+                if not place_id:
+                    continue
+                try:
+                    details = self.client.place(place_id=place_id)
+                    data = details.get("result", {})
+                    formatted = {
+                        "name": data.get("name"),
+                        "address": data.get("formatted_address"),
+                        "rating": data.get("rating"),
+                        "place_id": data.get("place_id"),
+                        "location": data.get("geometry", {}).get("location", {}),
+                        "photos": [
+                            f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={ph.get('photo_reference')}&key={settings.GOOGLE_PLACES_API_KEY.get_secret_value()}"
+                            for ph in data.get("photos", [])
+                        ] if data.get("photos") else [],
+                        "opening_hours": data.get("opening_hours"),
+                        "types": data.get("types", [])
+                    }
+                    detailed_results.append(formatted)
+                except Exception as e:
+                    logger.warning(f"Error obteniendo detalles de {place_id}: {e}")
 
-            return formatted_results
+            firebase_cache.set(self.cache_prefix, cache_key, detailed_results, self.cache_ttl)
+            logger.info(f"Google Places text_search guardado en caché con detalles")
+            return detailed_results
 
         except Exception as e:
             logger.error(f"Error en text_search: {str(e)}")
@@ -167,9 +194,17 @@ class GooglePlacesFacade:
                 "photos": [
                     f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={p.get('photo_reference')}&key={settings.GOOGLE_PLACES_API_KEY.get_secret_value()}"
                     for p in r.get("photos", [])
-                ] if r.get("photos") else []
+                ] if r.get("photos") else [],
+                "opening_hours": {
+                    "open_now": r.get("opening_hours", {}).get("open_now"),
+                    "weekday_text": r.get("opening_hours", {}).get("weekday_text", [])
+                }
             })
         return formatted
+
     # ================================================================
     # 🔹 FIN DE INSERCIÓN _format_results()
     # ================================================================
+
+    # 👇 ESTA LÍNEA ES LA QUE FALTABA
+google_places_facade = GooglePlacesFacade()

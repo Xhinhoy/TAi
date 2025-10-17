@@ -167,9 +167,9 @@ export const recommendationsService = {
   /**
    * Get AI-powered recommendations (actual endpoint: /generate)
    */
-  async getPersonalized(params: RecommendationsRequest): Promise<PersonalizedRecommendation[]> {
-    const response = await api.post('/recommendations/generate', params);
-    return response.data;
+  async getPersonalized(params: RecommendationsRequest): Promise<{ recommendations: PersonalizedRecommendation[] }> {
+  const response = await api.post('/recommendations/generate', params);
+  return response.data;
   },
 
   /**
@@ -319,10 +319,15 @@ export interface ChatRequest {
 }
 
 export interface ChatResponse {
-  message: string;
-  conversation_id: string;
+  response: string;
+  actions?: any[];
+  places?: {
+    name: string;
+    address: string;
+    rating?: number;
+  }[];
   suggestions?: string[];
-  places?: Place[];
+  conversation_id?: string;
   metadata?: Record<string, any>;
 }
 
@@ -331,7 +336,8 @@ export const chatService = {
    * Send a message to the AI travel assistant
    */
   async sendMessage(data: ChatRequest): Promise<ChatResponse> {
-    const response = await api.post('/chat/message', data);
+    // ⏱️ se aumenta el tiempo máximo de espera de la petición a 60 segundos
+    const response = await api.post('/chat/message', data, { timeout: 60000 });
     return response.data;
   },
 

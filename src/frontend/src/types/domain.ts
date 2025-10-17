@@ -33,3 +33,9 @@ export type Itinerary = {
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 };
+export interface UserPreferences {
+  budget?: 'low' | 'medium' | 'high';
+  interests: string[];
+  preferredLanguage?: string;
+  accessibility?: string[];
+}

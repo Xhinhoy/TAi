@@ -6,7 +6,7 @@ from math import radians, sin, cos, sqrt, asin
 
 
 # ============================================================
-# 🔍 SearchPlacesTool — devuelve texto legible para el chat
+#  SearchPlacesTool — devuelve texto legible para el chat
 # ============================================================
 class SearchPlacesTool(BaseTool):
     name: str = "search_places"
@@ -16,6 +16,10 @@ class SearchPlacesTool(BaseTool):
     )
 
     def _run(self, *args, input: str | dict | None = None, **kwargs) -> str:
+        """
+        Devuelve resultados tanto en texto legible como en JSON embebido,
+        para que el LLM pueda parsearlos correctamente.
+        """
         try:
             if args and not input:
                 input = args[0]
@@ -37,25 +41,38 @@ class SearchPlacesTool(BaseTool):
             if not results:
                 return f"No se encontraron lugares para '{query}'."
 
-            # 🔹 Armar respuesta clara para el chat
-            response_lines = [f"Encontré algunos lugares que podrían interesarte en base a '{query}':\n"]
-            for i, p in enumerate(results[:5]):
-                name = p.get("name", "Lugar sin nombre")
-                address = p.get("address", "Dirección no disponible")
-                rating = p.get("rating", "Sin calificación")
-                response_lines.append(f"{i+1}. {name} — {address} (⭐ {rating})")
+            # 🔹 Normalizar los primeros 5 resultados
+            formatted = []
+            for p in results[:5]:
+                formatted.append({
+                    "name": p.get("name", "Lugar sin nombre"),
+                    "address": p.get("address", "Dirección no disponible"),
+                    "rating": p.get("rating", "Sin calificación"),
+                })
 
-            return "\n".join(response_lines)
+            # 🔹 Construir respuesta doble: texto + JSON
+            response_lines = [
+                f"Encontré algunos lugares que podrían interesarte en base a '{query}':"
+            ]
+            for i, p in enumerate(formatted, start=1):
+                response_lines.append(f"{i}. {p['name']} — {p['address']} (⭐ {p['rating']})")
+
+            response_text = "\n".join(response_lines)
+            response_json = json.dumps(formatted, ensure_ascii=False)
+
+            # 🔹 Enviar ambos formatos: el LLM podrá usar el JSON
+            return f"{response_text}\n\nJSON_RESULT={response_json}"
 
         except Exception as e:
             return f"⚠️ Error al buscar lugares: {str(e)}"
+
 
     async def _arun(self, *args, input: str | dict | None = None, **kwargs) -> str:
         return self._run(*args, input=input, **kwargs)
 
 
 # ============================================================
-# 🏛 GetPlaceDetailsTool — obtiene detalles de un lugar
+#  GetPlaceDetailsTool — obtiene detalles de un lugar
 # ============================================================
 class GetPlaceDetailsTool(BaseTool):
     name: str = "get_place_details"
@@ -97,67 +114,71 @@ class GetPlaceDetailsTool(BaseTool):
 
 
 # ============================================================
-# 🎯 FilterPlacesByInterestsTool — evita loops vacíos
+#  FilterPlacesByInterestsTool — evita loops vacíos
 # ============================================================
 class FilterPlacesByInterestsTool(BaseTool):
     name: str = "filter_by_interests"
     description: str = (
-        "Filtra y rankea lugares según intereses del usuario. "
-        "Input: JSON o dict con {'places': [...], 'interests': ['museos','parques',...]}"
+        "Filtra y prioriza lugares según los intereses del usuario. "
+        "Recibe un input JSON o dict con {'places': [...], 'interests': ['museos', 'parques', ...]} y devuelve los lugares relevantes."
     )
 
     def _run(self, *args, input: str | dict | None = None, **kwargs) -> str:
         try:
+            # --- 1️⃣ Parseo flexible del input ---
             if args and not input:
                 input = args[0]
             if isinstance(input, dict):
-                data = {**input, **kwargs}
-            elif kwargs:
-                data = kwargs
-            else:
+                data = input
+            elif isinstance(input, str):
                 try:
-                    data = json.loads(input or "{}")
+                    data = json.loads(input)
                 except Exception:
                     data = {}
+            else:
+                data = kwargs or {}
 
             places = data.get("places", [])
-            user_interests = data.get("interests", [])
+            user_interests = [i.lower() for i in data.get("interests", [])]
 
-            if not places or not isinstance(places, list):
+            if not places or not user_interests:
                 return json.dumps([])
 
-            interest_map = {
-                'museos': ['museum', 'art_gallery'],
-                'monumentos': ['monument', 'landmark'],
-                'parques': ['park', 'nature'],
-                'restaurantes': ['restaurant', 'food'],
-                'bares': ['bar', 'night_club'],
-                'senderismo': ['hiking', 'mountain'],
-                'vida-nocturna': ['night_club', 'bar'],
-                'compras': ['shopping_mall', 'store'],
+            # --- 2️⃣ Diccionario de intereses -> palabras clave ---
+            keywords_map = {
+                "museos": ["museo", "museum", "galería", "arte", "historia"],
+                "monumentos": ["monumento", "plaza", "palacio", "histórico"],
+                "parques": ["parque", "jardín", "botánico", "verde", "naturaleza"],
+                "restaurantes": ["restaurant", "comida", "gastronomía", "chef"],
+                "bares": ["bar", "pub", "cerveza", "tragos", "nocturno"],
+                "compras": ["tienda", "shopping", "mercado", "mall"],
             }
 
-            relevant_categories = {
-                cat for i in user_interests for cat in interest_map.get(i.lower(), [])
-            }
+            # --- 3️⃣ Procesamiento de lugares ---
+            resultados = []
+            for p in places:
+                nombre = p.get("name", "").lower()
+                direccion = p.get("address", "").lower()
+                rating = float(p.get("rating", 0))
+                texto = f"{nombre} {direccion}"
 
-            scored = []
-            for place in places:
-                if isinstance(place, str):
-                    name = place
-                    cats = []
-                else:
-                    name = place.get("name", "")
-                    cats = place.get("categories", [])
-                score = sum(c in relevant_categories for c in cats)
+                # puntuación base
+                score = 0
+                for i in user_interests:
+                    palabras = keywords_map.get(i, [i])
+                    score += sum(1 for palabra in palabras if palabra in texto)
+
+                # boost por rating alto
+                score += rating / 5.0
+
                 if score > 0:
-                    scored.append({"name": name, "score": score})
+                    resultados.append({**p, "match_score": round(score, 2)})
 
-            # Si no encontró coincidencias, devolvemos todos los lugares originales
-            if not scored:
-                scored = [{"name": p if isinstance(p, str) else p.get("name")} for p in places]
+            # --- 4️⃣ Ordenar por relevancia ---
+            resultados.sort(key=lambda x: x["match_score"], reverse=True)
 
-            return json.dumps(scored[:5])
+            # --- 5️⃣ Devolver máximo 5 lugares ---
+            return json.dumps(resultados[:5], ensure_ascii=False)
 
         except Exception as e:
             return json.dumps({"error": str(e)})
@@ -167,7 +188,7 @@ class FilterPlacesByInterestsTool(BaseTool):
 
 
 # ============================================================
-# 🗺 OptimizeRouteTool — ordena por distancia
+#  OptimizeRouteTool — ordena por distancia
 # ============================================================
 class OptimizeRouteTool(BaseTool):
     name: str = "optimize_route"

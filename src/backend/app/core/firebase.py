@@ -215,3 +215,7 @@ class FirebaseService:
         return self._rt_root_ref
 
 firebase_service = FirebaseService()
+
+# ✅ Alias global para compatibilidad con repositorios existentes
+db = firebase_service.firestore
+rtdb = firebase_service.realtime_db

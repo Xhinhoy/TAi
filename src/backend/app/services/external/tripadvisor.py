@@ -13,7 +13,7 @@ class TripAdvisorFacade:
     
     def __init__(self):
         self.api_key = settings.TRIPADVISOR_API_KEY
-        self.base_url = ""
+        self.base_url = "https://api.content.tripadvisor.com/api/v1/location"
         self.rate_limit = settings.TRIPADVISOR_RATE_LIMIT
         self.last_request_time = 0
         self.cache_prefix = 'tripadvisor'
@@ -93,7 +93,7 @@ class TripAdvisorFacade:
         try:
             self._rate_limit_check()
             
-            url = f"{self.base_url}/location/{location_id}/reviews"
+            url = f"{self.base_url}/{location_id}/reviews"
             params = {
                 'key': self.api_key,
                 'limit': limit
@@ -130,7 +130,7 @@ class TripAdvisorFacade:
         try:
             self._rate_limit_check()
             
-            url = f"{self.base_url}/location/{location_id}"
+            url = f"{self.base_url}/{location_id}"
             params = {'key': self.api_key}
             
             response = requests.get(url, params=params, timeout=10)

@@ -52,78 +52,92 @@ const ChatScreen: React.FC = () => {
   }, [messages]);
 
   const handleSend = async () => {
-    if (!inputText.trim() || !user) return;
+  if (!inputText.trim() || !user) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputText,
-      isUser: true,
+  const userMessage: Message = {
+    id: Date.now().toString(),
+    role: 'user',
+    content: inputText,
+    isUser: true,
+  };
+
+  setMessages(prev => [...prev, userMessage]);
+  setInputText('');
+  setLoading(true);
+
+  try {
+    const response = await chatService.sendMessage({
+      user_id: user.uid,
+      session_id: conversationId ?? 'default',
+      message: inputText ?? '',
+      context: {},
+    });
+
+    // --- Mensaje principal del asistente ---
+    const assistantMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      role: 'assistant',
+      content: response.response
+        ? response.response
+        : 'No se obtuvo respuesta del asistente.',
+      isUser: false,
+    };
+    setMessages(prev => [...prev, assistantMessage]);
+
+    // --- Mostrar lugares sugeridos ---
+    if (Array.isArray(response.places) && response.places.length > 0) {
+      const formatted = response.places
+        .map(
+          (p, i) =>
+            `${i + 1}. ${p.name}${p.rating ? ` (⭐ ${p.rating})` : ''}${
+              p.address ? ` — ${p.address}` : ''
+            }`
+        )
+        .join('\n');
+
+      const placesMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        role: 'assistant',
+        content: `Estos son algunos lugares que encontré:\n${formatted}`,
+        isUser: false,
+      };
+      setMessages(prev => [...prev, placesMessage]);
+    }
+
+    // --- Guardar ID de conversación si existe ---
+    if (response.conversation_id) {
+      setConversationId(response.conversation_id);
+    }
+
+    // --- Mostrar sugerencias adicionales si existen ---
+    if (response.suggestions && response.suggestions.length > 0) {
+      const suggestionsMessage: Message = {
+        id: (Date.now() + 3).toString(),
+        role: 'assistant',
+        content: `Algunas sugerencias:\n${response.suggestions
+          .map((s, i) => `${i + 1}. ${s}`)
+          .join('\n')}`,
+        isUser: false,
+      };
+      setMessages(prev => [...prev, suggestionsMessage]);
+    }
+  } catch (error) {
+    console.error('Error sending message:', error);
+
+    const errorMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      role: 'assistant',
+      content:
+        'Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.',
+      isUser: false,
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputText('');
-    setLoading(true);
+    setMessages(prev => [...prev, errorMessage]);
+  } finally {
+    setLoading(false);
+  }
+};
 
-    try {
-      const response = await chatService.sendMessage({
-    user_id: user.uid,
-    session_id: conversationId ?? "default", //  evita que sea undefined
-    message: inputText ?? "",                //  evita null/undefined
-    context: {},                             //  asegúrate de que sea un objeto
-  });
-
-
-
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: response.response,
-        isUser: false,
-      };
-
-      setMessages(prev => [...prev, assistantMessage]);
-
-      if (response.conversation_id) {
-        setConversationId(response.conversation_id);
-      }
-
-      // If there are place suggestions, show them
-      if (response.places && response.places.length > 0) {
-        const placesMessage: Message = {
-          id: (Date.now() + 2).toString(),
-          role: 'assistant',
-          content: `Te recomiendo visitar estos lugares:\n${response.places.map((p, i) => `${i + 1}. ${p.name}`).join('\n')}`,
-          isUser: false,
-        };
-        setMessages(prev => [...prev, placesMessage]);
-      }
-
-      // If there are suggestions, show them
-      if (response.suggestions && response.suggestions.length > 0) {
-        const suggestionsMessage: Message = {
-          id: (Date.now() + 3).toString(),
-          role: 'assistant',
-          content: `Algunas sugerencias:\n${response.suggestions.map((s, i) => `${i + 1}. ${s}`).join('\n')}`,
-          isUser: false,
-        };
-        setMessages(prev => [...prev, suggestionsMessage]);
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-
-      const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Lo siento, hubo un error al procesar tu mensaje. Por favor, intenta de nuevo.',
-        isUser: false,
-      };
-
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const QuickAction: React.FC<{ text: string; icon: string; onPress: () => void }> = ({
     text,
