@@ -1,10 +1,7 @@
 import { UserPreferences } from '../hooks/useUserPreferences';
 import { TOURIST_INTERESTS, TouristInterest } from '../components/ui/InterestSelector';
-<<<<<<< HEAD
-=======
 import { recommendationsService, itinerariesService } from '../api/services';
 import { Place } from '../types/domain';
->>>>>>> origin/NSoto
 
 export interface PlaceRecommendation {
   id: string;
@@ -58,8 +55,6 @@ export class RecommendationsService {
   }
 
   /**
-<<<<<<< HEAD
-=======
    * Convert Place to PlaceRecommendation format
    */
   private convertToPlaceRecommendation(
@@ -87,7 +82,6 @@ export class RecommendationsService {
   }
 
   /**
->>>>>>> origin/NSoto
    * Calculate the match score between user interests and a place
    */
   private calculateMatchScore(place: any, userInterests: string[]): number {
@@ -184,17 +178,6 @@ export class RecommendationsService {
 
   /**
    * Generate recommendations based on user preferences
-<<<<<<< HEAD
-   */
-  public async generateRecommendations(
-    preferences: UserPreferences,
-    location?: { latitude: number; longitude: number },
-    limit: number = 10
-  ): Promise<PlaceRecommendation[]> {
-    // In a real implementation, this would call external APIs like Google Places
-    // For now, we'll return mock data based on interests
-
-=======
    * Now using the backend AI-powered recommendation engine
    */
   public async generateRecommendations(
@@ -231,7 +214,6 @@ export class RecommendationsService {
     preferences: UserPreferences,
     limit: number = 10
   ): PlaceRecommendation[] {
->>>>>>> origin/NSoto
     const mockPlaces = this.getMockPlaces();
 
     // Calculate match scores for each place
@@ -409,15 +391,6 @@ export class RecommendationsService {
 
   /**
    * Create a personalized itinerary based on user preferences
-<<<<<<< HEAD
-   */
-  public async createItinerary(
-    preferences: UserPreferences,
-    duration: number, // in hours
-    location?: { latitude: number; longitude: number }
-  ): Promise<ItineraryRecommendation> {
-    const places = await this.generateRecommendations(preferences, location, 8);
-=======
    * Now using the backend AI-powered itinerary generator
    */
   public async createItinerary(
@@ -479,7 +452,6 @@ export class RecommendationsService {
     location?: { latitude: number; longitude: number }
   ): Promise<ItineraryRecommendation> {
     const places = await this.generateRecommendations(preferences, userId, location, 8);
->>>>>>> origin/NSoto
 
     // Simple itinerary creation logic
     const selectedPlaces = places.slice(0, Math.min(5, places.length));
@@ -487,11 +459,7 @@ export class RecommendationsService {
     return {
       id: `itinerary-${Date.now()}`,
       title: 'Tu itinerario personalizado',
-<<<<<<< HEAD
-      description: 'Itinerario creado basado en tus intereses turísticos',
-=======
       description: 'Itinerary creado basado en tus intereses turísticos',
->>>>>>> origin/NSoto
       duration,
       places: selectedPlaces,
       totalDistance: 5.2, // Mock distance
@@ -504,11 +472,6 @@ export class RecommendationsService {
       tags: preferences.interests.slice(0, 3)
     };
   }
-<<<<<<< HEAD
-}
-
-export const recommendationsService = RecommendationsService.getInstance();
-=======
 
   /**
    * Get trending places from the backend
@@ -545,4 +508,3 @@ export const recommendationsService = RecommendationsService.getInstance();
 }
 
 export const localRecommendationsService = RecommendationsService.getInstance();
->>>>>>> origin/NSoto

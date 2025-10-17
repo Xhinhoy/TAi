@@ -67,18 +67,18 @@ const ChatScreen: React.FC = () => {
 
     try {
       const response = await chatService.sendMessage({
-        user_id: user.uid,
-        message: inputText,
-        conversation_id: conversationId,
-        context: {
-          user_preferences: preferences,
-        },
-      });
+    user_id: user.uid,
+    session_id: conversationId ?? "default", //  evita que sea undefined
+    message: inputText ?? "",                //  evita null/undefined
+    context: {},                             //  asegúrate de que sea un objeto
+  });
+
+
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: response.message,
+        content: response.response,
         isUser: false,
       };
 

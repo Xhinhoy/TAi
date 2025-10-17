@@ -144,6 +144,18 @@ class _MockRTRef:
                 return None
             cur = cur[p]
         return cur
+    
+    def push(self, value: Any):
+        """Simula el comportamiento de Firebase RTDB .push()"""
+        import uuid
+        key = str(uuid.uuid4())
+        self.child(key).set(value)
+        return self.child(key)
+
+    @property
+    def key(self) -> str:
+        """Devuelve el último segmento de la ruta, simulando la clave en Realtime DB."""
+        return self._path.split("/")[-1] if self._path else "root"
 
 # ------------------ SERVICIO ------------------
 
@@ -174,13 +186,15 @@ class FirebaseService:
             self._initialized = True
             return
 
-        cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS_PATH)  # type: ignore[arg-type]
-        firebase_admin.initialize_app(cred, {
-            "databaseURL": settings.FIREBASE_DATABASE_URL,
-            "projectId": settings.FIREBASE_PROJECT_ID,
-        })
+        # ⚙️ Previene múltiples inicializaciones al usar --reload
+        if not firebase_admin._apps:
+            cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS_PATH)  # type: ignore[arg-type]
+            firebase_admin.initialize_app(cred, {
+                "databaseURL": settings.FIREBASE_DATABASE_URL,
+                "projectId": settings.FIREBASE_PROJECT_ID,
+            })
+
         self._firestore_client = fb_firestore.client()
-        # Importante: en el SDK real, solemos usar una referencia raíz
         self._rt_root_ref = fb_db.reference("/")
         self._initialized = True
 

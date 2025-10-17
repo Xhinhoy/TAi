@@ -1,25 +1,30 @@
-from fastapi import HTTPException, Security
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from firebase_admin import auth
 import logging
+from firebase_admin import auth
+from fastapi import Request, HTTPException, status
+from app.core.firebase import firebase_service  # usamos tu servicio centralizado
 
 logger = logging.getLogger(__name__)
-security = HTTPBearer()
 
-async def verify_firebase_token(
-    credentials: HTTPAuthorizationCredentials = Security(security)
-) -> dict:
-    """Verifica el token de Firebase y retorna los datos del usuario"""
+async def verify_firebase_token(request: Request):
+    """Middleware de verificación de token Firebase"""
+    # 🔹 Asegura inicialización (si ya estaba hecho, no lo repite)
+    firebase_service.initialize()
+
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Falta el token de autorización"
+        )
+
+    token = auth_header.split(" ")[1]
     try:
-        token = credentials.credentials
         decoded_token = auth.verify_id_token(token)
+        logger.info(f"✅ Token válido para UID: {decoded_token.get('uid')}")
         return decoded_token
-    except auth.InvalidIdTokenError:
-        logger.error("Token inválido")
-        raise HTTPException(status_code=401, detail="Token inválido")
-    except auth.ExpiredIdTokenError: # type: ignore
-        logger.error("Token expirado")
-        raise HTTPException(status_code=401, detail="Token expirado")
     except Exception as e:
-        logger.error(f"Error verificando token: {str(e)}")
-        raise HTTPException(status_code=401, detail="Error de autenticación")
+        logger.error(f"❌ Error verificando token: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido o expirado"
+        )

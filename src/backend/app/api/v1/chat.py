@@ -8,13 +8,10 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 @router.post("/message", response_model=ChatResponse)
-async def send_message(
-    request: ChatRequest,
-    current_user: dict = Depends(get_current_user)
-):
-    if current_user['uid'] != request.user_id:
-        raise HTTPException(status_code=403, detail="No autorizado")
-    
+async def send_message(request: ChatRequest):
+    # 🚧 Modo de prueba: sin verificación de token
+    current_user = {"uid": "test_user"}
+
     response = await chat_service.send_message(request)
     return response
 

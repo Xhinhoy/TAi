@@ -11,18 +11,12 @@ import Search from "../screens/Search/Search";
 import Builder from "../screens/Itinerary/Builder";
 import Profile from "../screens/Profile/Profile";
 import Home from "../screens/Home/Home";
-<<<<<<< HEAD
-import { HomeIcon, SearchIcon, StarIcon, MapIcon, UserIcon } from "../components/icons";
-import { colors } from "../styles/colors";
-import { commonStyles } from "../styles/common";
-=======
 import Chat from "../screens/Chat/Chat";
 import PreferencesPage from "../preferences/PreferencesPage";
 import { HomeIcon, SearchIcon, StarIcon, MapIcon, UserIcon } from "../components/icons";
 import { colors } from "../styles/colors";
 import { commonStyles } from "../styles/common";
 import { MaterialCommunityIcons } from '@expo/vector-icons';
->>>>>>> origin/NSoto
 
 const Tabs = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -34,8 +28,6 @@ const Screen = (title: string) => () => (
   </View>
 );
 
-<<<<<<< HEAD
-=======
 function TabsNavigator() {
   return (
     <Tabs.Navigator
@@ -128,7 +120,6 @@ function TabsNavigator() {
   );
 }
 
->>>>>>> origin/NSoto
 export default function RootNav() {
   const { user, loading } = useAuth();
 
@@ -146,95 +137,6 @@ export default function RootNav() {
   return (
     <NavigationContainer>
       {user ? (
-<<<<<<< HEAD
-        <Tabs.Navigator
-          screenOptions={{
-            tabBarActiveTintColor: colors.primary.main,
-            tabBarInactiveTintColor: colors.neutral[500],
-            tabBarStyle: {
-              backgroundColor: colors.neutral.white,
-              borderTopWidth: 1,
-              borderTopColor: colors.neutral[200],
-              paddingTop: 8,
-              paddingBottom: 8,
-              height: 60,
-            },
-            tabBarLabelStyle: {
-              fontSize: 12,
-              fontWeight: "500",
-              marginTop: 4,
-            },
-            headerStyle: {
-              backgroundColor: colors.neutral.white,
-              elevation: 0,
-              shadowOpacity: 0,
-              borderBottomWidth: 1,
-              borderBottomColor: colors.neutral[100],
-            },
-            headerTitleStyle: {
-              fontSize: 18,
-              fontWeight: "600",
-              color: colors.neutral[900],
-            },
-          }}
-        >
-          <Tabs.Screen
-            name="Home"
-            component={Home}
-            options={{
-              title: "Inicio",
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <HomeIcon size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="Buscar"
-            component={Search}
-            options={{
-              title: "Buscar",
-              headerTitle: "Buscar lugares",
-              tabBarIcon: ({ color, size }) => (
-                <SearchIcon size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="Recs"
-            component={Screen("Recomendaciones")}
-            options={{
-              title: "Recs",
-              headerTitle: "Recomendaciones",
-              tabBarIcon: ({ color, size }) => (
-                <StarIcon size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="Itinerario"
-            component={Builder}
-            options={{
-              title: "Itinerario",
-              headerTitle: "Mi Itinerario",
-              tabBarIcon: ({ color, size }) => (
-                <MapIcon size={size} color={color} />
-              ),
-            }}
-          />
-          <Tabs.Screen
-            name="Perfil"
-            component={Profile}
-            options={{
-              title: "Perfil",
-              headerShown: false,
-              tabBarIcon: ({ color, size }) => (
-                <UserIcon size={size} color={color} />
-              ),
-            }}
-          />
-        </Tabs.Navigator>
-=======
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="Main" component={TabsNavigator} />
           <Stack.Screen
@@ -246,7 +148,6 @@ export default function RootNav() {
             }}
           />
         </Stack.Navigator>
->>>>>>> origin/NSoto
       ) : (
         <Stack.Navigator
           screenOptions={{
@@ -261,7 +162,3 @@ export default function RootNav() {
     </NavigationContainer>
   );
 }
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/NSoto

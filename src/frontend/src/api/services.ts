@@ -165,10 +165,10 @@ export interface PersonalizedRecommendation {
 
 export const recommendationsService = {
   /**
-   * Get personalized place recommendations using AI
+   * Get AI-powered recommendations (actual endpoint: /generate)
    */
   async getPersonalized(params: RecommendationsRequest): Promise<PersonalizedRecommendation[]> {
-    const response = await api.post('/recommendations/personalized', params);
+    const response = await api.post('/recommendations/generate', params);
     return response.data;
   },
 
@@ -313,15 +313,9 @@ export interface ChatMessage {
 
 export interface ChatRequest {
   user_id: string;
+  session_id?: string; // 👈 antes era conversation_id
   message: string;
-  conversation_id?: string;
-  context?: {
-    current_location?: {
-      latitude: number;
-      longitude: number;
-    };
-    user_preferences?: UserPreferences;
-  };
+  context?: Record<string, any>;
 }
 
 export interface ChatResponse {
@@ -337,7 +331,7 @@ export const chatService = {
    * Send a message to the AI travel assistant
    */
   async sendMessage(data: ChatRequest): Promise<ChatResponse> {
-    const response = await api.post('/chat', data);
+    const response = await api.post('/chat/message', data);
     return response.data;
   },
 

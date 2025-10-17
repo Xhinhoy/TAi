@@ -38,11 +38,7 @@ import { auth, db } from '../../services/firebase';
 import { theme } from '../../styles/theme';
 import { AnimatedPressable } from '../../components/ui/AnimatedPressable';
 import { usePreferences } from '../../contexts/PreferencesContext';
-<<<<<<< HEAD
-import { recommendationsService, PlaceRecommendation } from '../../services/recommendations.service';
-=======
 import { localRecommendationsService, PlaceRecommendation } from '../../services/recommendations.service';
->>>>>>> origin/NSoto
 import { TOURIST_INTERESTS } from '../../components/ui/InterestSelector';
 
 // TypeScript interfaces
@@ -224,39 +220,40 @@ const HomeScreen: React.FC = () => {
     return unsubscribeAuth;
   }, []);
 
-  // Generate recommendations when preferences change
-  useEffect(() => {
-    const generateRecommendations = async () => {
-<<<<<<< HEAD
-      try {
-        const recs = await recommendationsService.generateRecommendations(preferences);
-=======
-      if (!user || preferences.interests.length === 0) {
-        setRecommendations([]);
-        return;
-      }
+// Generate recommendations once per session or when interests truly change
+useEffect(() => {
+  let hasFetched = false;
 
-      try {
-        const recs = await localRecommendationsService.generateRecommendations(
-          preferences,
-          user.uid,
-          undefined, // location - could be added later
-          10
-        );
->>>>>>> origin/NSoto
-        setRecommendations(recs);
-      } catch (error) {
-        console.error('Error generating recommendations:', error);
-        setRecommendations([]);
-      }
-    };
+  const generateRecommendations = async () => {
+    if (hasFetched) return;
+    hasFetched = true;
 
-    generateRecommendations();
-<<<<<<< HEAD
-  }, [preferences.interests]);
-=======
-  }, [user, preferences.interests]);
->>>>>>> origin/NSoto
+    if (!user || preferences.interests.length === 0) {
+      setRecommendations([]);
+      return;
+    }
+
+    try {
+      const recs = await localRecommendationsService.generateRecommendations(
+        preferences,
+        user.uid,
+        undefined,
+        10
+      );
+      setRecommendations(recs);
+    } catch (error) {
+      console.error('Error generating recommendations:', error);
+      setRecommendations([]);
+    }
+  };
+
+  // Ejecutar una vez con un ligero delay (evita render conflict)
+  const timeout = setTimeout(() => generateRecommendations(), 300);
+
+  return () => clearTimeout(timeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, []); // 👈 Se ejecuta solo una vez
+
 
   const setupUserData = async (user: FirebaseUser) => {
     try {

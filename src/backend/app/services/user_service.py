@@ -6,6 +6,11 @@ class UserService:
     def get_profile(self, uid: str) -> Optional[UserProfile]:
         profile_data = user_repository.get_profile(uid)
         if profile_data:
+            # 🔧 Normaliza nombres de campos que vienen desde Firebase
+            if "displayName" in profile_data and "display_name" not in profile_data:
+                profile_data["display_name"] = profile_data.pop("displayName")
+            if "photoURL" in profile_data and "photo_url" not in profile_data:
+                profile_data["photo_url"] = profile_data.pop("photoURL")
             return UserProfile(**profile_data)
         return None
     

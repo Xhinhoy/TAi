@@ -1,11 +1,16 @@
 # app/core/config.py
-from typing import List, Optional, Literal
+import os
+from typing import List, Optional, Literal, ClassVar    
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# 🧭 Ruta absoluta hacia el .env
+env_path = os.path.join(os.path.dirname(__file__), "..", "..", "TAi_backend", ".env")
+
 class Settings(BaseSettings):
-    # Modo mock: no exige credenciales ni inicializa SDKs reales
-    MOCK_MODE: bool = True
+    ...
+    MOCK_MODE: bool = Field(default=False, description="Usar Firebase mock (sin conexión real)")
+
 
     # Firebase
     FIREBASE_CREDENTIALS_PATH: Optional[str] = None
@@ -14,9 +19,18 @@ class Settings(BaseSettings):
 
     # Groq (LLM principal)
     GROQ_API_KEY: Optional[SecretStr] = None
-    GROQ_MODEL: str = "llama-3.1-70b-versatile"
+    GROQ_DEV_MODE: bool = True
+    GROQ_MODEL_8B: str = "llama-3.1-8b-instant"
+    GROQ_MODEL_70B: str = "llama-3.3-70b-versatile"
+
+    @property
+    def GROQ_MODEL(self) -> str:
+        """Selecciona automáticamente el modelo según el modo de desarrollo"""
+        return self.GROQ_MODEL_8B if self.GROQ_DEV_MODE else self.GROQ_MODEL_70B
+
     GROQ_TEMPERATURE: float = Field(default=0.7, ge=0.0, le=2.0)
     GROQ_MAX_TOKENS: int = Field(default=2000, gt=0, le=8000)
+
 
     # APIs externas
     GOOGLE_PLACES_API_KEY: Optional[SecretStr] = None
@@ -33,8 +47,9 @@ class Settings(BaseSettings):
     # Rate Limits
     GOOGLE_PLACES_RATE_LIMIT: int = Field(default=50, gt=0, le=1000)
 
+    # 🔧 Configuración general
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=env_path,  # 👈 ahora lee el .env correcto
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",
@@ -63,3 +78,11 @@ class Settings(BaseSettings):
 
 # Instancia única exportada por el módulo
 settings = Settings()  # type: ignore
+
+# 👇 (opcional) verificación de carga
+print(f"✅ .env cargado desde: {env_path}")
+print(f"📄 FIREBASE_CREDENTIALS_PATH: {settings.FIREBASE_CREDENTIALS_PATH}")
+# 👇 Mensaje informativo sobre el modelo Groq activo
+current_model = settings.GROQ_MODEL
+mode_label = "🧪 MODO DESARROLLO" if settings.GROQ_DEV_MODE else "🚀 MODO PRODUCCIÓN"
+print(f"{mode_label} → Usando modelo Groq: {current_model}")
