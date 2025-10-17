@@ -2,6 +2,14 @@ import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+// Fix Leaflet default icon paths issue with bundlers
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: '',
+  iconUrl: '',
+  shadowUrl: '',
+});
+
 interface Marker {
   id: string;
   lat: number;
@@ -50,8 +58,16 @@ export default function MapContainer({ center, zoom = 13, markers }: MapContaine
 
     const layerGroup = L.layerGroup().addTo(mapRef.current);
 
+    // Create custom icon
+    const customIcon = L.divIcon({
+      className: 'custom-marker',
+      html: `<div style="background-color: #3b82f6; width: 24px; height: 24px; border-radius: 50%; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);"></div>`,
+      iconSize: [24, 24],
+      iconAnchor: [12, 12],
+    });
+
     markers.forEach((marker) => {
-      L.marker([marker.lat, marker.lng])
+      L.marker([marker.lat, marker.lng], { icon: customIcon })
         .bindPopup(`<strong>${marker.name}</strong><br/>${marker.rating} estrellas`)
         .addTo(layerGroup);
     });
