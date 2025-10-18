@@ -43,3 +43,5 @@ class FirebaseService:
         return self._realtime_db
 
 firebase_service = FirebaseService()
+
+

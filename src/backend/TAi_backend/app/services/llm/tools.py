@@ -174,3 +174,66 @@ class OptimizeRouteTool(BaseTool):
     
     async def _arun(self, *args, **kwargs):
         return self._run(*args, **kwargs)
+    
+
+# Agregar al final de app/services/llm/tools.py
+
+class SearchPlacesWithReviewsInput(BaseModel):
+    query: str = Field(description="Texto de búsqueda")
+    latitude: float = Field(description="Latitud")
+    longitude: float = Field(description="Longitud")
+    radius: int = Field(default=5000, description="Radio en metros")
+    include_reviews: bool = Field(default=True, description="Incluir reviews de TripAdvisor")
+
+class SearchPlacesWithReviewsTool(BaseTool):
+    name: str = "search_places_with_reviews"
+    description: str = """Busca lugares usando Google Places Y obtiene sus reviews de TripAdvisor.
+    Esta es la herramienta RECOMENDADA para obtener información completa.
+    Input: query, latitude, longitude, radius, include_reviews"""
+    args_schema: Type[BaseModel] = SearchPlacesWithReviewsInput
+    
+    def _run(self, query: str, latitude: float, longitude: float, 
+             radius: int = 5000, include_reviews: bool = True) -> str:
+        import json
+        
+        # 1. Buscar en Google Places
+        location = {'latitude': latitude, 'longitude': longitude}
+        places = GooglePlacesFacade.search_nearby(
+            location=location,
+            radius=radius,
+            keyword=query
+        ) # type: ignore
+        
+        if not include_reviews:
+            return json.dumps(places[:10])
+        
+        # 2. Enriquecer con reviews de TripAdvisor
+        enriched_places = []
+        for place in places[:10]:  # Limitar a 10 para no abusar de la API
+            place_name = place.get('name', '')
+            
+            # Buscar en TripAdvisor
+            tripadvisor_results = tripadvisor_facade.search_location(
+                query=place_name,
+                lat=latitude,
+                lng=longitude
+            )
+            
+            # Agregar info de TripAdvisor si existe
+            if tripadvisor_results:
+                tripadvisor_data = tripadvisor_results[0]
+                place['tripadvisor'] = {
+                    'location_id': tripadvisor_data.get('location_id'),
+                    'rating': tripadvisor_data.get('rating'),
+                    'num_reviews': tripadvisor_data.get('num_reviews'),
+                    'ranking': tripadvisor_data.get('ranking')
+                }
+            else:
+                place['tripadvisor'] = None
+            
+            enriched_places.append(place)
+        
+        return json.dumps(enriched_places)
+    
+    async def _arun(self, *args, **kwargs):
+        return self._run(*args, **kwargs)

@@ -9,13 +9,13 @@ class Settings(BaseSettings):
     
     # Groq (LLM principal)
     GROQ_API_KEY: str
-    GROQ_MODEL: str = "llama-3.1-70b-versatile"
-    GROQ_TEMPERATURE: float = 0.7
+    GROQ_MODEL: str 
+    GROQ_TEMPERATURE: float = 0.5
     GROQ_MAX_TOKENS: int = 2000
     
     # APIs externas
     GOOGLE_PLACES_API_KEY: str
-    #TRIPADVISOR_API_KEY: str
+    TRIPADVISOR_API_KEY: str
     
     # App
     ENV: str = "development"
@@ -26,7 +26,7 @@ class Settings(BaseSettings):
     
     # Rate Limits
     GOOGLE_PLACES_RATE_LIMIT: int = 50
-    #TRIPADVISOR_RATE_LIMIT: int = 30
+    TRIPADVISOR_RATE_LIMIT: int = 30
     
     @property
     def cors_origins_list(self) -> List[str]:

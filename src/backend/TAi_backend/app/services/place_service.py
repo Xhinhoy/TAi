@@ -1,5 +1,6 @@
 from app.repositories.place_repository import place_repository
 from app.services.external.google_places import GooglePlacesFacade
+from app.services.external.tripadvisor import tripadvisor_facade
 from app.models.place import Place, PlaceDetails, PlaceSearchParams
 from typing import List, Optional
 
@@ -34,6 +35,36 @@ class PlaceService:
     def search_by_category(self, categories: List[str], limit: int = 20) -> List[Place]:
         results = place_repository.search_by_category(categories, limit)
         return [Place(**r) for r in results]
+    # Agregar al final de app/services/place_service.py
+
+def enrich_place_with_tripadvisor(self, place: Place) -> PlaceDetails:
+    """Enriquece un lugar de Google Places con datos de TripAdvisor"""
+    
+    # Buscar en TripAdvisor
+    tripadvisor_results = tripadvisor_facade.search_location(
+        query=place.name,
+        lat=place.coords.latitude,
+        lng=place.coords.longitude
+    )
+    
+    place_dict = place.model_dump()
+    
+    if tripadvisor_results:
+        location_id = tripadvisor_results[0].get('location_id')
+        
+        # Obtener reviews
+        reviews = tripadvisor_facade.get_reviews(location_id, limit=5) # type: ignore
+        
+        # Agregar información de TripAdvisor
+        place_dict['reviews'] = reviews
+        place_dict['reviews_count'] = tripadvisor_results[0].get('num_reviews', 0)
+        
+        # Si TripAdvisor tiene mejor rating, usarlo
+        tripadvisor_rating = tripadvisor_results[0].get('rating')
+        if tripadvisor_rating and (not place.rating or tripadvisor_rating > place.rating):
+            place_dict['rating'] = tripadvisor_rating
+    
+    return PlaceDetails(**place_dict)
 
 place_service = PlaceService()
 

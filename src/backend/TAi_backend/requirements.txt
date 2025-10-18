@@ -9,7 +9,6 @@ langchain-groq
 
 # Firebase
 firebase-admin
-
 # APIs externas
 googlemaps
 requests

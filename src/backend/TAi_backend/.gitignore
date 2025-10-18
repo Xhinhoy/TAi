@@ -1,28 +1,65 @@
-# Environment
+# Environment variables
 .env
+.env.local
+.env.*.local
+
+# Python virtual environment
 .venv/
-test/
-pytest.ini
+venv/
+env/
+ENV/
+API_DOCUMENTATION.md
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 .Python
-waszxqw3ewsdawqefdsweqertfgrewsdvb nb-ountKey.json
-proyectotai-cb31a-firebase-adminsdk-fbsvc-ecc5309b12.json
-test.json
+*.so
+
+# Firebase credentials
+*-firebase-adminsdk-*.json
+firebase-credentials*.json
+serviceAccountKey.json
+
+# Testing
+test/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+coverage.xml
+*.cover
+
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
-
-# Testing
-.pytest_cache/_Ñlkiop
-.coverage
-htmlcov/
+*~
 
 # Logs
 *.log
 logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+*.egg-info/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+test.json
+*.tmp
 

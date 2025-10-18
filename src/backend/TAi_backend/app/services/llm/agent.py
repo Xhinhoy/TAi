@@ -7,7 +7,8 @@ from .tools import (
     GetPlaceDetailsTool,
     GetReviewsTool,
     FilterPlacesByInterestsTool,
-    OptimizeRouteTool
+    OptimizeRouteTool,
+    SearchPlacesWithReviewsTool
 )
 from .prompts import TRAVEL_AGENT_SYSTEM_PROMPT, RECOMMENDATION_PROMPT, ITINERARY_PROMPT
 import json
@@ -24,7 +25,7 @@ class TravelAgent:
         # Usar solo Groq
         self.llm = ChatGroq(
             model=settings.GROQ_MODEL,
-            groq_api_key=settings.GROQ_API_KEY, # type: ignore
+            groq_api_key=settings.GROQ_API_KEY,
             temperature=settings.GROQ_TEMPERATURE,
             max_tokens=settings.GROQ_MAX_TOKENS
         )
@@ -40,13 +41,14 @@ class TravelAgent:
     def _initialize_tools(self):
         """Inicializa las herramientas del agente"""
         return [
-            SearchPlacesTool(),
+            SearchPlacesWithReviewsTool(),  # Tool híbrida recomendada
+            SearchPlacesTool(),              # Mantener por compatibilidad
             GetPlaceDetailsTool(),
             GetReviewsTool(),
             FilterPlacesByInterestsTool(),
             OptimizeRouteTool()
         ]
-    
+
     async def generate_recommendations(self, location: dict, limit: int = 10) -> dict:
         """Genera recomendaciones personalizadas"""
         try:
@@ -67,7 +69,7 @@ class TravelAgent:
             response = await self.llm.ainvoke(prompt)
             
             try:
-                result = json.loads(response.content) # type: ignore
+                result = json.loads(response.content)
                 return result
             except json.JSONDecodeError:
                 logger.warning("Respuesta no es JSON válido")
@@ -101,16 +103,39 @@ class TravelAgent:
             logger.info(f"Generando itinerario con Groq ({settings.GROQ_MODEL})...")
             
             response = await self.llm.ainvoke(prompt)
-            
+
             try:
-                result = json.loads(response.content) # type: ignore
+                # Asegurar encoding correcto UTF-8
+                content = response.content
+                if isinstance(content, bytes):
+                    content = content.decode('utf-8')
+
+                # Log para debugging - RESPUESTA COMPLETA
+                logger.info(f"📝 Respuesta COMPLETA de Groq:")
+                logger.info(f"{content}")
+                logger.info(f"📝 Longitud de respuesta: {len(content)} caracteres")
+
+                result = json.loads(content)
+
+                # Verificar que el JSON tenga la estructura correcta
+                if 'days' not in result:
+                    logger.error("❌ Respuesta sin campo 'days'")
+                    return {
+                        'title': f'Itinerario {days} días en {city}',
+                        'days': [],
+                        'reasoning': content
+                    }
+
+                logger.info(f"✅ Itinerario parseado correctamente: {len(result.get('days', []))} días")
                 return result
-            except json.JSONDecodeError:
-                logger.warning("Respuesta no es JSON válido")
+            except json.JSONDecodeError as e:
+                logger.error(f"❌ Error JSON decode: {str(e)}")
+                logger.error(f"❌ Content type: {type(response.content)}")
+                logger.error(f"❌ Content (primeros 500 chars): {str(response.content)[:500]}")
                 return {
                     'title': f'Itinerario {days} días en {city}',
                     'days': [],
-                    'reasoning': response.content
+                    'reasoning': str(response.content)
                 }
                 
         except Exception as e:

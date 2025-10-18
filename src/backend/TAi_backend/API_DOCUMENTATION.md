@@ -1508,9 +1508,6 @@ Estas interfaces permiten:
 
 ---
 
-## Soporte y Contacto
-
-Para reportar problemas o solicitar nuevas funcionalidades, contacta al equipo de desarrollo.
 
 **Versión de la documentación:** 1.0.0
 **Última actualización:** 2024-01-15

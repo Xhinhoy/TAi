@@ -5,6 +5,7 @@ from datetime import datetime
 class ItineraryItem(BaseModel):
     day: int
     place_id: str
+    place_name: Optional[str] = None
     start: str
     end: str
     notes: Optional[str] = None
@@ -27,7 +28,7 @@ class ItineraryCreate(BaseModel):
     items: List[ItineraryItem] = []
 
 class ItineraryGenerateRequest(BaseModel):
-    user_id: str
+    title: Optional[str] = None  # Opcional - si no se proporciona, se genera automáticamente
     city: str
     days: int
     start_date: Optional[str] = None
