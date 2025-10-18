@@ -161,6 +161,11 @@ export interface PersonalizedRecommendation {
   score: number;
   reasoning: string;
   categories_matched: string[];
+  match_interests?: string[];
+  opening_hours?: {
+    open_now?: boolean;
+    weekday_text?: string[];
+  };
 }
 
 export const recommendationsService = {

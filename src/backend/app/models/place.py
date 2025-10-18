@@ -13,6 +13,7 @@ class Place(BaseModel):
     rating: Optional[float] = Field(None, ge=0, le=5)
     address: Optional[str] = None
     price_level: Optional[int] = Field(None, ge=0, le=4)
+    opening_hours: Optional[Dict] = None
     photos: List[str] = Field(default_factory=list)
     source: str = Field(default="google")
     categories: List[str] = Field(default_factory=list)
@@ -22,7 +23,6 @@ class Place(BaseModel):
 class PlaceDetails(Place):
     phone: Optional[str] = None
     website: Optional[str] = None
-    opening_hours: Optional[Dict] = None
     reviews_count: int = 0
     reviews: List[Dict] = []
 

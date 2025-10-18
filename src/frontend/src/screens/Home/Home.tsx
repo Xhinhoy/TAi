@@ -71,6 +71,7 @@ interface RecommendationCardProps {
     reason: string;
     matchScore: number;
     priceLevel?: number;
+    openNow?: boolean | null; // ✅ nuevo campo
   };
   onPress: () => void;
 }
@@ -95,13 +96,37 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation,
         <Text style={styles.recommendationDescription} numberOfLines={2}>
           {recommendation.description}
         </Text>
-        <Text style={{ fontSize: 12, color: theme.colors.text.secondary }}>
-          {recommendation.openNow === true
-            ? 'Abierto ahora'
-            : recommendation.openNow === false
-            ? 'Cerrado'
-            : 'Horario no disponible'}
-        </Text>
+      <View style={{ marginTop: 4 }}>
+      <Text
+        style={{
+          fontSize: 12,
+          color: recommendation.openNow ? 'green' : theme.colors.text.secondary,
+          fontWeight: '500',
+        }}
+      >
+        {recommendation.openNow === true
+          ? '🟢 Abierto ahora'
+          : recommendation.openNow === false
+          ? '🔴 Cerrado'
+          : 'Horario no disponible'}
+      </Text>
+
+      {/* Mostrar los horarios semanales si existen */}
+      {recommendation?.opening_hours?.weekday_text?.length > 0 && (
+        <View style={{ marginTop: 4 }}>
+          {recommendation.opening_hours.weekday_text.map((line: string, idx: number) => (
+            <Text key={idx} style={{ fontSize: 10, color: theme.colors.text.tertiary }}>
+              {line}
+            </Text>
+          ))}
+        </View>
+      )}
+
+<Text style={{ fontSize: 10, color: theme.colors.text.tertiary, marginTop: 4 }}>
+  Última actualización: {new Date().toLocaleTimeString()}
+</Text>
+</View>
+
         <Text style={{ fontSize: 10, color: theme.colors.text.tertiary, marginTop: 2 }}>
           Última actualización: {new Date().toLocaleTimeString()}
         </Text>
@@ -307,13 +332,14 @@ useEffect(() => {
                   <RecommendationCard
                     key={i}
                     recommendation={{
-                      id: rec.place.name,
+                      id: rec.place.id,
                       name: rec.place.name,
                       description: rec.reasoning,
                       rating: rec.place.rating || 0,
                       reason: rec.match_interests?.join(', ') || '',
                       matchScore: rec.score || 0,
-                      openNow: rec.place.opening_hours?.open_now
+                      priceLevel: rec.place.priceLevel,
+                      openNow: rec.place.opening_hours?.open_now ?? null, // ✅ agregado
                     }}
                     onPress={() => console.log('Abrir lugar:', rec.place.name)}
                   />

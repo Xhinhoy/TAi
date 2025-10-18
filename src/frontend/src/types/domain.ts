@@ -10,6 +10,11 @@ export type Place = {
   photos?: string[];
   source: "google"|"tripadvisor"|"hybrid";
   categories: string[];
+  opening_hours?: {
+  open_now?: boolean;
+  weekday_text?: string[];
+  };
+  openNow?: boolean;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 };

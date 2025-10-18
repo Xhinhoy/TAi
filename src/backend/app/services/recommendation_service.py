@@ -30,7 +30,7 @@ class RecommendationService:
 
             for interest in interests:
                 # Buscar en ambas fuentes
-                google_results = google_places_facade.text_search(
+                google_results = await google_places_facade.text_search(
                     query=interest,
                     location={"latitude": lat, "longitude": lng},
                     radius=5000
@@ -63,14 +63,13 @@ class RecommendationService:
                     seen.add(name)
                     unique_results.append(item)
 
-            # Ordenar por rating y limitar
+            # 🔍 Filtrar resultados poco relevantes
             filtered_results = [
                 r for r in unique_results
-                if (r.get("rating", 0) or 0) >= 3.5  # Mínimo 3.5 estrellas
-                and not any(word in str(r.get("types", [])).lower() for word in ["adult", "escort", "strip", "night_club"])
+                if (r.get("rating", 0) or 0) >= 3.5  # al menos 3.5 estrellas
+                and (r.get("user_ratings_total", 0) or 0) >= 20  # mínimo 20 reseñas
+                and not any(word in str(r.get("types", [])).lower() for word in ["adult", "escort", "night_club"])
             ]
-
-            # Si después del filtro hay pocos resultados, usar los originales
             if len(filtered_results) < 5:
                 filtered_results = unique_results
 
