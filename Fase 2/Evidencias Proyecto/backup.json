@@ -1,0 +1,2916 @@
+{
+  "itineraries": {
+    "24rxnY7OJqi07xjY808N": {
+      "city": "Santiago",
+      "items": [
+        {
+          "notes": "Dou",
+          "day": 1,
+          "start": "10:00",
+          "placeId": "mock-0",
+          "end": "11:00"
+        },
+        {
+          "day": 1,
+          "start": "10:00",
+          "end": "11:00",
+          "placeId": "mock-1",
+          "notes": "Ndea"
+        }
+      ],
+      "title": "El pepe",
+      "ownerUid": "Yqfu019g4IdNsXEbotLKjt1iZm42",
+      "days": 3,
+      "createdAt": {
+        "_seconds": 1758680908,
+        "_nanoseconds": 34000000
+      }
+    },
+    "AZd8MuZRoafKWBZNnhHf": {
+      "ownerUid": "JHTAD0iYfqN5wgH2DUpcLB9qqXC3",
+      "title": "Itinerario en Santiago",
+      "city": "Santiago",
+      "days": 3,
+      "items": [],
+      "createdAt": {
+        "_seconds": 1760765117,
+        "_nanoseconds": 56000000
+      }
+    },
+    "i25DwvRsN1PcYiW9ahpX": {
+      "days": 5,
+      "created_at": {
+        "_seconds": 1760783129,
+        "_nanoseconds": 159691000
+      },
+      "city": "Santiago",
+      "items": [
+        {
+          "day": 1,
+          "place_id": "museo_nacional_bellas_artes",
+          "notes": "Visita al museo para admirar la colección de arte chileno y europeo",
+          "place_name": "Museo Nacional de Bellas Artes",
+          "start": "09:00",
+          "end": "11:00"
+        },
+        {
+          "day": 1,
+          "place_id": "plaza_de_armas",
+          "notes": "Paseo por la plaza principal de Santiago y visita a la Catedral Metropolitana",
+          "place_name": "Plaza de Armas",
+          "start": "11:30",
+          "end": "13:00"
+        },
+        {
+          "day": 1,
+          "place_id": "mercado_central",
+          "notes": "Visita al mercado para probar la comida típica chilena y comprar souvenirs",
+          "place_name": "Mercado Central",
+          "start": "14:00",
+          "end": "16:00"
+        },
+        {
+          "day": 2,
+          "place_id": "museo_historico_nacional",
+          "notes": "Visita al museo para conocer la historia de Chile",
+          "place_name": "Museo Histórico Nacional",
+          "start": "09:00",
+          "end": "11:00"
+        },
+        {
+          "day": 2,
+          "place_id": "barrio_lastarria",
+          "notes": "Paseo por el barrio bohemio de Santiago y visita a sus tiendas y cafés",
+          "place_name": "Barrio Lastarria",
+          "start": "11:30",
+          "end": "13:30"
+        },
+        {
+          "day": 2,
+          "place_id": "parque_forestal",
+          "notes": "Paseo por el parque y visita al Museo de Arte Contemporáneo",
+          "place_name": "Parque Forestal",
+          "start": "15:00",
+          "end": "17:00"
+        },
+        {
+          "day": 3,
+          "place_id": "cerro_san_cristobal",
+          "notes": "Subida al cerro para disfrutar de la vista panorámica de la ciudad",
+          "place_name": "Cerro San Cristóbal",
+          "start": "09:00",
+          "end": "11:00"
+        },
+        {
+          "day": 3,
+          "place_id": "zoo_nacional",
+          "notes": "Visita al zoológico para ver la variedad de animales",
+          "place_name": "Zoológico Nacional",
+          "start": "11:30",
+          "end": "13:30"
+        },
+        {
+          "day": 3,
+          "place_id": "paseo_huerfanos",
+          "notes": "Paseo por el paseo peatonal y visita a sus tiendas y restaurantes",
+          "place_name": "Paseo Huérfanos",
+          "start": "15:00",
+          "end": "17:00"
+        },
+        {
+          "day": 4,
+          "place_id": "centro_cultural_gabriela_mistral",
+          "notes": "Visita al centro cultural para conocer la obra de la poetisa chilena",
+          "place_name": "Centro Cultural Gabriela Mistral",
+          "start": "09:00",
+          "end": "11:00"
+        },
+        {
+          "day": 4,
+          "place_id": "barrio_bellas_artes",
+          "notes": "Paseo por el barrio y visita a sus tiendas de arte y diseño",
+          "place_name": "Barrio Bellas Artes",
+          "start": "11:30",
+          "end": "13:30"
+        },
+        {
+          "day": 4,
+          "place_id": "restaurante_donde_augusto",
+          "notes": "Comida típica chilena en un restaurante tradicional",
+          "place_name": "Restaurante Donde Augusto",
+          "start": "15:00",
+          "end": "17:00"
+        },
+        {
+          "day": 5,
+          "place_id": "costanera_center",
+          "notes": "Visita al centro comercial más grande de Sudamérica",
+          "place_name": "Costanera Center",
+          "start": "09:00",
+          "end": "11:00"
+        },
+        {
+          "day": 5,
+          "place_id": "sky_costanera",
+          "notes": "Subida al mirador para disfrutar de la vista panorámica de la ciudad",
+          "place_name": "Sky Costanera",
+          "start": "11:30",
+          "end": "13:00"
+        },
+        {
+          "day": 5,
+          "place_id": "barrio_providencia",
+          "notes": "Paseo por el barrio y visita a sus tiendas y restaurantes",
+          "place_name": "Barrio Providencia",
+          "start": "15:00",
+          "end": "17:00"
+        }
+      ],
+      "title": "Mi viaje",
+      "owner_uid": "JHTAD0iYfqN5wgH2DUpcLB9qqXC3",
+      "updated_at": {
+        "_seconds": 1760783129,
+        "_nanoseconds": 159703000
+      }
+    },
+    "rGOzJ6fcsljuuMlzDCvR": {
+      "ownerUid": "JHTAD0iYfqN5wgH2DUpcLB9qqXC3",
+      "title": "Itinerario en Santiago",
+      "city": "Santiago",
+      "days": 3,
+      "items": [],
+      "createdAt": {
+        "_seconds": 1760759954,
+        "_nanoseconds": 965000000
+      }
+    },
+    "t2GRp8Hw4mRbDO6ePcGM": {
+      "ownerUid": "ICWDzXDI7BWZ71OfFloNcS61rLU2",
+      "title": "Prueba",
+      "city": "Santiago",
+      "days": 4,
+      "items": [],
+      "createdAt": {
+        "_seconds": 1760734117,
+        "_nanoseconds": 560000000
+      }
+    }
+  },
+  "places": {
+    "ChIJ-6JD8L7PYpYRlfIF67EwHR4": {
+      "source": "google",
+      "photos": [
+        "AciIO2cAEyonYBZtzZPG-_oRaH8lYfsJ1ZO8ImkDmTH5eu4guFNN-ztjJWNykfcg9Xxi7bHpxv1WS7Hn9SWxH877NSyQrscgGldNwa4Zx2POLxH54ifG3NiVzVpPke-NQKyfgWXdsRPm8da9obmBoTJwiRjuHnKucPOFAKo14bZ0OEZekmHxFXZ7GY9avyxXZSM9Ady6OByM6OCQ0gkmXA_2eU6Z5Rzgk2xL8_uJBCl8Lfcydv_2JhF__oI2G3SkHw5fDqdTIqh2WqK-GiBi_e-vlUrTzU8whIF9jAT7fGmhA1yryf-S_rUHCYZFQG2msLdE68WpGx-o"
+      ],
+      "rating": 4.6,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794904,
+        "_nanoseconds": 855686000
+      },
+      "coords": {
+        "longitude": -70.59421669999999,
+        "latitude": -33.45494
+      },
+      "name": "Catholic University Theater",
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Jorge Washington 26, Ñuñoa",
+      "id": "ChIJ-6JD8L7PYpYRlfIF67EwHR4",
+      "created_at": {
+        "_seconds": 1760794904,
+        "_nanoseconds": 855686000
+      }
+    },
+    "ChIJ-c32MfjEYpYRQO0BXSt4bUQ": {
+      "source": "google",
+      "photos": [
+        "AciIO2d-PAv8oGtqaBmCUqmZ2fjYw3vwZjzyWiFXOf0gipZQZAGG3TvTVI_p6sD1CkBm5S5ys4NZB2fZF1jX2DJeWYlEovE3wOsTY53tPvIJyKnPmwjSK1WnUwrkVGivt1RjWPOF4DyUtzfscGiU1DL-z3hJtLqrnAaq6xpsjBx-tO8EnJ7lNfuibCdiqb5Vv3iDlFs_fPosWDBK3u0dQo-METwxc-GRzluvgNU2AI-IIbdh3XpqcoY6u0aiu9Ek3lqqQ0YtnDlmd8UJZK85sFkv9Y2MoXTwW10zOx-zglFut8uYVkG1KvbLlLRFfLm4RaR1ZmJfP9XB576uGkFeO3CNu2j5f5aRp_uJLPZkIwk4h5Uo7GOEzs9kP3i5VRREW9yPvnNzGBsAm_pDn4xJ2K_5A7eHUi3CSw8nK-q3oxm9NzYa2sF6J9UPB6jnWPHbaC7k7iVcDzBa5eidreiqoriDBRZNiJQLXGK63kPZxMMR73B9KU3qqmSfJLCAlQVIYMMm1X1nST-_QxGc5zVg8QWYDoHeGT80j5DD9ajeT2ZpjzNwcbKl6-1jBvPnrc-goV9GAcT7tSsQGVTh8rm9HgKJASDpT15Wo_ddH8dXDprKXC0g0EijbNNCOdZxOGM9MJT_"
+      ],
+      "rating": 3.7,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794911,
+        "_nanoseconds": 388242000
+      },
+      "coords": {
+        "longitude": -70.6798505,
+        "latitude": -33.45447619999999
+      },
+      "name": "Terminal de Buses San Borja",
+      "categories": [
+        "bus_station",
+        "transit_station",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "San Francisco de Borja 184, Santiago",
+      "id": "ChIJ-c32MfjEYpYRQO0BXSt4bUQ",
+      "created_at": {
+        "_seconds": 1760794911,
+        "_nanoseconds": 388242000
+      }
+    },
+    "ChIJ1Sps_XnGYpYR3MuyTqX8HPM": {
+      "source": "google",
+      "photos": [
+        "AciIO2ecEkYCchzwp00vAGi0PSjwmx9IkQkw0GUz0rGX_7pBtMoDliY20xKPWrpLzuxzH0GwiyqlpCmsS04eiiiXFSYOScz5MrRTMg9c9peQmzbkPLzSPtgBlln-JpWD758XOPT-moStakGaqDkTTDad3n2-vh5IY5GctsCJSNPLhu0MOjbdjNcXrfRGA9WcnDXmGfOT7Uu3gcgZnjFvQFtzf5YgQt6biIp9oqH98r3p6KJwsbM5BHVRFIWWSElPpf7BUfxEsNS62c6LrYJM4x8G5Xhi-OMvBhhUEsJDJnVZXjS2_oKBtRzNrMRFALtcRzJvviZpRGkZZ23VAiCy0w2N2e8h9SydF8wkdP2fNZh30LWkQEyBO4zBqKk0xsbXHaNfQimPwhjnP69CGKE1WJGE7hOEu6bkDJ2bjy_NXWDwWQX9Nf-oIlDJ159Z1LykcZyQl7eOFZqug-9w0B_TTVROjLNBfVT3EjCVsRsdzq_n_w6zJRCFwGcbdd1dVDzfJvkm5r1fVfGJN4l6_t3UylgzG4L6YsRIbDwsUbXV-tDrYAVPDBPluYGnoMtK0kc5lYue-MveqIureJHY7iJbOWxhCzKUKisE3jteaCXZx81vvyfcadDThVgJ09jZVh5l9X6ivLk6xw"
+      ],
+      "rating": 4,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804601,
+        "_nanoseconds": 568336000
+      },
+      "coords": {
+        "longitude": -70.6571338,
+        "latitude": -33.4448495
+      },
+      "name": "Hotel Diego de Almagro Santiago",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Alameda Libertador Bernardo O'Higgins 1485, Santiago",
+      "id": "ChIJ1Sps_XnGYpYR3MuyTqX8HPM",
+      "created_at": {
+        "_seconds": 1760804601,
+        "_nanoseconds": 568336000
+      }
+    },
+    "ChIJ1ZaTYaDFYpYRDXHnBwetcd8": {
+      "source": "google",
+      "photos": [
+        "AciIO2faQjMxt87_9modC9QilidwGku8YifufdFsV4jp6hMnAH3HHJIVJsEGNz-udDrwIdM5uRir6vTI0Qis_ntsCn3U1zVHwjZl5YwnxpvQCBufK11c6WD5r4bxc74i8dpuSEI4zja2dpuo0whwt9UxYfgiAnUr3XZpa7o3XCfrV1RkkZsEwrhwDEGc8fJeo175FECCP91cM5YptCiAPC1F8eHCL7cRWbIBCosj3COspaRhpw9W2FWYhqpEqF_H0p20r711jaUeXt4BnptQZebeSCbyRHC9oQpssKY-s0Mcjge53TTiUaw2_SzTeq15QUfz5P_uq1XBV_BKxo8lbzli5-1WIA4oDmri0OUwkOIfAhMzKlMzKlzIM8ZO6nTJ-hoeSK4fRwAxpnneTRtEXm9PDfddJxHXJ8JcDlI-_IWdEKeOaSmDgWbashC5ITO30fEaqz0TuanPnKhEAu9jdhngq7xro39qBlweoA8TJhPML0uUGTmTfE6WIjisElibrm8mg-3Dz9Rw049cWBBLZsY58XMxY3mQY6oaUjjRAkdqOTJgvctFEkSxhXCpOqdxT1BAw8ZbKaM1zivvFUU_3AVU-weod95K3AfiYiQVyHL1RF3cgd8UlyTohz1l0cEcEnEcoLPCdA"
+      ],
+      "rating": 4.2,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804599,
+        "_nanoseconds": 256013000
+      },
+      "coords": {
+        "longitude": -70.64847619999999,
+        "latitude": -33.4444551
+      },
+      "name": "Hotel Vegas",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Londres 49, Santiago",
+      "id": "ChIJ1ZaTYaDFYpYRDXHnBwetcd8",
+      "created_at": {
+        "_seconds": 1760804599,
+        "_nanoseconds": 256013000
+      }
+    },
+    "ChIJ1w6rHgDQYpYR67RaxX7AJcc": {
+      "source": "google",
+      "photos": [
+        "AciIO2fhkiL1zutAX0o4yOX8Vxm90NlFsBq7pqlWJqW5Glr-uQttJuJz_RIArKoIffl6qZdZJgVgKEEJZFCGLtMwePXEsE454LVYqZo02lcay_0uZb6bE55MXaMJVBoZyzKLkLR8t1giCvROHe5GqrOMoMYubWxuw1g-4c8-6-fxJMDXwJndH-6vKDRKUMKxfuIwOktMPBvWauzIblQW6Ep8rs-UkvLdXjHKtm97n_80xo4FT5JuRDLte4HxnWiicE0gFicyQfjRhczUEDvRSqqPHsF4j7xR74NAIPwTIf-ai7H44qlesufUZkZmA7UVgvMBTcxCB-9OpZUOyM-H_xE1_dWRFDyyk5B9Iqt6naABNY3bC7kYvTWeV6k5mdFVRDWsD5FTjFzBzmvCtiEWtA9MjhUj31W4iOgsx8BfAxBMsaGWdCxBz9geehBzq394QL-GHmvSVi4VOHlM9ENp-nrGvY9MWj-YhtmrnUzTRzOkNa49LnNvftpHc5j0MBs0LuhKiCISRO1N0LUa1CQmiGXvsFj-Zyx1ng6AVCjxIuFdgLy9frjILCoBsAViE7qUq5I7EID04uMVLWs4S3ZsNkgaVD6B8YVITdtFj6yINp6x-HdUwS3Km3CTXLCCWvv2uDIOCIqEcg"
+      ],
+      "rating": 4.4,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794067,
+        "_nanoseconds": 743120000
+      },
+      "coords": {
+        "longitude": -70.6168513,
+        "latitude": -33.4964107
+      },
+      "name": "Comercial Rey",
+      "lng": -70.6168513,
+      "categories": [
+        "home_goods_store",
+        "hardware_store",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Vicuña Mackenna 4601, San Joaquín",
+      "id": "ChIJ1w6rHgDQYpYR67RaxX7AJcc",
+      "lat": -33.4964107,
+      "created_at": {
+        "_seconds": 1760794067,
+        "_nanoseconds": 743120000
+      }
+    },
+    "ChIJ347o1wnFYpYRZ09KUA6sjOw": {
+      "source": "google",
+      "photos": [
+        "AciIO2dbKgc0M_9e3GuZt-ahEppfbvUZJXVtNFxbvsRZ5tDPa4AfC12a_8KRYr6vJR75l2xncYi2YVq_6SIdwl6Utj2Sj14zgogNStrpoktAQo4XRT_iA_0RAalDt4k2VGu-8GjyMiRZrV_pPpW7pKxVeYhiiGC1AKi20vMAWOqD5-g0yfcP-lh_sISmLFfHTWOwWkd-edpWR2ZBlnkqiEbY8jJ8JKVxP3sVenreky7GhKonYWIzC-yJXdkQgSNHvgP41N-Z59j11bItCzvgz4LeWXUClnKzcGNPqMQhYIOXgZU784sUzn_77SZcJSv743jc_Q76ZmpkKrALqKsP0HnBNZ62TeDIn1S0HRStMkuvcaRp_ChT1ZXGfXP46v_IUrGI4juPBD9Iq8SL70l4YbdxI3QWRqQuq4LVBuFY8XGe4XX7B2ebAjOUKJKY2I9x_fpiChfGV3_WA1JEnjJJiqbUsnQFMzVrKbPFvjdbY9jINNNU2i2jCj3O30JHL53pk32O6FH4OmS4ESxgUQwbtxpzGEfsthhA0rGFqx2sZknojL2bmK0p3NoMIeyqRTnBEfLzWXYwztyu2iJQamPyCj86Z8qmzU84mQtmJy9nDPsnMNdyKZU12n9KBGLYPkAU4qHnppMVSg"
+      ],
+      "rating": 4.4,
+      "price_level": 1,
+      "updated_at": {
+        "_seconds": 1760804604,
+        "_nanoseconds": 79926000
+      },
+      "coords": {
+        "longitude": -70.65360989999999,
+        "latitude": -33.44652
+      },
+      "name": "Restaurante Evergreen",
+      "categories": [
+        "restaurant",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Nataniel Cox 102, Santiago",
+      "id": "ChIJ347o1wnFYpYRZ09KUA6sjOw",
+      "created_at": {
+        "_seconds": 1760804604,
+        "_nanoseconds": 79926000
+      }
+    },
+    "ChIJ4_DysPvPYpYR7IMEC7OO84w": {
+      "source": "google",
+      "photos": [
+        "AciIO2eBnvv0jE8sGHCMpd12_bpjfn14zPIF3eXIl4xeUzrjaOWwSuQvyOT1735xHX2kbc7zGAG1ARrUZscHQWnUsSUWTzG9JEE2nfYBJbJZAw5JP061DvxNnR5byB6DRrDUcDazGf4OvrD-GL2U2iLQKuX43eidYHlTSmS0lirzVbrcjApX4BCvVenvVWn23Imdvt7A1659r36TEi76KYeRzb5dY7aqj6q7vSCheagOMGcr_Ixp2w5b9G50FJST6z4wY3XNzYs_6UlK4szLHRP15u4rCqL1_kIp5-JzTfMhfaPyuMCFEOGnZ1goHSEvg3trTOHOnQOqLtSjK7Gp7qvuw0ihNCcIgzwDpgdJVAMIyA8Yf__ErykuQoJV6xeOxw7F0-eO5KgHpGAVw2xmsOZW7vivf72TvL272a_vEfGfs5dH89Lti650NE6G0YHGvrHYSWBvPjpXOjdM1EUfSFCV7dquHMmxMFsgMr29Hohzufv59KRk0ECBn3AniGH85DYppU34L9z8EaG6TepCI3ILjwIes1f84Bs3XKn1nBQNNXX97B7zrpcGoWU7nQmxto9_iVcpvI28U9Sa7RBzVDwRM-gmLto_2j7pN0pmhUTN-pIC7UdY2ngWKWdpzHalKHL8dWf1lg"
+      ],
+      "rating": 4.1,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794902,
+        "_nanoseconds": 156400000
+      },
+      "coords": {
+        "longitude": -70.61399349999999,
+        "latitude": -33.4758652
+      },
+      "name": "Monarch S A",
+      "categories": [
+        "clothing_store",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ],
+      "address": "Avenida Marathón 2239, Macul, Macul",
+      "id": "ChIJ4_DysPvPYpYR7IMEC7OO84w",
+      "created_at": {
+        "_seconds": 1760794902,
+        "_nanoseconds": 156400000
+      }
+    },
+    "ChIJ53--pH3PYpYRS11mT1mybls": {
+      "source": "google",
+      "photos": [
+        "AciIO2etqDU0i_BNbV-JZlzmfET8Nr5IKIcYusC9lPeM2x6g4XU6FaS3P_Etqtl6XXylxFUi9lKUm7C6BgWr_LZOL5XTfr0Qay1Jn-f-PipZ_pPLHztxEqY-b06uBUCMZZCe6Xn2ZALE1Izox-RIpMEcZ8hip6PRCAa3GHXr0Sww-P0IG1KzcFX2ok2bGisLFVUZMWL7qHRArkqmLs3sSqEtEphcbu-KkOaRTvUtkoZFdStNZho6dni2pSk2cYeubUWA8xuj0Ab-0CoH88Wrh2OP90b8T5lgsYsHMXEmUJFLv-BRvzSFp2wKSLamt4f05w6-akUHhglJcJk"
+      ],
+      "rating": 4.1,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806168,
+        "_nanoseconds": 279238000
+      },
+      "coords": {
+        "longitude": -70.619995,
+        "latitude": -33.4333454
+      },
+      "name": "Hotel Maria Angola",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Miguel Claro 425, Providencia, Providencia",
+      "id": "ChIJ53--pH3PYpYRS11mT1mybls",
+      "created_at": {
+        "_seconds": 1760806168,
+        "_nanoseconds": 279238000
+      }
+    },
+    "ChIJ6TZN_JTPYpYRRVH-3xZvjZU": {
+      "source": "google",
+      "photos": [
+        "AciIO2d9DFrOIBKUP5hR1tsIJEjZG0A5JIefeEFzR8gjZ7JK0j6zDXfjUkR4mByCXtl9sFAAHvRUvDon8DoVtQGwPeaYI-YA0vghESHdsK1ulHcbA_NkpAs8M4lqA1YOyWTe1sNsnv25oGMbVfOdTtNFh1UuIDkmUWueYJ_Pdj3qyvl5ETSbnDiP_t2D3OHWRhQs_1aoCuHkyKn8uSq2dn599Mh4SNOoFtDbpUHT9GZNH5Gyu1NnAwrwpMCpOoy_R3NumaJ9YvIMytOL2nuSLghpdVfZlLtUPk5r9-jy76nX6PvAUaLiwMdpUHUhFf4ga4thIRbB2F3D54u_q50Y1HqTtlsgqHazOHCo6uOdv_2O79QABx7dEE4jLCXiYMZ5Rh0osJ9Gn02wsUIa5KZlvMGmzuISL_6GJZTye_dKJqE_OK44ww1HHwglXw5uLut8yoz7DnnWCU-l9W3W0X7zaGZTur7Z0shfU2FgKE8CBmpNhWoXH01wu_vDl5Ku1uHJ-Wc1jRzTdpYXCfA_WumxpXiV2KW_kn5cNrRAziK7ATUKht24TeRiY0usAGm8mM9mjMSHj776OknrolK-3qiEqKiqDQ7uAwtsz3ob3jf8nAJCRFh_ZlZVmHDUI906T9AwwP3_spP-uKcl"
+      ],
+      "rating": null,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794905,
+        "_nanoseconds": 119360000
+      },
+      "coords": {
+        "longitude": -70.5982915,
+        "latitude": -33.4549175
+      },
+      "name": "Ñuñoa",
+      "categories": [
+        "locality",
+        "political"
+      ],
+      "address": "Ñuñoa",
+      "id": "ChIJ6TZN_JTPYpYRRVH-3xZvjZU",
+      "created_at": {
+        "_seconds": 1760794905,
+        "_nanoseconds": 119360000
+      }
+    },
+    "ChIJ7UqlU6jFYpYRhlTouv0eQp8": {
+      "source": "google",
+      "photos": [
+        "AciIO2dXWEjlaaszAOObyzmKA2m_qopeKADGJV8a0KHCfruOTViHd7CcKix3WguiuOygcCdQXL9SVgipFAtxqGw50QBiUd6VCu1XRjFEc1u6XvX5eR3PP-RC9mPhY1ORME9yojhYyt3mN4xdJvM0jNrV-Lt2AnWgjB1JsivFwWjxyerHHUtKQ-7_FNx7bZ7gBhe6WLzaq0l3dvJLdaKF2MOJgmbzlrA6iV1n1qj7x7FCqzJM0JHF8Ya4S3R0lG_dzRSGDKlUsQbizk5VyDxDhkNTKnD96e8kIL5iKpz8MCPG1C75IR0ArE_jju1XPtgtRts51cpM5xo-e6-9kDKnkPfUV080zR29Q2igBvfLmPapMurqwEBngu-nsEE_XvhntDablwqIWg2o_v5Pv6Q6IrH5qFaL8kSpC5RS3f3kLqWv0sM654eQ1YhPoQQ0ss6WG-NhE8yEmHIITOe7bDIUDV5wF9ItP1OW-QjxKIz9X9FY_TTEaZZu6QOq7zKZA3CYTMkq_WEfqtiWNLRTHlmkNLnbB612iSjt9juMsk9F4dBfWfCrktone_fbCftSaSgLtPD4yRHPdg3mH2aJtbPSJUjYM75D3OkY-zd3UKqOi0uciGIjAuh3SQYtCowuAWUSg9B0"
+      ],
+      "rating": 4,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806078,
+        "_nanoseconds": 546619000
+      },
+      "coords": {
+        "longitude": -70.6607897,
+        "latitude": -33.4473666
+      },
+      "name": "Cosmopolita Hostel",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Manuel Rodríguez 21, Santiago, Santiago",
+      "id": "ChIJ7UqlU6jFYpYRhlTouv0eQp8",
+      "created_at": {
+        "_seconds": 1760806078,
+        "_nanoseconds": 546619000
+      }
+    },
+    "ChIJ7dMrY6zFYpYRk44I1mtxdso": {
+      "source": "google",
+      "photos": [
+        "AciIO2f7pBZTc1uW5evjOhSsYEiGOsePHPNi1pM15IQvG_quslqPOlUEw500VtQ2uTSHo1e-IYgEX1LbaR1H8adbVdeaJ49Ijdwzq9Zs6G0YkLGJM87uFx5cVTfCRb3eTyuwJSqdSHP-EX2ZmoqWruVn6DPKNS8V1Zrt0_pa81uh6iY6V6duuKQPd2dlO457FjQh_GTvijgSQD1jAl8nAN01rJNmSXf3woEGYbo3PmEz-HoKjHHVXAouc5nK5GYPnRMUWnVUo5vthQ4-FzlAe2J-ubb0Pgip4emEkEQ6X-ccdB-b4vI8ByyO5W_HaAJ4810-tFXf-4fY65LgMvpBltTkaeiMRXsttyc8QKN4fLPlUme-saNkqVQTNfWC-EMutizv-nJaahJQsuSsm80mk84R9AYaSzwU9KsRpjGahhgqpmD8xuDmVjcJM2gMK8jwXwUS-ka3Sqm2rSGz0EOPvC2PlctUhTeO1Pe_qV5kdz6ubDAuCpS2BRG4G_ypRPkvQBf17g3rSBap9WEta6-uVJIKiAmT5BSEplVUOJBNy4Uf1htFNsHEScqESf7isaTlvm1yWLjpox4NGLs4fqZ24FaVQ0SxVj7Si8-yAYDaSbRkPJ6KmmtpMOgLinMA4ScZv-88j7TnSA"
+      ],
+      "rating": 3.6,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806078,
+        "_nanoseconds": 918007000
+      },
+      "coords": {
+        "longitude": -70.6662611,
+        "latitude": -33.4421543
+      },
+      "name": "Inactivo",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Agustinas 2173, Santiago",
+      "id": "ChIJ7dMrY6zFYpYRk44I1mtxdso",
+      "created_at": {
+        "_seconds": 1760806078,
+        "_nanoseconds": 918007000
+      }
+    },
+    "ChIJ8wBhvfnPYpYRw_zzcBPGMNY": {
+      "source": "google",
+      "photos": [
+        "AciIO2d7UkXrEpqi1o7vS98D5NvIr8wMveglJWsIEg-eRLltKkbmuydNmQLxcq2McmRTMnQ9YKuE5XGDfelrRB6Nj0seS8OWv6qQDC-VuzW2MyTEdcXuw7usq7uh6ZmORn9A5mFlwMe9OJZ13TcZ8nw9yfhyNpc7DWHtgd4YcjqE29W_2y7rCblOuhpADsBy4kinduuK1vs6syrCZYGK8o0Hft6w4YvZj931YpuhVeLTIluWCP9UOwC-vORN5OqF83oiIe4ZjWLUKBDKazce2wrEStIbDqGkBBexFz6jUFuG50jpmQ53rgb1wePSxhyJ_sXToRkhqYn1kGYZEwgRFfvHV3QSbgN4FXQGawxPzPE461GHVailTjXwRODdpt2voREJCrvFzOHaZwfhTSRajkA9lyYtN3b2EmZ1G4sPlC_VQR_ytjJOrBovOA0j8kf8A577uqvNoMIwy9Yf3ZLanZL4nEA1JGlyKqlhWeJXuQocI5Ik2U9tUB_4guZ-P34MFoouuWceiLQcumwkZCRxtstagjKUFI7uaKGpMXYY2tf6j6zYEs6Z-j6SL6mdja1mrtRsnA0B7QETyH534lX9Hpjxy4eAvED8p6jPhf6ssOskNBzXD2oH2S6LumnprF0VwTIW"
+      ],
+      "rating": 4.5,
+      "price_level": 2,
+      "updated_at": {
+        "_seconds": 1760794068,
+        "_nanoseconds": 592112000
+      },
+      "coords": {
+        "longitude": -70.616894,
+        "latitude": -33.4758972
+      },
+      "name": "Viña Santa Carolina",
+      "lng": -70.616894,
+      "categories": [
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Til Til 2228, Macul",
+      "id": "ChIJ8wBhvfnPYpYRw_zzcBPGMNY",
+      "lat": -33.4758972,
+      "created_at": {
+        "_seconds": 1760794068,
+        "_nanoseconds": 592112000
+      }
+    },
+    "ChIJ92aDbnzPYpYRfI1HCsD874c": {
+      "source": "google",
+      "photos": [
+        "AciIO2ciqiuwPmMG0keXGgLjRkM4hxgDzoEuWSwCC2ISbELLRiu9gqsSsOMki3YXML4dUhHSdOu1OUG-TNx-Sl4_dDCacMlZQq7CHh_tDbBWAkVduqMXIMr8YTZje05bpYK6Dxiazcme8vLgOF4CtnKFAk7PaCVmS44W0FFepyWzWmsMEbGItvTPGFP77KcAjuFMWt0AdUNyyp-p9ZHstoh4_TJVdn4Nr-VWrPTKqV7D_o7pjIVEparVPk9WQOX5R7MH2jXUjy2zFR_Ilef6FlKlj1eodQjvX4MuZP4dd7OVeKJVWHv_8Pck-7SdSIPVsS-i1MzMAyQQ7FX7-eIdwBAnOshUP2fOeFPkRzW1vQ62rh289Gs1DUUxoBkiK1H668W9HeTH9axcyYIl-FVfVeZZvI6ZgAtysG4zY3ayfVNAtcHWSLQIuO-96tg544lDUX6x-YReo3clyDXqKzRhItp30OMjzSDfIvSXfx9PRNODHtsBFtQEel0bUb2s0wGUNQa7iK9AWuGklILDdAhJDPNnW0oQXWZWwWoSE9e6fbaZwFlyUzz0umsTw2PhbD0JdaNnWVTmfQPeiceZk7M07FsYQR4NtxzNb1vsNlo-kbI5hK4DZzSM63P7DamGITpMB4Iw3IOLjA"
+      ],
+      "rating": null,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806172,
+        "_nanoseconds": 844614000
+      },
+      "coords": {
+        "longitude": -70.609455,
+        "latitude": -33.4314428
+      },
+      "name": "Providencia",
+      "categories": [
+        "locality",
+        "political"
+      ],
+      "address": "Providencia",
+      "id": "ChIJ92aDbnzPYpYRfI1HCsD874c",
+      "created_at": {
+        "_seconds": 1760806172,
+        "_nanoseconds": 844614000
+      }
+    },
+    "ChIJ97xyembPYpYRH4jyGo3ucnA": {
+      "source": "google",
+      "photos": [
+        "AciIO2eWs6SvNMY2Slgu1Iz08X3sE9HQwQKTNs27Dqedbil5YePuitwPPNhFDibojDyTx6goTQFM5fivlJNLyPsIZpI0wkwH3jd2LaGvDaR3RV3DXSYpjbw76UJVppx5Db7mGABL5kabVk6nNQTGMXcV60sq1aJdzH_VICfoj--srY3-bt6CYD5qw7mJwn4O5tEHNn7__H0O4B01nEVpRX5dLri46sfDkGdig0zDOt3wDM2zcwvs15RU3_My0Aq5W2DVBjG5FjBhm2eR5V1vifCVc3ezNyapiNjVgtpxJAf7Qx3zE4B_37r6GA9-B-No2rsX6j3qKJjkP6g"
+      ],
+      "rating": 4.8,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806170,
+        "_nanoseconds": 917270000
+      },
+      "coords": {
+        "longitude": -70.6121984,
+        "latitude": -33.4227556
+      },
+      "name": "Hotel Boutique Le Reve Hotel",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Orrego Luco 023, Providencia",
+      "id": "ChIJ97xyembPYpYRH4jyGo3ucnA",
+      "created_at": {
+        "_seconds": 1760806170,
+        "_nanoseconds": 917270000
+      }
+    },
+    "ChIJ9Sknht7PYpYR5kJGt1sl2RQ": {
+      "source": "google",
+      "photos": [],
+      "rating": 4.5,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794902,
+        "_nanoseconds": 959953000
+      },
+      "coords": {
+        "longitude": -70.5946609,
+        "latitude": -33.4752353
+      },
+      "name": "Liceo Municipalizado Manuel Rojas",
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Santiago, Macul",
+      "id": "ChIJ9Sknht7PYpYR5kJGt1sl2RQ",
+      "created_at": {
+        "_seconds": 1760794902,
+        "_nanoseconds": 959953000
+      }
+    },
+    "ChIJ9dyMAVbEYpYRlShgkDuvgxM": {
+      "source": "google",
+      "photos": [],
+      "rating": 5,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806083,
+        "_nanoseconds": 594077000
+      },
+      "coords": {
+        "longitude": -70.675553,
+        "latitude": -33.44981589999999
+      },
+      "name": "Ernesto Eduardo González Susperreguy",
+      "categories": [
+        "health",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avda Liber Bernardo O`Higgins 2995, Dp 91, Santiago, Santiago",
+      "id": "ChIJ9dyMAVbEYpYRlShgkDuvgxM",
+      "created_at": {
+        "_seconds": 1760806083,
+        "_nanoseconds": 594077000
+      }
+    },
+    "ChIJAy1LEG7PYpYRyO7h4K0S-OM": {
+      "source": "google",
+      "photos": [
+        "AciIO2d7-7ZKkz04Ko5oYZ0H_hgUX7T2Dbe7u4jZ-ARMSqJL7m6d5rWCLrx63osCIW6n46u-H0aUAp8HLG3Zo9YnYArIUhUMIDxdpVz0oFpvS8-uEeFQJVjSD1kHNCcwLcHUurajOhLzJCm2eSGxxGbnQGzYLo9V3h4AAyujLpUPNra4i1mPqXjUfF8sLFjkyjnbyJX7kLFoQsBduSpqmzSVJtoVRWp7lICQZCzSRKv-YaNsaQAaYDlCD6wwat8WvghJ106_QF5JUtdUNKCZ6Jd-ozkqlSE8f2ehA-OYMeosSSrNuRWvYj5a6qSKtF9WHL8AgDJlWKfyHnk"
+      ],
+      "rating": 3.6,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760797421,
+        "_nanoseconds": 863287000
+      },
+      "coords": {
+        "longitude": -70.6047474,
+        "latitude": -33.4269599
+      },
+      "name": "Nogales Hotel & Convention Center",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Los Nogales 741, Santiago",
+      "id": "ChIJAy1LEG7PYpYRyO7h4K0S-OM",
+      "created_at": {
+        "_seconds": 1760797421,
+        "_nanoseconds": 863287000
+      }
+    },
+    "ChIJDVL9MeLPYpYRs24N7NlJ0js": {
+      "source": "google",
+      "photos": [
+        "AciIO2f6F7bvYKsWFShq0VS2ptfL0cBGXvDP5ZJZYxUJS27aGvP0LuUPX82zwrX4v_NkiifPgTd-R_LXYGud4GoXQZuCD8qPsrdVpUreuImHuMNhFtrHam0I6DvARn2RtosPXkGrtvUcBIvkyhD7shTTXYzmL1ZQ5QlfosWCGsxBarVv2QGefwYU3Ezly-57n1HeEgNAiCJn99lrHsfDgjSTN45K01t3eDP2795zAxMhFV_k2N5wa8x4okM7Yte_-rSTzLqOBbK1Xd0ZDVRaWccPjnR3CHqK7-xo8We7Emt3veoTsTceLWUYTMal0hglGz3ZhhbxsRiM4WI"
+      ],
+      "rating": 4.5,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794904,
+        "_nanoseconds": 40850000
+      },
+      "coords": {
+        "longitude": -70.60457219999999,
+        "latitude": -33.4784737
+      },
+      "name": "Feltrex",
+      "categories": [
+        "point_of_interest",
+        "home_goods_store",
+        "store",
+        "establishment"
+      ],
+      "address": "Obispo Arturo Espinoza Campos 2587, Macul",
+      "id": "ChIJDVL9MeLPYpYRs24N7NlJ0js",
+      "created_at": {
+        "_seconds": 1760794904,
+        "_nanoseconds": 40850000
+      }
+    },
+    "ChIJE3xEXQvFYpYRGBH02PO4Fno": {
+      "source": "google",
+      "photos": [
+        "AciIO2ex4AcYvVDeMK2keHe05Z3VlGnrdxqKt9YfqRzrGjwFIeBvAUYblRcNkyLNfkAZ-biCRJhmb1bKaXLIzkFU1TY2iuYkY5L6bPSjhY1kZdnqAzUKbSN0oTV9u4BNT5w28Wjx6TRJq4TvGuj5AZX2BPiFN2YwB5mae12xmWcw8p7HhN38jMEWk_dywFcwL33sxAhYaTVjr-XPdCHVzMx9B_5yf9umEXlWqoRVwvwlba3mE9zlFVd9SGLxDLwSI4Jz3dmBPQ9xVOx90DYvYzNDKjBtHun7_ucprEWKGFn1QFfT08FaJK3L7ElCM0W-p24wf7pbGgujt2cbY4cnaPNoD5_xj4SQN__-CM1pUasBM03cr7qv4dguJoJgo-OnUjc4vbD3aMPOxV6JajUcxbXoCfCzstCTqGksd9IXsSEkQSAXj7l_YsrgY-2L-RxTmSTrfqKfTJ9aq6DZ_gNPS0tf_RJaD7Sbb9gUOPevn0XrVY-TmiVrjlcEIic4rXXCQPDgzj0gl9mMkw7jWDJFUIc0127N3PS1_uC-jOHjonxzoOz94uMRPWkZSDQRhaksNXJENOa4wHbgapqtQujc_LUHTQk-e-GqNITBmgc0PyYc2DQ0Qqw0idXPmAyTNeVFhNc_dIp-Pg"
+      ],
+      "rating": 3.9,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804598,
+        "_nanoseconds": 874172000
+      },
+      "coords": {
+        "longitude": -70.647139,
+        "latitude": -33.4501153
+      },
+      "name": "Aparthotel San Francisco",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "San Francisco 415, Santiago, Santiago",
+      "id": "ChIJE3xEXQvFYpYRGBH02PO4Fno",
+      "created_at": {
+        "_seconds": 1760804598,
+        "_nanoseconds": 874172000
+      }
+    },
+    "ChIJE7iaY-3PYpYR36FWBQaIJLk": {
+      "source": "google",
+      "photos": [
+        "AciIO2e0kCC0Zdkn36QqJ8VNHEDHcXo4QDGH6gUftbpUwvx5SQqFwC0LtTLRORf6UBwdMxVc1VVA1wEDxvBbtBlz5dviq-Ty0Sv5JuAm8_H9GWFhfxZcjhxQDsQers14FBxFxxXlMn9ErTpROfd_FlXpZE7xw_N1PGUZ25NSyi5NSwXmz4gnfNU4ZVdIL2a_9YEACFo6GYoau_vduLTbCbAbzzO0qljnpfIHaBaOlykBQVM9nKE7dbAHhJ8OkNHXCl_cblumskjRGQ8ss1RU7Ew_Jr8U4PdVsQ8SKziQWX6mr0ft6l3aeIxdI1TcK7aKnnJ7SKVa55U37Glc04o3c-vg-iaZnIm6RoUCX8A1NCw4PRQBVAmgmUe6FFDM0K8Pd5CX43VO-TDWpWhBZgqXoqx77CnLpDQ17MHk0qlwEpk4-zRFf4M_upj1UYPU_QOjxwaOQNbacWXyoMwVOvC33yonx3hQE3olW2yiLJXiIDUXjb-FRQog_PnlCRQrzZTtWzeddJtoCI6ihaWwNJ4qsy6k4ZzefWXMhm8lSLT_U41D3g0DYobgepmSyexrUBPOeP2IWPinBCcDrMsBeVF-BWzxc3utGRYqG0uQCOQnNL7Pjmd0d2U8LoJwwdVHZ5iiatRsydAjXSGA"
+      ],
+      "rating": 4.5,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794900,
+        "_nanoseconds": 238304000
+      },
+      "coords": {
+        "longitude": -70.6106319,
+        "latitude": -33.4644994
+      },
+      "name": "Estadio Nacional Julio Martínez Pradanos",
+      "categories": [
+        "stadium",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Grecia 2001, Ñuñoa",
+      "id": "ChIJE7iaY-3PYpYR36FWBQaIJLk",
+      "created_at": {
+        "_seconds": 1760794900,
+        "_nanoseconds": 238304000
+      }
+    },
+    "ChIJG5nCY3zPYpYRYfbqoQ3tEFU": {
+      "source": "google",
+      "photos": [
+        "AciIO2d339DeSx-7hteRwTZpd7PpEaONet4fXPi_5m1iT_c0N2CyH9JTBwMCADF7fgIZ3a-XW4vMVpHCTDqQicWVL1_yOXT76_21b6TM0SYaid7bWpYMT1JIGWfuYAMcBdw5w4C34J_nhaohKx9GYvc3jajO4qO_NbVbxbK7TgPaJ3PqDWXEi7lB6GOFb7XLN-FvX5wVui8gkUjHw4vKUhPg6KYbUYvkiT9JF10G23Bvtb6GESWcV4TrqzGsrLEq7kHJUorb7cbNYWDDHz7A89kDzCyro9czk2XXTccqme5qGTemew8Yu9jq4oPC0SB5GybO1FEDT-_E0oE"
+      ],
+      "rating": 4.7,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806166,
+        "_nanoseconds": 634546000
+      },
+      "coords": {
+        "longitude": -70.6168398,
+        "latitude": -33.4325403
+      },
+      "name": "Providencia Bed And Breakfast",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Alberto Magno 1398, Santiago, Providencia",
+      "id": "ChIJG5nCY3zPYpYRYfbqoQ3tEFU",
+      "created_at": {
+        "_seconds": 1760806166,
+        "_nanoseconds": 634546000
+      }
+    },
+    "ChIJH8tIRR_QYpYRYA_Tg1aIi4I": {
+      "source": "google",
+      "photos": [
+        "AciIO2fNdxfkqj6lw0zpX3DsOtizTq_qZpH5ZE4QFBMiNyRYUcI1qal-NMC20A5zArFlEhrGH-QstYAGCFRkqHFkdcWy8F5sCTaUP4pzpAFT7D493iepIo4S0LbqJ3JFPKgU3nFcq_CRdjSmkmi3_rpOzYhlotpdMPn6jFwCVORFuLAYRC4pMOgNw21SGmUv4jsD7dcMmFE7zLrnqetp0yUSBHJWwHAWKAeoFsYC-mNmOm-bcHcwwK7_Xt-RUPBRTUIg2HjIfBpPeU7wR-5ZlmqRZ3JqmVCAOvvXg2DwZ4WvQZVunGaF4WXIkFLm38gG1GfyRXaSzQOvtOAnnml2r69buGPrOvPlEWbTNJNU0QzVnO0on3marHxuAwfxU5ylpHEcTXnoMBsfXPp-dddC5LDQmyk9mcMb9s-bqwTcqGDil6N-W1YeUtmRR2MHOI8r6KVf-9dpZSO4vvTfSB4-YdjOuM0wp2MBEXOTt5mD0bl3XCA-d7WmasrEKdMwurFg2_cHd2qJK0BXc6s1w3zmJmBVnHeW5tl4f6l6wgh5gnWRi9F_Q55qmn0DDOiZw3nHLItyrhulO7Pi98eqTXHTIThf-0ozzjGneJsfN6P9P9m8kojMtlOW9rHa6q3ZTlSNW3uMWwAHug"
+      ],
+      "rating": 2.9,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794904,
+        "_nanoseconds": 313024000
+      },
+      "coords": {
+        "longitude": -70.59830079999999,
+        "latitude": -33.4846171
+      },
+      "name": "Municipality of Macul",
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Quilín 3248, Macul",
+      "id": "ChIJH8tIRR_QYpYRYA_Tg1aIi4I",
+      "created_at": {
+        "_seconds": 1760794904,
+        "_nanoseconds": 313024000
+      }
+    },
+    "ChIJH_rqa_7PYpYR6_t_Al05MiU": {
+      "source": "google",
+      "photos": [
+        "AciIO2efLb4S3QEfIdCwU7ne1rCCPAajUwphQKnSBmWSolqxQsoBJOu0n9IpkIH5djCIYikX3RY3W0vV8CmcVi8G2pZZU1vyjCNpG5ycKXf40FYpLjYCs370MPAezBekvq2E_q8mvGGd8Gsls2cLz-aDOPqxSLiqBP527jPBvq73mcbI7-FTvxRHHGNfNHHIChET0u3c6rdSnaAIiGEnyAQMCtBdYsweo6YOhVy92p5-cFm3szuv52z8-uNU09HVQ2Ve3dGAus1rFor9kTrzx_zEm8Pg72qH7P1zE4Nyh-oGLl8qbMrlBysH9BYBKxVLSjK60XOISo2T6xNkqvuX3He5ZUTQChKfRxJJ9otvEPhNdUJljzcCaryqWaa9z0p0qzJQJ6KYBwAq34eOciMo6uUHYmWe-6R8qkJQ5Xol5WAsg5xGIeHBhFhxqSGQMBVZXOnQHtyfQLHMvaZJOvzi-8jNF5rHWEmLTLPsKIvPjnjCJGp7kW4X9lwaYD9FUWj8Fj3AGWXt0Ov8pFnJhzgEx9tRjd_ShBJtUCFMKxm3E4VuEUVnssNXN8Zf42frBLD3N9Ih-dobzRUEwZvxajc-FdJayvcCRZMKdA9x3nY4NpxICV2kevy5IfYgHllHAQUfZV30wJKUlWfX"
+      ],
+      "rating": 4.1,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794903,
+        "_nanoseconds": 779444000
+      },
+      "coords": {
+        "longitude": -70.6167533,
+        "latitude": -33.4819145
+      },
+      "name": "Valenzuela Delarze",
+      "categories": [
+        "car_repair",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ],
+      "address": "Til Til 2900, Macul",
+      "id": "ChIJH_rqa_7PYpYR6_t_Al05MiU",
+      "created_at": {
+        "_seconds": 1760794903,
+        "_nanoseconds": 779444000
+      }
+    },
+    "ChIJIaejo6nFYpYRSXbGJbi8FyQ": {
+      "source": "google",
+      "photos": [
+        "AciIO2eUC3xy1qQIJnwkRuS6Ios3YbXFXxFj_98gCl6WbcjPCcKdRuXTjfphHOXrWHqmvFBgjgbpGspcNWXoShZCW4vsTvj5SF4H2BqxO1YOy_ECt5BLtn3KlKzpre-tzsEomOggLhVyPHPK6ZuipU6wnkGAmi22cfxUmJKOlhgGDUClHzPff0pW1J38F0ClYFNDjBZbwztj8_fdG6q2DWKUoOK9jRAmOFFQ7ksKOQHrAxMHmwpFmwz8nStUzjivZr4j4ABZD-LgCdK3LLqjiOf3qHeM3toUS_4g9j5KV1jwgZM4RP36wLERbQjjlY8U_V20_XD8N1Y0XQM"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760797259,
+        "_nanoseconds": 719981000
+      },
+      "coords": {
+        "longitude": -70.66174649999999,
+        "latitude": -33.4459497
+      },
+      "name": "Alberto Hurtado University (Chile)",
+      "categories": [
+        "university",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Alameda Libertador Bernardo O'Higgins 1825, Santiago",
+      "id": "ChIJIaejo6nFYpYRSXbGJbi8FyQ",
+      "created_at": {
+        "_seconds": 1760797259,
+        "_nanoseconds": 719981000
+      }
+    },
+    "ChIJJ51FmnzPYpYRuZyvlhj4E8g": {
+      "source": "google",
+      "photos": [
+        "AciIO2cv7TYMl5Kdp3W36oiJfCC-waE3lut252dLyg8R4Tx6sFU81bly1eADGLOGvWl7BZL_qF9RevdlTAGeA3dSbou1MnJ9m6hovc51o52wg2WWK7PSgNhQfFtK2IWcAiks_cQFrCEz23r9QUSUSASt-7cxFJNiHICFo_rvsSmQ5IIYs6bybvjwaEYsDQAHAsf_MSNM2QFG8H98a5zAmeF-0s3MyAqmejaP3j15e7KZapDtFQVwQJcdiqiNPjjeI1gRl-SkWqA3xXbCvC1rYBWGRtVUIvkEsqJmfhcRSv8YOHBptqrdqCeBg818tzDI172jdkene5PgBddqQeLuMz_6nLPyJDfYJr6al0NE54zK7XrMUpN_4tY37JAUVQGhEAhn8w9EYj8TiUe9hGX8ywoIQagW4Opx_mAZ6dobS0MqcFHYMJ5zYsHM6W6Vgb1iwq6IUtbP8WQGab-QJWShvK8QOKaNeHOrHdK06KhZlr76zNX_cBuorO6LnsCStfvnac6E-vhJzVQrnT3WhB-jdoHeInpS3nXrn0d2w5cA2nIVmoBkcHAIA6Lr2rQJDt2xAfgFtObDkU6EIYQvpgibLpGQTS2azQ_AP526LZ3FO8ZcQl985vkEjWptC_kxr1sx9lCd3OSmwg"
+      ],
+      "rating": 4.1,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806169,
+        "_nanoseconds": 432522000
+      },
+      "coords": {
+        "longitude": -70.61646,
+        "latitude": -33.4315401
+      },
+      "name": "Flowers Hotel",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Antonio Varas 423, Providencia",
+      "id": "ChIJJ51FmnzPYpYRuZyvlhj4E8g",
+      "created_at": {
+        "_seconds": 1760806169,
+        "_nanoseconds": 432522000
+      }
+    },
+    "ChIJKeunWlPEYpYRMe5MPHReHDs": {
+      "source": "google",
+      "photos": [
+        "AciIO2dEd2uirA6eMN_Fiaet8poox18SDf9qU3JnCuq6qEJu8hWYcS2n_X9a5WmFej5t3O6ZPJ0RkR2uGygxkhkPZUmtE1wfvvAUqbTyPE_W5tYH6vJaqmZlo0C5GSjBSbcdDYUYOZWU5fanubPJtt0i8wpFloF5y9RSLUpcmIS8zUnUg7aGdSETLDeXgyh2ztOuNRkjxx-5Bs6EQph3ze_f-V48zbPvxC62AtgYPvPq-Fm5Vs3wm5OvKIkywDayXXnIFqVd-I_PJ-n9K1-ivFmiEJaENFolUFkAlJqMsXG0ywdg35d0nZtwrTVUJOSnJusS0An-KyEQRH0"
+      ],
+      "rating": 4.4,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806084,
+        "_nanoseconds": 36657000
+      },
+      "coords": {
+        "longitude": -70.670014,
+        "latitude": -33.44299
+      },
+      "name": "Hostal Cardenal",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Agustinas 2404, Santiago, Santiago",
+      "id": "ChIJKeunWlPEYpYRMe5MPHReHDs",
+      "created_at": {
+        "_seconds": 1760806084,
+        "_nanoseconds": 36657000
+      }
+    },
+    "ChIJL68lBEHFYpYRMQkPQDzVdYQ": {
+      "source": "google",
+      "photos": [
+        "AciIO2dBsGBDyd3vPcY-p0MN7wx6BnkgVMvbC1iwpp01XRy5vrKbYZYQ3ChhzOOKVzKFcfUTt7MnE-Ge9sXAhyVDPYoahs74X3aLm2_2-25PuaTjkRHFcZS1Q_qtttzKmqgnou0xLQEFrYMYDRCpdx-4cJ5nIhe34FDLGkS2hx0KtOU70YtuW9CGexsCLwKqnBzNk_0wBiSIrx5szaflhuR1gM-c_VYj0pq1mVrsbDGQ9Lsnb4yhoP5LUlx9sPm3VJEf519BxJULYlCD_1ajq52DhHtCaLTW8oGjU-THTytId4P2XrrpsdgdFQ5PcMflenlM-_59liCkoVjG6pjFdbkBL1G6R33KTcbp1Se2-UuYijh_Iw_p4RwXG4axBvFvREkXtYyt7WS-79VIbV6XXRjFuDRVuz6B_fzcF_eSad7c4sHOvyDMYMonsVAyZuNwZHDOSnfSx7790AuAXKxhhPa_jVotV2EEwz2oSThlDy6xmAnq5Zkw3aG7NxA-idj0wjSNj43LLZaQ3mhS8oBB75qSF5QLWQUFRbbKCmayp11GPJ3KB9-72wz17D_uTQeAFTCD3S2GfQAf85gs8tgVYx9RUrJ4gyppalr9sbUYnIm80tI7G2QZE7aCMzyJqiSXYLqD"
+      ],
+      "rating": null,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806163,
+        "_nanoseconds": 617238000
+      },
+      "coords": {
+        "longitude": -70.6692655,
+        "latitude": -33.4488897
+      },
+      "name": "Santiago",
+      "categories": [
+        "colloquial_area",
+        "locality",
+        "political"
+      ],
+      "address": "Santiago",
+      "id": "ChIJL68lBEHFYpYRMQkPQDzVdYQ",
+      "created_at": {
+        "_seconds": 1760806163,
+        "_nanoseconds": 617238000
+      }
+    },
+    "ChIJLw3ZbW_PYpYRlT-DFGaBCYw": {
+      "source": "google",
+      "photos": [
+        "AciIO2dH1upwq_RlQCerlCbi8HZoeieZjWlzXhh8MLYAm0f8rIG4y7L8xAoiVgA3l8Aw-hU4CyKYtGgjf1fcT-n26BEzTgCqzaW3davVVvq4hgXRkIvKghaTjcvEjDrfTtEbVB9Sj2HVyV5O1jkz0C0nOKvUqopAfjF20YmyhtQkoOx2s2yUyHF14djWDT2Ofbttu19rbOuB6lLJ7oA4K6OWssPs9pqyRGqaBzvW88wrJWBktgslmdc3v7UP8rEzOIZ2jv7i_jcy5JnPK7XkU8vzjxsPfCslH40DgM1Sbh3zb3eWbbNaaL0TlWco6jh1rpAmQp-Lvyc1hw6SOZFH7mIoducexfzCt9CNVZDgQOx1c_uIMr5v3bP4DEDgFOKuNdbOOOnjzH2fkq7EQme9DFLxI4CouWREzRMPCdgLZ0yV459HBR-dbm4rbjKuC-LYtpf4gEE5JGny_siMHV5w0x5j0uEgtP4d6mEV07k7wkApC-UZeZ5_PPq7hF4714JF2ltZAYS1A6fPn5KXlirEoVr8oJmC5yIRnowtgH3QxRML18Vxt72lrI7uWSVGOBnDW9kBjOdXFViNpuPBkcbDF7_uUXy58lRnW0WAWgCMblVz0LLFA6U5PLQzzqpd2R2i8Ij58ikXwA"
+      ],
+      "rating": 4.2,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806170,
+        "_nanoseconds": 205380000
+      },
+      "coords": {
+        "longitude": -70.608555,
+        "latitude": -33.424644
+      },
+      "name": "Hotel Torremayor",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Ricardo Lyon 322, Santiago",
+      "id": "ChIJLw3ZbW_PYpYRlT-DFGaBCYw",
+      "created_at": {
+        "_seconds": 1760806170,
+        "_nanoseconds": 205380000
+      }
+    },
+    "ChIJLwueROfPYpYR3aliv39Ysjc": {
+      "source": "google",
+      "photos": [
+        "AciIO2fnj4x5vYJpdwKWQnvebM7QoIk-ult_-bD6apNdBqcSTGryUhSBGSsTMEF9UosFnOb3_f2jCpJN6YQM2dZZ5XYHNhlBeVXI_G2f57Os_ck9aNeD14R9IeEPAx4jQDXbI0MDFY0X_bvf8sDvEWCV5bs4shwVFty58EzpWrZiFRfIkV5oUCffEbslDyI4C9rAc9kmw-_sXu4z5M98D3-m6q1ii2tHYHMvz8hkN691mSqF--9CEatZumgsu-xa0SB1893zkYODYde5A6hlgg3hND9l94mhBZhqp2c7-V0DzZLTvPHUPPOu_aD3DRekwSRoJmK6RmdSrCk"
+      ],
+      "rating": null,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794901,
+        "_nanoseconds": 605814000
+      },
+      "coords": {
+        "longitude": -70.597859,
+        "latitude": -33.47393350000001
+      },
+      "name": "San Marcos school",
+      "categories": [
+        "primary_school",
+        "secondary_school",
+        "point_of_interest",
+        "school",
+        "establishment"
+      ],
+      "address": "Avenida Rodrigo de Araya 3265, Macul",
+      "id": "ChIJLwueROfPYpYR3aliv39Ysjc",
+      "created_at": {
+        "_seconds": 1760794901,
+        "_nanoseconds": 605814000
+      }
+    },
+    "ChIJM4V4jA3FYpYRONChiqgOznY": {
+      "source": "google",
+      "photos": [
+        "AciIO2fJuwF-jEKdZEg1sFClzunLV4lWUzyYudv5iVFEs-l368U6ew-O_amMcc09CZ08p9UF1h_2lo_TFXr81vxwK0f8JGVDzax6w2oHcl2fuI0EFY8Sm-ic_zQkYpW1_-wb_boCbWWpO5hFFykmkiVtpk1y4A-jQ6Yzz4eo7e0omHFCEoWKUWeLmIdaPAp3IAVMAUxFQe8Ywbu21fDjPGOPppwYMiJWofdwzbuNHhIiGfFcAiPKo5BPM8f8Sn1lJtAXiBp8OTA1jTxbcyVxEfP40y_3F6Yc3DtSNksKY2HDw6scOzBbulwim7l-_m8SFwzfSmVFX2fun_myk4Fd6GUZRfE7abQoM0sesysoNEVRF3yX0VUaBNpuh-wGro9TyCtUqbpmdiWaI173_BN1-zZYE2OH5V1NxoxuZIZ0HlaaD--vbSRX2rjB8Qqnt51p-YyN5-p2k1MDcpJQL5645xPT4HrK0FBlsnLVmkSnB3BN3dd4O5J4ks_M9brzUOHRaGzLV9G6vxbV6uEncaLuWA8HiSNf2e_Ndk5HzCL-ZmpaAJ8hh19jzdvozFSF-aRnMxcDU8T2sfNx8ngd8l7sFnd6vQjFXlT4dDgmSAxMdI44Sl_oCTrbMh0Cs0g8ux_x6DPXz1ZSGQi2"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804602,
+        "_nanoseconds": 607876000
+      },
+      "coords": {
+        "longitude": -70.6494471,
+        "latitude": -33.456225
+      },
+      "name": "Teatro Caupolican",
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "San Diego 850, Santiago",
+      "id": "ChIJM4V4jA3FYpYRONChiqgOznY",
+      "created_at": {
+        "_seconds": 1760804602,
+        "_nanoseconds": 607876000
+      }
+    },
+    "ChIJN64s_qvFYpYRzUIy4526MQ8": {
+      "source": "google",
+      "photos": [
+        "AciIO2dUgpfAHLzuAT6EUbm_Su1ctmwUgyYmXFxkQu_bA6mAWhGjQ0l6nkPgbyraOOVdhsy2kP_023eucZdALxjpl1PCzAE-7qBo_GePYPXQhTB53Y7EbeccvNL23zNLBjAoj96by39xEQXho-ShPBfPW1vHMNFzg1qimaPLXZqlpZ6z8Oc55OvhnHnd6fCnaA5dXI8brphHRDyFqqPMyVckHgDXcwA7_6Xncs56y3KFBRn4O_nU2V4AaF8yytyAX-F0XlZWeJu6fQ6Oa_GL_jYWcQkAn6Oro19qxL6Td8tEJ4FAMF_hVzrid7uZ8NnbeJHsSRNY2JOehRDTgMuPEq3cYEprAThbR0SI2C69Gt4dfXn8LOogvZVMEv5ZnelsXc8kuGPTy0LYBwoHqz8uU6ili9z34HzvwdwF1Z7FS50hac0xDTQF6VrchJ3X3RpJ3lVI7JXuMaTYC6psitzavJ4n0BYAvZ1U5IlVIJjql4N2_g3HQVyKI9ilLmmDVVo5m-ynzzznZKRzapAlM65DnSfDjQHip6Eiojf7J3P50-MridjvQQOHCeabS7Ip4b2kd2tolOLWeyiF1FSneLr8js8_FnLg7ySkREbZhIVjRNT30vsI1_VyP8JemF-gtfaJJFRsUtPGjg"
+      ],
+      "rating": 3.6,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806077,
+        "_nanoseconds": 797807000
+      },
+      "coords": {
+        "longitude": -70.6632614,
+        "latitude": -33.4426803
+      },
+      "name": "Hostel Cienfuegos",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Cienfuegos 151, Santiago, Santiago",
+      "id": "ChIJN64s_qvFYpYRzUIy4526MQ8",
+      "created_at": {
+        "_seconds": 1760806077,
+        "_nanoseconds": 797807000
+      }
+    },
+    "ChIJO6IF_4XFYpYR26MLAKTb9vk": {
+      "source": "google",
+      "photos": [
+        "AciIO2c14nfUsyTVHiDJ2jIO02o1ydzLqSSz7UXwFLZMgI-a80ssyt7W8puMXhnCdzuhGvEm7gozIdubq-rg9lgylvHj66RLBsQhLdOKdoql9EqWCfU-HFJC94Di6k3jt5w8pJNkQcrSbMM_UgBtJxPdhkk8n-igDkZ9TVsvKgJj7kwREJL2sZ1D4NVEmYU4o4vxytlJcMhlzCnghOT0LyD9x4vatPKsjimMIWPurQHlInVxDJabBiMWurJx5-wyfDtCLm4hqbyeHtHS6x2NsOvn1lTIiznWm-IVliyhgi0a-5qM5ZTQ89udkiF5ODs6c20EelnHvUTVAgs"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806172,
+        "_nanoseconds": 79633000
+      },
+      "coords": {
+        "longitude": -70.6279415,
+        "latitude": -33.4316503
+      },
+      "name": "Hotel Don Santiago",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Fernando Manterola 0550, Providencia, Providencia",
+      "id": "ChIJO6IF_4XFYpYR26MLAKTb9vk",
+      "created_at": {
+        "_seconds": 1760806172,
+        "_nanoseconds": 79633000
+      }
+    },
+    "ChIJPSC0s63FYpYRJvl6S_wQcuE": {
+      "source": "google",
+      "photos": [
+        "AciIO2dsvqtTgnEau8xi9e8mAQa2rl-WzR-nsK_bJs8Cho4GlgeNLbsEGH6nWU8SthQp5Rq7teejIq0TLa78MTvwQt3LRzOjTeAxx_0_ICupAc-66rEvMHurm-mW4Gm3k4Wh4kWAatAigZcDuRRZANM3GZWN1nRB4iSRXi-wmBDN5qKe2PpsphJlM9T-xjkbAK042SNIWcnAM-wuNDcnG_osi6pEy_gwtNJ4hp9NqHOStclpDVxFIA85H9Yl08RYHsTse4VQNLBf_p6uYfwAaGBYJynoiSNVDIOv2MfDqqGNJFbf1wbNZb3L4NBLirWciJJBBNn6gkfi8FM"
+      ],
+      "rating": 4.1,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806077,
+        "_nanoseconds": 426186000
+      },
+      "coords": {
+        "longitude": -70.66581699999999,
+        "latitude": -33.4421635
+      },
+      "name": "The Red House Hostel",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Agustinas 2113, Santiago, Santiago",
+      "id": "ChIJPSC0s63FYpYRJvl6S_wQcuE",
+      "created_at": {
+        "_seconds": 1760806077,
+        "_nanoseconds": 426186000
+      }
+    },
+    "ChIJPYE4EgnFYpYRLWSwUvEpDT4": {
+      "source": "google",
+      "photos": [],
+      "rating": 4,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804602,
+        "_nanoseconds": 975162000
+      },
+      "coords": {
+        "longitude": -70.6531883,
+        "latitude": -33.4497805
+      },
+      "name": "Departamento Paseo Bulnes",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Eleuterio Ramírez 1291, Depto 1307, Santiago, Santiago",
+      "id": "ChIJPYE4EgnFYpYRLWSwUvEpDT4",
+      "created_at": {
+        "_seconds": 1760804602,
+        "_nanoseconds": 975162000
+      }
+    },
+    "ChIJQd6-HZTPYpYRCgDRv32vz1A": {
+      "source": "google",
+      "photos": [
+        "AciIO2eeeTJ3xaydc-dTnjrDpF0PhV4bf1vRzC-ziSQiHPESY1Zxmo2I06KLOIfWcxpcvr95hD4zu3n_jcO0hAYOkzr3sBmbaS2LzT_TxFt0LhNzZitiS0Bv_PraW0CI2BYmhjWhgmSehNvNUFj0pfQCyn1Z1LWniAaT-vWPajkVxJPEyet4HDj-Dd-aG76ienrK5CeLveEPbPUdiPbJvmgtlQgo1WXZVes1U7Y3ThzuL9pB3lcYdXeNPcPxHhLMYirz1lkHBXouKt-lL3nr67fZRaZu2i9zrGKzMDOEaBLhZdUUHDFKXFa1myEmyIjyiyEEay7SzccjRv8"
+      ],
+      "rating": 3.4,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794903,
+        "_nanoseconds": 501411000
+      },
+      "coords": {
+        "longitude": -70.6027508,
+        "latitude": -33.454183
+      },
+      "name": "Chilexpress Centro de Servicios",
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Irarrázaval 2716, Ñuñoa",
+      "id": "ChIJQd6-HZTPYpYRCgDRv32vz1A",
+      "created_at": {
+        "_seconds": 1760794903,
+        "_nanoseconds": 501411000
+      }
+    },
+    "ChIJQxoOgQrFYpYRjzfHHdspPwM": {
+      "source": "google",
+      "photos": [],
+      "rating": 3.1,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804603,
+        "_nanoseconds": 339028000
+      },
+      "coords": {
+        "longitude": -70.6485799,
+        "latitude": -33.4456773
+      },
+      "name": "Infinity Suites Apartments",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Padre Alonso de Ovalle 875, Santiago, Santiago",
+      "id": "ChIJQxoOgQrFYpYRjzfHHdspPwM",
+      "created_at": {
+        "_seconds": 1760804603,
+        "_nanoseconds": 339028000
+      }
+    },
+    "ChIJRYx8uWXPYpYR6UKe1NmnljE": {
+      "source": "google",
+      "photos": [
+        "AciIO2ddyc58o4stOYXObez9rO6Qa12MOGtnO-H1R62RyiXSuizPR0nS01_5frVoGhLoN821ljzR8v5pwL_Xo3WJthnVo3q3G7hParCrmziDdxAuOYStgpK50adZackSZBOIoijta968Q37fDbcxq-gY0WhblSgfQntWNzMX6eh6fQgYxgC3q7tUdrRdLLH-lwPJX10W4Ez_qaWLyH93cd11GCs7kCpZb9GyNsUpm79UGBeCNRcFwd7_EbDADRrLx5otAl8epeUFpzuAcyEy2_n6-4-VmiV_q0mKj8y6nAKfytnhWldi9nfxG3MlGA_djktEeoJtnwfDekIUuhNx2UC4T_gdz_ctyRkmZGfUUU3LtRezXZ-0ryx31AGsOsMRI0L6nQQ0wvO4i-CUeDiS5khDnbcBq9DFZO7pTFF8bB-JrtbVRKZvpBxoNWpQxUiy-VZU2nSqdDEG8J4cQbaiIMd8pMXv1xv_YslOW5Cmskzldpek2ow7SProTB3p_8qWDdGrv4jusLwb2erGxQG-KIfEuQUZb-omxh1T-MqjYg-GoXnMir6bdTPBQg5RnT0yZWiezyN8t4RpjU_0DlnxlHfewBQ1apqustmOjo6mgPx9MPOnIdAATr7S1N3daMjnG4VjKteg6A"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806164,
+        "_nanoseconds": 763627000
+      },
+      "coords": {
+        "longitude": -70.611491,
+        "latitude": -33.42490429999999
+      },
+      "name": "MR. Hotel",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Pedro de Valdivia 164, Providencia",
+      "id": "ChIJRYx8uWXPYpYR6UKe1NmnljE",
+      "created_at": {
+        "_seconds": 1760806164,
+        "_nanoseconds": 763627000
+      }
+    },
+    "ChIJS3Lam1TEYpYRPzh3k-yiyUg": {
+      "source": "google",
+      "photos": [
+        "AciIO2cMge1dY19gRcyihoBsUOyYsVmHYJxm7B2wGxrFKf9P6c_Bu1SrbgOpPweeo9m698_vH799kl5nzazav7J_7zlIJm4rClqFEKGqnIjHidVTynZQz8urOZF61jMo_5QMcHzbJ2X8WcwIcOKDmum8z6kCDAd8Q0gf9fzIXrQFeKXSSrnH0QPhM9hIAACg-HW93AF_MKLI3GBKLoeZlRoRYTj4rINYxf2HXU3gSGzUMRgUN-6HWSFdGXDKzgWnGdcolI1Y3EGAMnmObcwzybPfBDreYrlNyUaG0kE4NiSDdBbnY67aYBfoCLzz096p6SO0SClgdzfHhos"
+      ],
+      "rating": 4.3,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806082,
+        "_nanoseconds": 647660000
+      },
+      "coords": {
+        "longitude": -70.6714327,
+        "latitude": -33.4444534
+      },
+      "name": "Chile Lindo Hostel",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Moneda 2514, Santiago",
+      "id": "ChIJS3Lam1TEYpYRPzh3k-yiyUg",
+      "created_at": {
+        "_seconds": 1760806082,
+        "_nanoseconds": 647660000
+      }
+    },
+    "ChIJS8zRJZTPYpYRpfQy9IrIM8U": {
+      "source": "google",
+      "photos": [
+        "AciIO2enrvvlhRbl35553hC7EyRiCf3mUtK0PiOjyNCdF5zxPtmWiW9y2eWOzsm9Jv_Ieg8WPUPaSFadsC1UzG-etkihysv9qIu5jdeAb2PGbDpzgQTlNFyINvGf5edp-m6Bv1bUqGJzxzk0NyaGEY-lKIPyg2IzR97LzVT0dVkNwIznYY7u1FXZJvdX4bJpcctWvOUoVuocnxfpRwxXLmw_H9HZcinsV3G5KLjJ6ZbvWKFSjw3gOQ1B94Ds-X8SUVVXC7O0G8i1DEvi93ZyDvayTtzZIwdYQYLaM9IArgXolOAq_w5lv-L294hRz62lmhyEcwjjBdynELw"
+      ],
+      "rating": 4.4,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794902,
+        "_nanoseconds": 693194000
+      },
+      "coords": {
+        "longitude": -70.60182209999999,
+        "latitude": -33.4547121
+      },
+      "name": "Casaideas",
+      "categories": [
+        "home_goods_store",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ],
+      "address": "Avenida Irarrázaval 2815, Ñuñoa, Ñuñoa",
+      "id": "ChIJS8zRJZTPYpYRpfQy9IrIM8U",
+      "created_at": {
+        "_seconds": 1760794902,
+        "_nanoseconds": 693194000
+      }
+    },
+    "ChIJT0FAuWXPYpYRJFzRHn6d6ok": {
+      "source": "google",
+      "photos": [
+        "AciIO2cIknqi-P9PlXbQuebs4NowQbT17sx5fpQJKfvQgpA_qCsvuodr8WMT1CZZZgEHq4Bsghbs8XzWee_BPaWqBwbavHhZQCHlUAsM91SskzOkijQNMXpuEU0m2OEBuLU9qOMA8QDEi6Mtfsg8ciW2r5gU2LjkbX1eGDSmXpl6PFFbM6BnVOCgZf3TCm3l4So4p85tXZaBtLDMY8betT5TqGMXHAPUpwlwYSvJCyuRUCgiedblJqwpsGe1sP9dpQuFCFW1ebT-4--gxFGBFqtPM-s0G5NOWpxYndMAa1L9QfkDgphaeTy2xOna4iEhPIoEH_dfH2IbeYY"
+      ],
+      "rating": 4.2,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806165,
+        "_nanoseconds": 684002000
+      },
+      "coords": {
+        "longitude": -70.6114992,
+        "latitude": -33.4248778
+      },
+      "name": "Apart Hotel Cambiaso",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Pedro de Valdivia 150, piso 12, of 1217, Santiago",
+      "id": "ChIJT0FAuWXPYpYRJFzRHn6d6ok",
+      "created_at": {
+        "_seconds": 1760806165,
+        "_nanoseconds": 684002000
+      }
+    },
+    "ChIJTVL8UYDPYpYR250pTgV58Js": {
+      "source": "google",
+      "photos": [
+        "AciIO2c_HkGOCBPouimpdZxDg0O344JatTXpRauCsCQcm-lXFdDPWiKE6ODJEasKJmCIDGIjDCncGDQnD3-EMLfkPu4IhWDy1XnaJVT4nVWHcLLoxqnM_ApsRe0pEp3mtZaqsxpRPiM4JU7JFBMaEY1_IPB8dRep_GasYkGVjuOLIPx0gk4Wc37ktngK-ro6r7rqKwC5hIHbWvujtDAo3VUEaBT2SlhX8DmjhxFWnB86JKhSSuHORjIJxiM2dCsrPlV_-mbr27mTpa8muDGE_cUxydYrRuzx9QFJy8Qhdxo-s_7a_g7Ft7jQcD_QuhDP8VLweGvQF80bfpXpRlT8cgwtWT32E1w-9g0HVX10ZFaJfkJ1z-1byNEeKEH6qC8K2WaUB51DdIt-0Fp4rVCHt37hworlJM6vcSNExlk03kLuuG1BNMdsG-xZ5Dr5I0eIwEbxfmpkqtjjgpHRV64lgPBbD5ZG43oPdUnL1B-hnDo9ix1WOa28Nm5FPKPffpYhiiONfXUZBd004A7Oj-Y0mGRRKgBWAcL4O2_yuiZHUxycWm-cWlquvwilIVMhEpM_hh-qWPR7mfwYtXJJ-ljzvdjb6O12L1sdr2Yg4S95LcFkev8k0fPVNyzybKfy3k4Uenc_WjgWeBk3"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806172,
+        "_nanoseconds": 444161000
+      },
+      "coords": {
+        "longitude": -70.6192374,
+        "latitude": -33.4428674
+      },
+      "name": "Hostal Romandía",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Román Díaz 1403, Clemente Fabres, Providencia, Providencia",
+      "id": "ChIJTVL8UYDPYpYR250pTgV58Js",
+      "created_at": {
+        "_seconds": 1760806172,
+        "_nanoseconds": 444161000
+      }
+    },
+    "ChIJTX8ekQLFYpYRFCEw8TLMChA": {
+      "source": "google",
+      "photos": [
+        "AciIO2ec8PfPe3OZfQzIQtcHcUo5YWz9tUeMFxLx1ks8cn0iIMvmaqzUXO9g3VR_y-J5xsJjuKk5ODBNfat7WEkF29HC28wL_7Mj0Qu9LMs-evPZljSS4CGKSHyfTCtmCLTYQ8ix3Hb0S02jzTXc1xPHz45S1ejh3GJ6m9z5H8_1hiNx45EVaTUv3Xd6JE7WOUXJNV8klc3AFnb5bm0PhEDu_IryDIh70VsGxioCnInJ7-WWUxIFc_cIgxWU8tbpbXihYz_RSgVEpfFDNPbT2oxJigbXxYLXUtJ5VEh0snQ15mn-JE56OCi_mgYCeq5P6Qug0NOuoIWhITQ"
+      ],
+      "rating": 4.5,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806081,
+        "_nanoseconds": 247199000
+      },
+      "coords": {
+        "longitude": -70.6657707,
+        "latitude": -33.457064
+      },
+      "name": "Club Hípico de Santiago",
+      "categories": [
+        "veterinary_care",
+        "restaurant",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Almirante Blanco Encalada 2185, Santiago",
+      "id": "ChIJTX8ekQLFYpYRFCEw8TLMChA",
+      "created_at": {
+        "_seconds": 1760806081,
+        "_nanoseconds": 247199000
+      }
+    },
+    "ChIJTZ1Oqw7QYpYRU_hrItNVD0I": {
+      "source": "google",
+      "photos": [
+        "AciIO2eNHR7qm7hMa8DS_4R7GxgVXKRx6tC6RCJThScOJglTcmAKJvR4qLRjs5Ppbv5RKuedZ8KANhcS5-_GrU06Mv2DMxIjWwhc36XjOlkQ77tIlAjTpUt94h-BBPb9ev_brSMfO-EVcrRBp_snfOfEoPh6mrxrNh8wWOfmPXoKvWuQh4Sx4cAQPeny6EE7gewvtH8gIdpdrXCHRoc4FV40LkFIYz4rFJHiuh6NUwyYQ8PpsYqS2nC1vEB8eShrQedyArbBAh-ySCSUKOHKf2w1iRTViJJOUWUcyi9GJXyG9jKAMgDALgABB0Vlp1lanutg5ECKSornLNfbhBTigM-NjNk-MI35FsTXh20Q8fu_34jeziDNowcM10gwCV9ChqKClUYAl6uF_w2Fj8GCzHHAJ_IyWDtyZ3NFpZvaVpPP3sk89LBhGdO8i2llFHzjaqMHEfTKIGozd8NaPf0_ImhDfTpJl517nED59M8SDJxaHz4Zp6M5zOKmaJwT-0KJP8XPgg7OxTv5ij70D37Ll2SJd5uV-QF-quzV5T3yrrJBgGHiaK9z4FOQV8ZXWdmnYxGRuwMP-ut8uIgx22KzVZLfYXVmVHjNWEWFKGWAGaVm_RTCs4pkWtMknh9WOa1Zve0d"
+      ],
+      "rating": 4.6,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794065,
+        "_nanoseconds": 985128000
+      },
+      "coords": {
+        "longitude": -70.6118147,
+        "latitude": -33.4983075
+      },
+      "name": "Campus San Joaquín, Pontificia Universidad Catolica de Chile",
+      "lng": -70.6118147,
+      "categories": [
+        "university",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Vicuña Mackenna 4860, Macul",
+      "id": "ChIJTZ1Oqw7QYpYRU_hrItNVD0I",
+      "lat": -33.4983075,
+      "created_at": {
+        "_seconds": 1760794065,
+        "_nanoseconds": 985128000
+      }
+    },
+    "ChIJUWPreIfFYpYR6KIDKKAoDE4": {
+      "source": "google",
+      "photos": [
+        "AciIO2eVMJbH0uszgCTuU_89wCdXafItYUZGMZOhSocP8r59PHFKUtNcwgkM7HGE9NF2isToTvFiv4MFlOvS7O39HifjqYZWFJYBwq1WazHjO1OnIzB0YyVKyue9OOGBnKG6MB5X-ew923z7xJcVZ8e3kqHUuuFyTO7F3LBy_TA9D6-Xjk7GCMEHTwJlbdsxOP9ED4-bodoAKGGlReAZTTAt47gcuzOZZ0G9nw_XhmYEwQsqWRoM0Aqnu4mSvJ8nI3jXTDGjEbcGkoOvpOme62RLX-poChMZQeF-3p4P0tgknicZCIkpvD_iIkPpbpqnbtK6CFhPx4ebkgE"
+      ],
+      "rating": 4.2,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806167,
+        "_nanoseconds": 109155000
+      },
+      "coords": {
+        "longitude": -70.6221872,
+        "latitude": -33.43322199999999
+      },
+      "name": "Marilu ´s HomeStay Providencia",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Rafael Cañas 246, Piso 1, Providencia, Providencia",
+      "id": "ChIJUWPreIfFYpYR6KIDKKAoDE4",
+      "created_at": {
+        "_seconds": 1760806167,
+        "_nanoseconds": 109155000
+      }
+    },
+    "ChIJVQ5dVmLPYpYRM0G7Npu2Gjk": {
+      "source": "google",
+      "photos": [
+        "AciIO2eVvV0d9uZ3epMqtzKbh3ekDOuxpv0Ts4l2BKYg3X82WnuXEjfSjNm-Kq8SfFfvM2-R7LGHwBVWv6pDw3iCK_9-bpHm7X-jqfDSPJ1U5mpDPzlSbyrkWafB7QBOIni8JkIUSPNUTG6cw-Q1-IWW6oPQBomjvudvU3amr6Bg6QyHHoBPXjP6diiFHFAYq3E_0zwNRrZoS_C9KJ76Bwa682jY03gYzqQE_eC5wsndg5ohfs2nf2lXYV44WgARZq5DA5-0rmuyfYnp2xkOJlwVJKk08OuewcLBE4jpJ0-aoiP0_FhxiXtaWDxyoDWzMZl_z7YJ6b45I4A"
+      ],
+      "rating": 4.5,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806169,
+        "_nanoseconds": 838392000
+      },
+      "coords": {
+        "longitude": -70.619379,
+        "latitude": -33.4271602
+      },
+      "name": "CasaDeTodos B&B Boutique",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "General Flores 120, Providencia, Providencia",
+      "id": "ChIJVQ5dVmLPYpYRM0G7Npu2Gjk",
+      "created_at": {
+        "_seconds": 1760806169,
+        "_nanoseconds": 838392000
+      }
+    },
+    "ChIJVVVhewrFYpYRN_qnU1Dm-hg": {
+      "source": "google",
+      "photos": [],
+      "rating": null,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804603,
+        "_nanoseconds": 730036000
+      },
+      "coords": {
+        "longitude": -70.6488421,
+        "latitude": -33.4461618
+      },
+      "name": "Apartamentos en Santiago Centro",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Padre Alonso de Ovalle 884, Santiago, Santiago",
+      "id": "ChIJVVVhewrFYpYRN_qnU1Dm-hg",
+      "created_at": {
+        "_seconds": 1760804603,
+        "_nanoseconds": 730036000
+      }
+    },
+    "ChIJWw5XAgjFYpYRZLNd6TnIPKE": {
+      "source": "google",
+      "photos": [
+        "AciIO2eJiX0Ft1r1HD3LgMjqVuFop4Qn_HQ4N4sSI_f57aQiTKd7Su_W3AcS49OstOlfviHjD-LrcG65s-zfO3oXnEnye8sCgaMep8unXWR_OcSAEbqwv2X3an_ryHKsSFtLGC2blMtJ0m5d4z9-jFzj_zM0xIee4cVpH64aFHzt_bxBiIKE7QLVu_CksLDilU1T_zcpGTzZeXI8mAG-nI3yucV7OwvzLj5HLeelkeOsyXaSG_HNdaKM7zFWXZOPl1bXurXMafIdqfJpyRLGAxdqTX6Ys0qpMX8saLPJzYjLu4KDK5uzpJUSzlsB1pxrNe75kfcon5xU5bsBCAk9hxE70p1CsM-9qS-rY6Be73mDy4Efvw52DJ_-_y_qHb9M8FPsDTNjDd39tKdLg4ejwpdwg9xl8FdtFXZUkSYeCtSF_cuMSvmseX5TaAcc2ETTFl7Ur129uwcSoz3urIDQbu6ltmuTzSklAN6jWv1Wbp1EWRoRUn5v8mOvTUbvvh-H8X4b1_ug2QowhRmJGHbEm0sbE_KrrXEK9E0-77bP5oHNqC_SLRFonZAaY9HRKDNG68of6OqzoIDe5VJB--hXJViInRicPgJArcxANw9uI-Ox7orbqavHa-Y1ZTGHCUPghgy9PVwSjw"
+      ],
+      "rating": 4.1,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804601,
+        "_nanoseconds": 207051000
+      },
+      "coords": {
+        "longitude": -70.656386,
+        "latitude": -33.446903
+      },
+      "name": "Sucursal Caja Los Andes - Alonso Ovalle",
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Padre Alonso de Ovalle 1465, Santiago, Santiago",
+      "id": "ChIJWw5XAgjFYpYRZLNd6TnIPKE",
+      "created_at": {
+        "_seconds": 1760804601,
+        "_nanoseconds": 207051000
+      }
+    },
+    "ChIJXcP6barFYpYREzVq-5KMBzM": {
+      "source": "google",
+      "photos": [
+        "AciIO2dlIGmrfiZTWYhPVuJN7l81cmjWds5epqVrLLAHAsZ0fquhtrIl6OCVisPc0I8Dw5IAsuykFCfVvDWPBfPHGNsREXe81jWD4FeIuZ32Y1UIPGN3aTjvfpDrPdG4ac85jUWfdBjSRJ_712BMnWbutNLd_2zeIJcnjh8WTQ0rMmg8-NO8HKJlFq16tuE8QShG8RxF2nqasvK_YmEljBpin4_lRn6aSTw-lYES_CRnlQl7GRPli1J5VKrxF6DjM0qH1RgiL2CRqqrTTDY17Eg28Rmr4zSIAMNf0kJuC1ZWRcEfysvXJ5EomAOJ62SzSSVgK2KFdYHLkTk"
+      ],
+      "rating": 3.3,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806082,
+        "_nanoseconds": 72729000
+      },
+      "coords": {
+        "longitude": -70.6652519,
+        "latitude": -33.44772799999999
+      },
+      "name": "Chilexpress Centro de Servicios",
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Alameda Libertador Bernardo O'Higgins 2128, Santiago",
+      "id": "ChIJXcP6barFYpYREzVq-5KMBzM",
+      "created_at": {
+        "_seconds": 1760806082,
+        "_nanoseconds": 72729000
+      }
+    },
+    "ChIJYdsV9FXEYpYRcyxWHAtdvfg": {
+      "source": "google",
+      "photos": [
+        "AciIO2fpq8WYEiOpYlewMz5G5S6JbUxtaT2RmrJvv_KOjVJwdEoN2Dj04JYawSUKQDjPajkGd6hDR44uhB8Ymt7HMZpuj2yLueEt8oVpsV5AzaZlxABmf-KjYQjwFVTdZMBwsxYbiZ1kknfPJKnd-0QSixlPUykIsc8Wkc7L1-2K9BhIqSC_ZkKI0ObCAkvsnkpr7EOGHiy-oHhwWDC0fOyRIIvsng6xd6eX14bG3CbCjueQJHB03OKC3JUtKG2Hm5lFsoGpUlYx3KxzVfyPxpjY-a3eMRU5STkxhrBh4NROQg3V-V07P82TyuujePxx8P9ACD5U9K5fru8V3vXn4cMtQImmQdxy2SpuZXOz8cclELX2T8N-vZdzS0BQxBgvWOcZQaWVlZkQXUVy2ZymCaTDZwEUzVN6PVeYwNmvanLgqCdEYzpMgBx6nxCKJZFsGU1Te5qCFg75I26sfD1l1GmDOwtHT6m00idaLvgY37EqFxhdPdCmyiSJ2N1WUHH-0a3XrwmOSFzBFZq1y_IoZ2gg6oIckMv3N9_VlfTOxu1dfiIq62DkDPa6xrk0f9fHHql_7zoUjq6DBiwf9Qs6aHRfSjIl_trmO0D3QqCa3ctOfDeVBNcOy_uIYaHQwkJFGJ3R"
+      ],
+      "rating": 4.5,
+      "price_level": 2,
+      "updated_at": {
+        "_seconds": 1760806079,
+        "_nanoseconds": 716608000
+      },
+      "coords": {
+        "longitude": -70.67383749999999,
+        "latitude": -33.4492062
+      },
+      "name": "Blondie",
+      "categories": [
+        "night_club",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avda Liber Bernardo O`Higgins 2879, Santiago",
+      "id": "ChIJYdsV9FXEYpYRcyxWHAtdvfg",
+      "created_at": {
+        "_seconds": 1760806079,
+        "_nanoseconds": 716608000
+      }
+    },
+    "ChIJZ60qYX3PYpYRYhSDUrgnYjU": {
+      "source": "google",
+      "photos": [
+        "AciIO2e2xrcZzQmVSSLE3XdKa81HjDZ69qA-Y33rocdLxeBBn13R-CQUTcaCythLVldIt1xYaSp1pxm4QCjx6i2-36bAAjFL2Mh8FL-LR_HWfrPTEgpv2Ab_psHt9LRFrFLVDTzCOUqXDt7QyU1UJt-E7LYqJmEw7KHzozuY0P108Lj160SSlLtnHUnsaJq3JFgiGVyrKAgPOamIKtTPdCEf6uBYXR1-H-v-6VRauGn9jtBosPHFdXKFTzzzhEo793_gBKYkSPiRZYVF63EriqAianua1xMm1iSxMr1fXpzfYB02akYOwCzT7_LUzKeVBalJ0wYN2nkOjv0"
+      ],
+      "rating": 4.2,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806093,
+        "_nanoseconds": 914506000
+      },
+      "coords": {
+        "longitude": -70.6212703,
+        "latitude": -33.4318533
+      },
+      "name": "HOSTEL UNION",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Román Díaz 186, Providencia, Providencia",
+      "id": "ChIJZ60qYX3PYpYRYhSDUrgnYjU",
+      "created_at": {
+        "_seconds": 1760806093,
+        "_nanoseconds": 914506000
+      }
+    },
+    "ChIJZz-FusfPYpYRdlqWz_TWPo4": {
+      "source": "google",
+      "photos": [
+        "AciIO2dHHHFBv2cYazw-sEIHgSaIvHCOp7D8OmP5Sollx5B5bqX6vAusyXc487vqLvss9zB18oP6Nejo4Jl9Bw8rWl-zboCnmhuvwccAWX2mPHR8zIbyE8S-AKT7-xFRyXS-FE_ERTBkeprjkQWIs9WqC7drgx0Rf4xYR1yV_H4U4XAAX9Ps-pOh0h5nseOMrflqADeDCqPvEzLxWKVYgSTowfiwAMXSrFMwUVSI5WqAcV1LUn1RJ1gw7YdTisnnZ9vjun89RuuboZ-EO-sJG2Sx9kcMZoomQZSPds-m09Q2y0OWu8SuhrcQ-DH_ousYq7KDfR6H3M5yovmljagnyOzoUyAjayUfAFWPz48Ml4vNWAenSY8AGMHC3Ztb2IRZOozPbhTvCIIy4H6Oio9HTryKtCLh3LsmcZNCVDeUy6r3Wr2euyOEwCDZ3qSIErZ7t1nExci6N-ap-GY_m4hy2ekgtGfa4uQBthff2JiacyLRYwJafPriYquhPFS5Fj0wHV2Vm4U__vBSLAMzxnB9aVFe3p68bVW66WCqZobsmrLa7YZ08n1we9w8F5IIzGue66Fa_8TlFecvUPBdp10bd-1KYVz8FmfxcdYVPJviMFdLSOPju9fLJW5GLNFC4NagSpL-"
+      ],
+      "rating": 4.5,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794904,
+        "_nanoseconds": 582329000
+      },
+      "coords": {
+        "longitude": -70.5883328,
+        "latitude": -33.4605003
+      },
+      "name": "Juan XXIII Park",
+      "categories": [
+        "park",
+        "tourist_attraction",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Pasaje Juan Moya Morales",
+      "id": "ChIJZz-FusfPYpYRdlqWz_TWPo4",
+      "created_at": {
+        "_seconds": 1760794904,
+        "_nanoseconds": 582329000
+      }
+    },
+    "ChIJ_32DqqDFYpYR28bVqccWokQ": {
+      "source": "google",
+      "photos": [
+        "AciIO2cEaPbZgh8bRsfh6aW9Ep74HY_Cku5suuEGIp8vrCm7v1szsUOSMGX91cCCLkKt1akMACeBytx6HNods7bkx8kS6rVFmMypno9RHUkX7HdD2XSL5Xx2UwwFGsj8_Sg0hgtc4YC0cu4FeV7Ic3ZV22Ws7SKbi1kjLLfhvqbDLHAtPaEcsCO8Fz6tD0yIUo6ImdYQC0ukKj7Tk8QnIg6HYJcFRxudpCIEurNQiCw458cd6-3sQATCQ4QUlQHI4Pb8Y9XoN3i_Wuy_2i2hIg5ZM0KkyfoHxwdJZiNm1SSA-xIJJIkLr4NeHwippdwIxjCr8nrZ74VDGmIOR2TZ7Nikvil-gu3ijclLtT5z2KX8xVGGdTeOExOnMfFzP6-jCazw5M0fK2RyDJsUpQgi4EXMALzopKIO1XmPzfsDP_UwTsMTsY43WJ1qEKA77s50pSBCqIKn2Cd6byI-SQetI4BYXXYJW_NVg0G7nsUZvXpjOVykf1bH8R3YRzQ-EpKrXRECMXmIEDZBFePfh6cFbaocIeBVhOSfuceU55kqex0x2k73SNHnoHsviz1W-sMjigJGnkwW6QwuolRKG6q4qoUZJMjL2i06tWHl7KHPoxJbCpbBJKjPR0pllaC2YMEg0DzHpcCWUw"
+      ],
+      "rating": 4,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804602,
+        "_nanoseconds": 245905000
+      },
+      "coords": {
+        "longitude": -70.65015850000002,
+        "latitude": -33.44631640000001
+      },
+      "name": "Multicentro Alonso Ovalle (Mall Chino)",
+      "categories": [
+        "shopping_mall",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Padre Alonso de Ovalle 1060, Santiago",
+      "id": "ChIJ_32DqqDFYpYR28bVqccWokQ",
+      "created_at": {
+        "_seconds": 1760804602,
+        "_nanoseconds": 245905000
+      }
+    },
+    "ChIJbbmcaAHFYpYRfhjere5ZyVs": {
+      "source": "google",
+      "photos": [
+        "AciIO2dLBBMyiO2vjev1pj5Zp_xRr_oQrq0Q5vBTHDxn1CkxO5HBBjnbUky_aT_CLl9Z6Y-CIeK35ZXCkQhh5YMhDIHJ7rbIZRGGJOt2NPmqrFSBsuiO-nRT3wkhHMmPxXLguK3PwB4gw9eY87mxjK75dx3D4b4RCJVu2CGrcrSk9kvhbNaKkL7L9-Gr0dSGqtJGnE0KCVDPeUU0aQt3OhpOptJOlPBSWtx7QOK2yL5doF5KVkx3W2OXtL3poVZwQJIOasD2TTw-ll-CDlpiHRYymHjNRHRlgooxL_15lMBy6BWBT55sbsujVDJ5vqz3z9ZI4jvsub4Wq5qNsvlDkEzL5RGyeyV0B3uh0ufeEfBoHoP8iFTO1usuBvXZEYOxLcoU8g6wGEtmQlozVD1kTagXcEh3Tel1r1yU2YdZw3QbtCkda1ZNMqg-3ljrkmfqOM6HpeBbXIr8SF_kZt9BBRqs_Ujh7oGtvFPEQP7wnjZTGBhZIgpkiFjt0mPp5p_ToU4U4BHUSVhLGbwRSTj9shuqFk4XpsJLS4ILgpEnj65mWD3wA-AxokilWvwS0K8x31OTd8QdQ7Mg35zPB2C5pW-s_40VsHdEhLRiXiRN4v1JA-NvEd0ObK4oZz9j5LfDQpj5"
+      ],
+      "rating": 4.4,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806079,
+        "_nanoseconds": 319470000
+      },
+      "coords": {
+        "longitude": -70.6654227,
+        "latitude": -33.4530635
+      },
+      "name": "Residencial Universitaria",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Gorbea 2132, Santiago",
+      "id": "ChIJbbmcaAHFYpYRfhjere5ZyVs",
+      "created_at": {
+        "_seconds": 1760806079,
+        "_nanoseconds": 319470000
+      }
+    },
+    "ChIJbxlgGMPPYpYROOy8UsXHz30": {
+      "source": "google",
+      "photos": [
+        "AciIO2fwM9ib05PMXCfGptP1hX5aeb7eR2ic2CSUIyDYrLRysfggsNOIn0HpXUTv8Fy6fv6M3HR-6HMeTshzHhXaskSunXLFcMt4XtToKUIihvCS4UQ12aWDKuPyd2D5CkIzFfwTwB_tRLjMtzfAQfKpgJzaOtPhU1q09mzMtvdGOZwLoqPRL0MLsOv3z8LeKmMaibmc5sgFLqNT_faal7UeRhV1VrxdHb4STTbfND8faIllHWX_NYGO6xw5cprC18SjyhTj7HlZSWtkvHp3GICoQsEtTDxlCZlpMCUErbHb-AwxsUUlHbb0LVecktK2spRX0Su8JGsX"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760793817,
+        "_nanoseconds": 590985000
+      },
+      "coords": {
+        "longitude": -70.5944655,
+        "latitude": -33.46777439999999
+      },
+      "name": "Facultad de Ciencias Sociales de la Universidad de Chile",
+      "categories": [
+        "university",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Capitán Ignacio Carrera Pinto 1045, Ñuñoa",
+      "id": "ChIJbxlgGMPPYpYROOy8UsXHz30",
+      "created_at": {
+        "_seconds": 1760793817,
+        "_nanoseconds": 590985000
+      }
+    },
+    "ChIJc_gO9dHPYpYRyKV-7T0y-jU": {
+      "source": "google",
+      "photos": [
+        "AciIO2epF1TOuI2-EPQINWFX4BZKtlqD9D3cIrG6tOPFsvpWr0mfQjBTioBisf7Dn9hQUZhYtNQLHLILQO4ZZNAR1BwLLudWuDsKb76DbR07wdc5bEOaN0lJOE9e03O8fcANe3kndHiL5j3cENG2022uhxZw38gEm5VKesgFn43V-uabNQ-2aI_ASBZ3nmrIyD9WPBLwfmha5DODKlwwy1lPV93kn8EawHF-QTqAwzjZmAJuYlJzxcDHmWR1Tn0WVr5ruBM_3d1tBU4vf15-HDi-0IbFnqlnXn0dmtntgSj1LyPSuiGLLOB202VGrDNJqYu58hKaBzyVs_JeLhkd9-mwa_0pGM0z6PcGaufZu6Lxpjjb1i2qhKaIxAVnp-NiqWcI8YX3IGgHsHzKgSi_oNHeppHjDgCjxXAjJ58TpulJUBZF4OiuEIoBM9vApw-hYqboJmULSRGs3j9qmZDOokCme-Mohynn5xOLrMLzfiHjs2Tbr0suFUp8PmsroQaQOLPzice964uu_kdt6lB4TlPcCkUyPl2Ber_A70xUFuIxVEY-90gOeIny2i_Hxp926SQTZH6fB7e9kvSdRJxkLzwZBcWre9pm_GhjTOG3l58ymzcf2aQy-N0iiNatnxw66R3zQncaGg"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794901,
+        "_nanoseconds": 59963000
+      },
+      "coords": {
+        "longitude": -70.5797372,
+        "latitude": -33.4682128
+      },
+      "name": "Grecia Farmer's Market",
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Santiago, Ñuñoa",
+      "id": "ChIJc_gO9dHPYpYRyKV-7T0y-jU",
+      "created_at": {
+        "_seconds": 1760794901,
+        "_nanoseconds": 59963000
+      }
+    },
+    "ChIJcbtkgqjFYpYRJrWHYN_HLUs": {
+      "source": "google",
+      "photos": [
+        "AciIO2f9XMXKYZLdMTUq5c4G7pJim92S2v5dGb6FsCDTUVv-9Swr7rDkSpzovk2g7pE_3cRKWhNVCGSYgRgSXKODZT-4KquEwjb1eBXRpX7iFkWFCop7ZI1HtIRwzq_5H9ZvPtfFBD2t7-lX4JZw_ndtR06SzIgm72wqGh95R1rSuTxKaQ2t3XBNO-jO9TibVbVKIjx-g73xLF_jXG0Wd-ORqzMSOsOVKTl-IGli4SIiUMEhoNdz3NeGjezFVtMLOPsCCsioiy5dNGIPNePHYAHSnDYStvnye9kD_kTIifjGPvLk122dP3Xfd6mJIwwcoCKxjL92vDASTaE"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804600,
+        "_nanoseconds": 422788000
+      },
+      "coords": {
+        "longitude": -70.6574454,
+        "latitude": -33.44361649999999
+      },
+      "name": "RQ Central Suites",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "San Martín 55, Santiago, Santiago",
+      "id": "ChIJcbtkgqjFYpYRJrWHYN_HLUs",
+      "created_at": {
+        "_seconds": 1760804600,
+        "_nanoseconds": 422788000
+      }
+    },
+    "ChIJd7YSbR7QYpYR9Z1bbOrWVH0": {
+      "source": "google",
+      "photos": [],
+      "rating": null,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794900,
+        "_nanoseconds": 784529000
+      },
+      "coords": {
+        "longitude": -70.6028489,
+        "latitude": -33.4827483
+      },
+      "name": "Construcciones Totalark Ltda.",
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Las Dalias 3076, Macul, Macul",
+      "id": "ChIJd7YSbR7QYpYR9Z1bbOrWVH0",
+      "created_at": {
+        "_seconds": 1760794900,
+        "_nanoseconds": 784529000
+      }
+    },
+    "ChIJd8m0gT3QYpYR71gaPYWOZD0": {
+      "source": "google",
+      "photos": [],
+      "rating": null,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794068,
+        "_nanoseconds": 62095000
+      },
+      "coords": {
+        "longitude": -70.597697,
+        "latitude": -33.494025
+      },
+      "name": "Julio Montt Salamanca",
+      "lng": -70.597697,
+      "categories": [
+        "school",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Santiago, Macul",
+      "id": "ChIJd8m0gT3QYpYR71gaPYWOZD0",
+      "lat": -33.494025,
+      "created_at": {
+        "_seconds": 1760794068,
+        "_nanoseconds": 62095000
+      }
+    },
+    "ChIJe4TqBPzPYpYRfSzxlwuZOfw": {
+      "source": "google",
+      "photos": [
+        "AciIO2dwHeZGQND0tM8gQMX-iBsmG1drnX_KKpsUuRfpNXZJ3XSybo2jiaa7W-_yLMZQe5e9J4oves4pRo__WxHkDeVmOYXFPKtNrEbsQzA4jGxIdmN_avHrqlmpJIlRhjP8aAxxIduKbHr48TbyzvRC8jpxObEa989h4l-osBILcdf6RWL7rliFagJZaXk_DbjHjlcbXmf1cVigiwMo8I47ApymmBoQqHR7-lt3stgmDMk-CoFU9y4YFCbJgKyFXoOpYItxWDsbMRPyUq2WJtBxjkWcv_1XaMbCM6YXP3sCNWW0lH0_8tNfO4FRzEduHFAH0LQKw48MXJIuAzs0xvDdHU39TJGdJvu3EI4_xpoFbB0-X1R1DIVHjJky3ewZ_TLN-Q64_gH1Mg2-RnZljq6S_YOKwJ9eb2_ZcHYNfcoo7nZTWeyXPKjwGS1XSeuS24ahXV1s1K-O_eqI-4n1Ufivc4YtQ-F294nQwFA9MCUGyiJ_GYW_G1N16kJd7jUAHFCAdAZDJedNtgOU3z9XWUuTqx_AbIx8Z7D_Pz-Es1rAsvoNSkUDw25kRHpThux3U4-EscFeDLEFMQseH6zhKD2tdIgpxhtj44UUYrl-HfBkMGrsb3HIo5CRL0O-TbVxsMs4"
+      ],
+      "rating": 3.1,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794068,
+        "_nanoseconds": 497603000
+      },
+      "coords": {
+        "longitude": -70.6164044,
+        "latitude": -33.4784006
+      },
+      "name": "Plastics Haddad S A",
+      "lng": -70.6164044,
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "José Ananías 444, Macul",
+      "id": "ChIJe4TqBPzPYpYRfSzxlwuZOfw",
+      "lat": -33.4784006,
+      "created_at": {
+        "_seconds": 1760794068,
+        "_nanoseconds": 497603000
+      }
+    },
+    "ChIJea2gfv_EYpYRVbV-Rwr2PCs": {
+      "source": "google",
+      "photos": [
+        "AciIO2f7oJoe0emcEzLPRmstNpEABMu6z1PHW5qkrPMTVTjnm_c0e4_HhDy-DEsngio2-Z5wEbwC7WKKQY6wBoBQVrLq9MRToTDMsDtqJStuTNajvBL2-cP5wPB9ZHZppV8SfUtT_yMWsZutIF6ajobJ8RT9mDeoBZI6KOG5q0TINy3MR_lNYmJ_e3ZJDYtGyXP66id4wWg7ua43c3GvNYV7qcIhdd10F85GhpINPGpwe5OPi38JHLn-fBIoWfoTSt8I7sVpyaGsUn0_1ejblh7QihQ3gkynTGZHOakeUPoywn1dH4qUNVajfHO-6G35kqzfm6_OkYGqzgk"
+      ],
+      "rating": 4,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806078,
+        "_nanoseconds": 175725000
+      },
+      "coords": {
+        "longitude": -70.67280509999999,
+        "latitude": -33.44980949999999
+      },
+      "name": "Lancaster Arts Hotel",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Abate Molina 23, Santiago",
+      "id": "ChIJea2gfv_EYpYRVbV-Rwr2PCs",
+      "created_at": {
+        "_seconds": 1760806078,
+        "_nanoseconds": 175725000
+      }
+    },
+    "ChIJf8Ekm6DFYpYRHzkKSTnw7Wc": {
+      "source": "google",
+      "photos": [
+        "AciIO2c8L9WNG2cviRrrkAYZMCi8YED_n8uxeEFa7uuSxsJAprMEOlSedYcOmIGVH1kVfYTa2mSuL7b1ZJiy79pHZfZPPXu3s0gs0UvWNkaHl6kKaXd37i9fqwI8kTuOHpPwWaYbMt87i3JtP-YXrZ3Q34LS8i0EQ6vFUKu4fyDTSl_UQTxIF9JuMPWyAdr0-Et7yl-ojP9FmvhcIcxbkrhdLL2Oe9If1w0PjB3mfEHZBR2ppUjk2nJ8RCQ3rPVi1f6L40zSUeOodFX03uOEkjo_inJ45tFnb8fUa_J9BC77T70jUDjVUsjhRy5wk0YyqQjPkz58kkcX"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804598,
+        "_nanoseconds": 159428000
+      },
+      "coords": {
+        "longitude": -70.6492082,
+        "latitude": -33.4450959
+      },
+      "name": "Plaza Paris Amistar",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Serrano 62, Depto. 215, Santiago, Santiago",
+      "id": "ChIJf8Ekm6DFYpYRHzkKSTnw7Wc",
+      "created_at": {
+        "_seconds": 1760804598,
+        "_nanoseconds": 159428000
+      }
+    },
+    "ChIJgSn_DF7FYpYRi6yJ7bU-oFo": {
+      "source": "google",
+      "photos": [
+        "AciIO2dmKF5PLIL8tFA9Q7aaG5DJTbW-mCKyrqiSvGWTJzIclmKUE9lbtdCESFrByks9P34-h3H8cJwp3UGqThl8B-0Q9Js9gWSzG23HOz_3cStKUr9ZB3EI3OjDsSls7tFooWl96Q0ZSmWVX1DCWCxdrJGUa4Op9_Y7aDe238wQZsSEnk3A4Iysl2eobRfEdZhe9EB-nxieh7uXVCa6_tKJaWTd6_SvBohXymKTtNrU0limxjlQkNWlu0cmBOe_8SkJOc883V2Zz_7Rknhp2eB8vn7eq0sgCb3sQMCwbuHC_rryAz1l9Qx7XMuQMJLpoIhcebPSJUFIgVmgjdkUwCzipXCilRF4AQ46cjXwalRZUmI8Qn-DPrPqk7L3MXW6CbqfoKiQbSmA9lIigSHdO_FSC9B1zQ6HGT2Rnjka5WbztrMD8d4pwzsWALGu9BFxK7TiN0qXUnlhp7T49DiwiXWoFNflTs38FxxHJ1AzotlzWnmXC71ByeXz1V5X-73CiD-SeQ24T-LeKMIgLor77_3s6TGuRiY8QzfxEAgt3mio1G4eGpBmePCf7OXV_YXwR6_LPPs8d369KBJFMcKnBzOcqv9gZBVbz6sWqOJEHlIZifIEcu7DxykeiqRRHkk9AYg0FZlkUg"
+      ],
+      "rating": 4.6,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794068,
+        "_nanoseconds": 411496000
+      },
+      "coords": {
+        "longitude": -70.6266943,
+        "latitude": -33.4651363
+      },
+      "name": "ABB",
+      "lng": -70.6266943,
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Santiago",
+      "id": "ChIJgSn_DF7FYpYRi6yJ7bU-oFo",
+      "lat": -33.4651363,
+      "created_at": {
+        "_seconds": 1760794068,
+        "_nanoseconds": 411496000
+      }
+    },
+    "ChIJhwI5hFXEYpYR2AGnM5L9VPE": {
+      "source": "google",
+      "photos": [
+        "AciIO2dJmMDLNUsz1tIOob_AiklQY8lJrYH7i5nRfwxjiNaxHg2dIR2Cyjfssb52ExQ68BXLCkMDp7ctM5WvrY5jDoKqben14jQ0UwgPElzItuxrSl9dqqjKWahHr3fFXGCSS8ULO2xzdLD7xrm3QjNZYuqv1SGxWoDAZe2TsHfTrrYSq__wJcrsRhlFNxbWlz4sGfQmBKUn8taJ-NMie6Fz-iUHwsPSlvWUGLIU5D8BJ0tl8Bbr1HHksWrTZDTx9rO1tAMtnTgfn-X9f0tp4-VhcvLIsCqQf48rX0BsdQIpf4OOjI9utAMmy_6QXbeaoEHpDiAr-e1J_odzHfb3VqSvIiwuCQYTUebLDpCvuSMMQo-uDBaWbRX1sI_H0DkBx5v8iikHLAopUiHFzaukJeizOwDm_8LctmrUdOLK3c2z6dItfGEz7c4ZrPoddOb5oQ8q88sMP7c5T28C95FSO0ri7aR01b4YYGll310iNZqcAirJwiyQcBRQBj3oF8mq3NiZQdOlPp0FVGRdw0PDPEA2eprdyWC89sQt3j8qKMoxXkb8M87Ieg_VNgs2kSOW4MDOf7uVf34RLTHt_uS6y2gAsmlKh1PcRzYV9GDTuSpFGKW4ilN_6Y4pNQ6P16XUpFQ3TTfEuNac"
+      ],
+      "rating": 3.7,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806083,
+        "_nanoseconds": 181210000
+      },
+      "coords": {
+        "longitude": -70.6727371,
+        "latitude": -33.4490397
+      },
+      "name": "Nelbelan",
+      "categories": [
+        "clothing_store",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ],
+      "address": "Avda Liber Bernardo O`Higgins 2775, Santiago, Santiago",
+      "id": "ChIJhwI5hFXEYpYR2AGnM5L9VPE",
+      "created_at": {
+        "_seconds": 1760806083,
+        "_nanoseconds": 181210000
+      }
+    },
+    "ChIJhz3qpmLPYpYR3Bh8UZM8uEY": {
+      "source": "google",
+      "photos": [
+        "AciIO2drg9ciRLp09-e9SBRMrz_RRja6s3FrToPdGMdUTpeejjwfaa77JSY3Yk0xhRVyPfSR6KlGRudK-sv6Xc9ON7_jpldOAmUkFPYzD9d4LA3qOtQNAgM7KLSCXbraBN4KIfhE330mEPER1ggPJOQ1y-RdJSETp_s7IQNeZ3U6dHrfFJYQlOkoOlkz_8QXUzufms19LX4Knrm0a_d9_qM74bNVtr9ayJLIyV5hOmcx80w-L_xN3JD0DWYeh25a6_v3AzTrI89zZGShog3l7ltbUDyHHjF_Kmjet1SBlf-zX_6Ms6qH74J2NFTAneTPcW_yKuGwIKbq8Rw"
+      ],
+      "rating": 4,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806092,
+        "_nanoseconds": 774207000
+      },
+      "coords": {
+        "longitude": -70.6210668,
+        "latitude": -33.4295555
+      },
+      "name": "Ibis Santiago Providencia",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Providencia 1187, Providencia",
+      "id": "ChIJhz3qpmLPYpYR3Bh8UZM8uEY",
+      "created_at": {
+        "_seconds": 1760806092,
+        "_nanoseconds": 774207000
+      }
+    },
+    "ChIJiZWgawjFYpYRcaEc13Hcm_8": {
+      "source": "google",
+      "photos": [
+        "AciIO2dHxx_Ud1JEGCAANtritxXUVMw__r0-krWMgykrxINtZwH6lx67OMmrGsrSMYgWnd3SumEUuQjIalxRUCkCKPX7PjxFdr0z4p1uIVKEOoDS5rQuEzfBvWVbE8MwY7W3_jcYKMez1Nrwv4Gr9zdDwJ-70proSCdK6d7hwtD_fAXLqfv_SGNQyVtBrceXCFSJdCF1wNTtpq_Bj4GVwfMI1pZqehaprzG1KgqHmG6-Z7rk6I9vktsN6iKdk_SmRSWCsjpv_Dhhn0VdoaVeCzvxloux1EomokLwLZ8dj3c_wzb4tuF4CrJlxn1o7GjVvYGUmp3GYembRlE"
+      ],
+      "rating": 3.9,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804597,
+        "_nanoseconds": 735086000
+      },
+      "coords": {
+        "longitude": -70.6559939,
+        "latitude": -33.4484456
+      },
+      "name": "HOTEL SAHARA INN",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Corte Suprema 168, Santiago",
+      "id": "ChIJiZWgawjFYpYRcaEc13Hcm_8",
+      "created_at": {
+        "_seconds": 1760804597,
+        "_nanoseconds": 735086000
+      }
+    },
+    "ChIJkx_YIoTFYpYR2iOymRc2VvA": {
+      "source": "google",
+      "photos": [
+        "AciIO2d0xDUxeqbRNlOKVve3eqy5gcT5sOQ8KDXmMGHSk74V1O18eYMPAY2Uu4uJRhBEfrW-nNS5-gr_K_ACj5v9oJEMVjT6KAEtA1L3JqSOdlD3OcbXU0Kb7TEz_SrSje2T5djLVY2rP_QTSlRXgzCQAmi6Wdg_cgxJCVNSiqxO_HVDC0ZN0AmwYf7oOYpVXF5UDnOMQvvCSbXc4ZkBHEcScHr7OJd-Qrl1FM05hMZUXGHrAnsOh97L5Y439vlDV2Z8cmsY52x2pf7UTcy8RIV48K0H5vhEjPzHG-dTpq_tNzMaC77XVJOgsuJFbkYavmTuMBcy09FmMh5YaspATWPm3GbyfEdXDRdEH9QEGJj5Zv5_jpwezfKZtgnXNkJpIc0UMZTQljh42ZOreomPXn9lX4DIU2nXolpJ_HP2jF5ZtJHSUkPrhqg0KN3UwuZ6miELgnw-_2juspDkQmiKniBomlMgejrUr37FkUzgKrmYTygTFib9Pcr0XvMdI6ODYcKlDKCLnmvx38UDYCMw3EcsCqkNGU72XptOImNYrC6BM65ddS5b_IqymgJ6BnDBmLom4eIBIMwEX_GVIViBM5X2Ovac7Zx7-kC5Sno4Fm2PMxxc_gv0o1hR6FD3UOwFyhj0PXQuuQ"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806166,
+        "_nanoseconds": 255915000
+      },
+      "coords": {
+        "longitude": -70.6279532,
+        "latitude": -33.4354339
+      },
+      "name": "Hotel NH Ciudad de Santiago",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Condell 40, Providencia",
+      "id": "ChIJkx_YIoTFYpYR2iOymRc2VvA",
+      "created_at": {
+        "_seconds": 1760806166,
+        "_nanoseconds": 255915000
+      }
+    },
+    "ChIJl5mD8GXPYpYRg1qCLRchCxI": {
+      "source": "google",
+      "photos": [
+        "AciIO2eHmrNaJch7vtE4No245dzhktbT_7aUvnYO4Yvoa4Sf-e-V-Lc_oPnpwHywDxtLkEXKmSXy-0LZRNBwpHoWE_5bHZMkl2NotK1ymJ0-F8MqSDsXeh7_EMGcq1eF8yhuDCbMcwg1Xv6lt4Vzo5ueKsRWvjhSMIiMbEbgGRikLjO1bS9ZjOy95L6lJiVsDzOzoiJf8BF9II8kkDMAIjGrGWONW6jHvy1c9pOPm5QojQFhm-b61vr9f8r7sH1mA9RYMnGtKomBb-4ybONIwLJS9sPI2TqrF_04QfOCFjxZ9v9-FnU9iRt7X4YicSRTD8L3rD7XLT8KKLg"
+      ],
+      "rating": 4.2,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806170,
+        "_nanoseconds": 545640000
+      },
+      "coords": {
+        "longitude": -70.61010739999999,
+        "latitude": -33.4239845
+      },
+      "name": "Hotel Diego de Velazquez",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "de Chile, Guardia Vieja 150, Providencia",
+      "id": "ChIJl5mD8GXPYpYRg1qCLRchCxI",
+      "created_at": {
+        "_seconds": 1760806170,
+        "_nanoseconds": 545640000
+      }
+    },
+    "ChIJlYx4TFLEYpYRZjFI5SnZpBs": {
+      "source": "google",
+      "photos": [
+        "AciIO2dQL1GiBazBxluyolqHvmS-R5GPTZibyrD_jOnKimUkcxlbcMc71ysQvMEXB2ix60PmxNFDOm8V9NDNQWHnmmzrAZfginHZ99X8j7sAeBB2-DFV1qFX0v1ah4ARaBo-J1waQclz3I6JX7dEXzexH5FI3MNiRVAwmfAkSfcGxUSNu_aCV6O5kYTUJY85I1e3d-RhMa8ScUWw9ZnzACDVobm6ZiwdpttjpoBcUjuT6rciC9s9nh6bcRuH2leq7fuc6YC5H-nqMbY7kkim_jaCkDRyZMw2oJ5fow828HpKBxJBbRHeUpLQHgo2Rurbi5n_8JbXkutUUuo"
+      ],
+      "rating": 3.9,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806080,
+        "_nanoseconds": 436636000
+      },
+      "coords": {
+        "longitude": -70.6740949,
+        "latitude": -33.4408695
+      },
+      "name": "Hostel Downtown",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Rafael Sotomayor 360, Santiago, Santiago",
+      "id": "ChIJlYx4TFLEYpYRZjFI5SnZpBs",
+      "created_at": {
+        "_seconds": 1760806080,
+        "_nanoseconds": 436636000
+      }
+    },
+    "ChIJn4BLmZHPYpYR-iECV2R5Wtc": {
+      "source": "google",
+      "photos": [
+        "AciIO2cV5U0lETg-40YMbZ25sK9zeZ8BZTbNKeUXzHGj6kZH-OCKtPHlmagIldhyGUAwZNXlEpTBserYu8NWeSqAdFItySHPqx-0i6Sd8__BnRixL4QdGVTqK2sFUhedIwvzTESaMCcn6BdR_iH8xXCL02DJqDfmqjhjEvDFz_mo81tm9LRo7a_wGfUleB_UFT9ZG5A3eEplk4qRip4kXqY_MlqWsxOn1tyCRNKsSZVTxBcvIcKSVT5IRxpnaVXR1Po9KHWIwdfqXWb5Qo2N3rDavbngLFI24pQ0BWdHRoxAa0j2LUT1iLpdLkMlvHk7Cbc-7NBFZL3ERaY"
+      ],
+      "rating": 3.8,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794900,
+        "_nanoseconds": 514451000
+      },
+      "coords": {
+        "longitude": -70.60705879999999,
+        "latitude": -33.4545218
+      },
+      "name": "Centro Médico y Dental RedSalud Ñuñoa",
+      "categories": [
+        "hospital",
+        "health",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Irarrázaval 2305, Santiago",
+      "id": "ChIJn4BLmZHPYpYR-iECV2R5Wtc",
+      "created_at": {
+        "_seconds": 1760794900,
+        "_nanoseconds": 514451000
+      }
+    },
+    "ChIJn7vFl-DPYpYRktcyeGoDle4": {
+      "source": "google",
+      "photos": [
+        "AciIO2eRsEz3RdLN8vB5vrwCCSBH_TOtLvujbf4i5wIfWkD7Vkcj9wcakhRsxHLq2UGm4NLJK9ZGtLFNVn3oyG7vQ2AItWKhTzPaYc5zT4UN4_Dtej5lTuBrYxZ4aRqiyOtWuQgPlp7cYQP46jLQPCCg3mxnKr1CzEdLKd8y3spzGxQ8rHOQI7LZ82bcckBHYy0GZkd7yOHlx_ZFYE9vGVyn6U4PZMXM2yaGfjmMU-ft8kxfr2YBsNd7n2xHEKbDVv1OO1d6YTW2632_7vdL9cozVIZzkTCcFLgLcineigLTNOvEXEm4mKvMpYQXNXZ17m9S6x9gg_ZKHWtHeJuuUiKRc2rW0SdwPZeKEnz26W5gxmmpchj0Hxag4NXCaXU8XPyH6WWEQ4ZL13TQhVWferflKaIiyXqNTjpuz0OeyEAjAwqe6UKQnwJ1IA_vY-DdmlH0bVS2WydWOVDMw6bjkdfYFnu9aiQBtfYbfyaUWl9jNHfVzGGnF5IoT8pf_68ZYigqbxI-sxRJmVns7exW58LqBdlX6nX3kIVchARi7BHW-XcHxnncDjJlpWgK5K2VYmErWkV_nbugtIHxACJ51NIgMq7oFHsH4hlGPApE6RZEyJVfXd_C6uakZNb171dFcrA-ILsEOigL"
+      ],
+      "rating": 4.1,
+      "price_level": 2,
+      "updated_at": {
+        "_seconds": 1760794902,
+        "_nanoseconds": 423136000
+      },
+      "coords": {
+        "longitude": -70.5986696,
+        "latitude": -33.4764953
+      },
+      "name": "Restaurant Fung Wong",
+      "categories": [
+        "restaurant",
+        "point_of_interest",
+        "food",
+        "establishment"
+      ],
+      "address": "Santiago, Macul",
+      "id": "ChIJn7vFl-DPYpYRktcyeGoDle4",
+      "created_at": {
+        "_seconds": 1760794902,
+        "_nanoseconds": 423136000
+      }
+    },
+    "ChIJncFq4MHPYpYRed6W3FmOHRY": {
+      "source": "google",
+      "photos": [
+        "AciIO2eQQc89mvrogrv_amcTWtH0bQ6jexPKi5t6Nneg4uDyczbpREQmO773oXEh9JWQEXm09G5HXTvdgx3Vt8sYUNlMJv1PLmoyA0hPe9BAsLo0-0YJnZC-S0-tPF9CT_pqSbut57tzATzpR83ocqH3amPO71qOogy794kaRpx53VRfp6h5df3wTam8Bq-oUg30FZ09ZZGrkCkX3oLgT4HwAyIQVcgotODuYNHZ1ExYh5vwwHy_8BBw0p44VUW5fQxDUlRUkLJ4s36eNamBeWUcpiYxokhT9QdqsLNvprhI914RvgxQH6EFUdHuDbPo5aft97czfc5QRulnXznd7Mce98IFKoBB33vhVyNeRJtsaRlgYyE9YsjPbFUr89u_Cozkpkz0h54N6uTa_xxPw-f_G8gnMBTKye97owPKtX7TpNXTlhT8F-hJ4TKu6ejRkMMbU_W6Fl4cZlPf1GFWcon20wAGTwOqzPIC_JBnPhRcg9EDHGljlZlo8j2VZJHOhtLKuXYz8O1J8KbsyFOl0Vl9q-oXtIVkl_3uqGpEBvdMEF30GfAEzbXDAY_fnI3OlF5WaAACzRCN853-Za5X-mcjp3IdQLmgBagaGaLmSYf0t9Arjcr3OE1yEr63-7jaWUAtojaaSw"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794068,
+        "_nanoseconds": 317494000
+      },
+      "coords": {
+        "longitude": -70.6191628,
+        "latitude": -33.4712434
+      },
+      "name": "SGS plant Technical Review",
+      "lng": -70.6191628,
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Av, Guillermo Mann 1251, Ñuñoa, Ñuñoa",
+      "id": "ChIJncFq4MHPYpYRed6W3FmOHRY",
+      "lat": -33.4712434,
+      "created_at": {
+        "_seconds": 1760794068,
+        "_nanoseconds": 317494000
+      }
+    },
+    "ChIJneCRF1PEYpYR4Zjt16sYsTU": {
+      "source": "google",
+      "photos": [
+        "AciIO2dQbOn_7LFoU3pVQSq93ljJ6fzcnyTm6zspu9_Nw9IV_jcg5Oss5zXpyVmUmwI5LrFt2m7aV7sjNWQilpeVuuBcYf36mUHaL6i-DuSAqfE28Lss2t7KD-q7u2ZeyZneB72g1P3ZZq8KXh_G5o2YNdAd9p4U5fZpxys9Bl0df99NyT6YLyxZxkCUlYraEQS0oJYzPKXd5hUpJT_4LZ6n7bByOr6p_pIzj5h8LZXM0OGyAp-gyNjGFKDTrXNmDqYGgnSZkaqtyZJC1z7fNIe1vsJViAIAT2IsZLkjAdXVQeMoP9NdajmryuR6iU0-E8JJtiH2q0VaPg1PznzyF4-XSbPYab6nNI6Nm1WtpQgmY8ayJH_w4s6oRUPv0vCZJVvRZ2sOewaNW_JnE-ovxYoHWnMmgf_gBLIHuctjix5ovxMTp4vsZ-8zkfjIK_Uyba9tfSx5ugLKTwh0qCqw9w5ZNYBD_-DftUzeTyEISHrgcdRnHW6zUQ6tLWTd3g1lj2qvqB82Swi8pszO_vc7z5u0WwFZrDusos2urlfsfG3renwNjd4Cyglq166o9vLQbF-gMfUrTv67Jjk9rbVDziWSFQ8xWtm1k6YLI-vnt-RvcuVB1v-2V_z7k8aiJxHetQFxT9U9jtWx"
+      ],
+      "rating": 4.8,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806076,
+        "_nanoseconds": 989037000
+      },
+      "coords": {
+        "longitude": -70.6707918,
+        "latitude": -33.4418706
+      },
+      "name": "Hostal Lago de Plata",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Huérfanos 2460, Santiago, Santiago",
+      "id": "ChIJneCRF1PEYpYR4Zjt16sYsTU",
+      "created_at": {
+        "_seconds": 1760806076,
+        "_nanoseconds": 989037000
+      }
+    },
+    "ChIJoXeBZwDFYpYRBSWt2fCA3vE": {
+      "source": "google",
+      "photos": [
+        "AciIO2c9bLh-52ky5G7K1tp6N-e8s-V-A-EnBi3ufGrd95T83pZCcDONAlua34T77RWKCIFRH2aGNvlzvJA40Q2534X6hKHJbL_7zDq3DzqUNdDKCUjLQyf_iuOF56ALgIW_FbhNjFzAs4w8DTkRu_AcV2NiPN0rTYqNK8ufkxcZzQ3Xn7Ynop-FkY_QpbnlOxJYkIRGtyvjVIpqEU-9WWRPE7-JWVgGNUgAtKAFqZ2g-grO4Gp86pEq74oAUVl_3b9bqpjAtZHeoawg0JsCzf61ViKlFvMhvZj9kNSjwDqeKkgjHdRoc5p8uTw0kTVJVaG1ChokZePrrREIknlzHvTvZ2KNWgVQSGrmQ9J4FfccQPCXP_D6837hyyNYwgn7zut93K6WEHqXLT3pRrvZFGurctyCCun3sZLIdRjYGnMpsYf5A4WfuygzjIwAW2W1_Ztl6P9bawrL70oHvdDlAN-XW9hZfu4hnPOYtXWiMZpOFroikj2k1hX-NQjESLaw4JtZ5y29snTilppclMhOnftZk3RaCmz3KwJMlf7J-uynemknZJv7gjibczp0VcBJ7KefaG1FQ2pPvs_i4f_csyz99vTtwP_S-AhBr9--XD-vwWWdlMCS2NTTone1lpvCreExZMQPcd_q"
+      ],
+      "rating": 3.8,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806080,
+        "_nanoseconds": 840731000
+      },
+      "coords": {
+        "longitude": -70.6668614,
+        "latitude": -33.4498321
+      },
+      "name": "Hostel Todas Las Voces",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Salvador Sanfuentes 2224, Santiago, Santiago",
+      "id": "ChIJoXeBZwDFYpYRBSWt2fCA3vE",
+      "created_at": {
+        "_seconds": 1760806080,
+        "_nanoseconds": 840731000
+      }
+    },
+    "ChIJoY3cXXzPYpYRjsncPo0EFvE": {
+      "source": "google",
+      "photos": [
+        "AciIO2do6hwIoalyfYyh08JxesYLAim53qn0lfThZiGJ8oR7UooPXBbqwPcrwKI-0IY6SPDfXgCx_NlVMqjD6OsfH4D0BVbruXDvJCf8J37vDkqgMAuWco-Ui-o4RkJ5UZPcBKy2EsH7ZYXVh1uSneRXstRJE_oLayMRnocD6gFETFNp1YJJsDgWLXs9_2Vjga4Ugog05YctkOMIxA7rjKAdIduV5jHeVelUo18FuSuFAGD8UUn-YjNQjIkgVjYpa8G5yLsCSN-akT5oip4_DXIjflt-eMJTxhBMZ3WyjoLxTX62dDqeZWT2X7BvqNzRpsAQcFq0wxJJQvY"
+      ],
+      "rating": 3.8,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806171,
+        "_nanoseconds": 693811000
+      },
+      "coords": {
+        "longitude": -70.61730349999999,
+        "latitude": -33.4328386
+      },
+      "name": "Tralkan B&B",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Alberto Magno 1339, Providencia, Providencia",
+      "id": "ChIJoY3cXXzPYpYRjsncPo0EFvE",
+      "created_at": {
+        "_seconds": 1760806171,
+        "_nanoseconds": 693811000
+      }
+    },
+    "ChIJowIVJQLFYpYRMkQxOoBPUB8": {
+      "source": "google",
+      "photos": [
+        "AciIO2c8RsESeHA0U_J89j6LtklVsX_nSH5DcwiXa7PChq5ZKf8Iky--ZMu0-K0AOZdJg1kzCMhGiKo0tKFHM4Q1zX4RQAuAZ6PYFMuglqFba3cccpi_stYAR4h3AL7MabNHoyUbychm01L4zUn9s9GF_zcuoKdEzjrANbvuv7sysLqtjA_4meJArgnGJluB_-pXRxqIY-7FHea9DyfbSxMQ8wRn8qSCauKKGtUDEZnIXPC239MK-C7uJMGE5vMWKu6-0rha22J3v4uTDMjG7S0GTwt6RtvvOBj-Bt1gKe87kJz90EumV9gXwq6fFYuXxZxSbDLylu85Bsw"
+      ],
+      "rating": 4.4,
+      "price_level": 2,
+      "updated_at": {
+        "_seconds": 1760806084,
+        "_nanoseconds": 540504000
+      },
+      "coords": {
+        "longitude": -70.66556969999999,
+        "latitude": -33.4543125
+      },
+      "name": "Casa Toesca Restobar",
+      "categories": [
+        "bar",
+        "restaurant",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Toesca 2164, Santiago",
+      "id": "ChIJowIVJQLFYpYRMkQxOoBPUB8",
+      "created_at": {
+        "_seconds": 1760806084,
+        "_nanoseconds": 540504000
+      }
+    },
+    "ChIJq2-j_HHPYpYRWO91eF9OhkU": {
+      "source": "google",
+      "photos": [
+        "AciIO2fuy3Fk0TXk7e5nkvlXtM-5j0cXggPBng_KpU3SATdcB32TyABMP6vPdi0uFC5NEr7EhiNqMbAwHvEMVf6BgAzqlN-iOzxZ3dGASU6XLAq_DpVSOMFV5Qwf2siBNlHqJJby2q19nHxcaLWIrB_fsGhEM5sIQotr7pqD36cOcjLU-AKXx3ofIH9gJWKosM62hnpp8toc45ycbFkYDr77QhMCk8PON5fPInHqOVj2LXvy82Zrz0Wdcx8DWwdLCy05JpOGx6QVID97oqFtCNCKfx6W5wevla7Vmp5WrH7XsF8Ugn5fbhr4bubQ5f2eTothZMSQ7RQTzls"
+      ],
+      "rating": 4.5,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806093,
+        "_nanoseconds": 517498000
+      },
+      "coords": {
+        "longitude": -70.604665,
+        "latitude": -33.428009
+      },
+      "name": "Heidelberg Haus Apart Hotel Providencia, Santiago",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Los Nogales 843, Santiago, Providencia",
+      "id": "ChIJq2-j_HHPYpYRWO91eF9OhkU",
+      "created_at": {
+        "_seconds": 1760806093,
+        "_nanoseconds": 517498000
+      }
+    },
+    "ChIJr36Cb5HPYpYRU1FKmVaopmU": {
+      "source": "google",
+      "photos": [
+        "AciIO2eeNRb8JQvPD_MQ4FQIyacR_96THvbAuwLFwQjTUz0qI4a405l3IhHUJKLCPnKxGU4dA4GAJhE-g-VodR292Fvuw2E16J3N50YJbEbO3sqlbs0jB7cTz1R5KZPrqs1tM6x0MEiP554e1kK4w8Qojt8dvvI8v7F0tnJyqw17RpypV2ZLZzeOCPP675OZHIjhCBzS5HraiUUSAus8iGnciBwy_kte1XtPsA9tj0VbOG7GWtDnViEAAgy-geR99edlx9mvG8jXAaQgRYtgU6S_HA7aAAe-bjaCD58RB0hXNCCAg_kvQZdIOkOASrn4s6Riq6-urcEUrFI"
+      ],
+      "rating": 4.6,
+      "price_level": 1,
+      "updated_at": {
+        "_seconds": 1760794903,
+        "_nanoseconds": 230684000
+      },
+      "coords": {
+        "longitude": -70.605786,
+        "latitude": -33.45594800000001
+      },
+      "name": "Golfo di Napoli Trattoria e Pizzeria",
+      "categories": [
+        "restaurant",
+        "point_of_interest",
+        "food",
+        "establishment"
+      ],
+      "address": "Dublé Almeyda 2435, Ñuñoa",
+      "id": "ChIJr36Cb5HPYpYRU1FKmVaopmU",
+      "created_at": {
+        "_seconds": 1760794903,
+        "_nanoseconds": 230684000
+      }
+    },
+    "ChIJs0TVk6DFYpYRRwYLCh99iTI": {
+      "source": "google",
+      "photos": [
+        "AciIO2erzQj9tBc1cV4O8nOt6x5imhcbZRwuRj_1rfW8oJK0rCZ-hMyEOoz5NnT8e5z-zGWvKNo4iFXaYLRh2tmg_UtTPCuR6epBg423GaWl_10cxWkguBDPtMS6EWW88QHe8txNe0A8uRRzftuEQJC86nOqjE-LvluRnuSIROYcPOEsEI0A3jusqCJhPd4oDJN0Dez589dcD3iW2pZeF8UvAr5YlD4AaLDtygHOLb4FmFSs4K_tfJKyLtE43PRO-4SWqiHxR-nqiiXoOraTOhcwHQZKg_u2pMeqQKWEVTosLxVnaTes1mSQ6UK_EQbdYVsNHQUra9YU3X4"
+      ],
+      "rating": 4.2,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804598,
+        "_nanoseconds": 514035000
+      },
+      "coords": {
+        "longitude": -70.649338,
+        "latitude": -33.4446022
+      },
+      "name": "Hotel Fundador",
+      "categories": [
+        "bar",
+        "lodging",
+        "restaurant",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Serrano 34, Santiago",
+      "id": "ChIJs0TVk6DFYpYRRwYLCh99iTI",
+      "created_at": {
+        "_seconds": 1760804598,
+        "_nanoseconds": 514035000
+      }
+    },
+    "ChIJsdfLp4fFYpYRUevTPec69Vc": {
+      "source": "google",
+      "photos": [
+        "AciIO2fnMxdADP9S75xVKTxpcr06g5J0cm018gSNb2_CLU_2ZDHTsdNvUm27LgyIEe271riHYenzDhc72P07UX1IiKjB92ecQ3Zy-Ze1Yl__DHdIDePOtaK3g9rkzVcuPAriAZ7M1cmhpsMzex2UOHqmx4m_s8fwKICMQPsRlKo4TVvtiHyZxVvLdt78xuzHxLSAEi6dor3PTebla_YRmSG-hu-wyntmEBeOlSoaJxpos8Ao-0T896sBgOU3P3Cb4DTfi7pHIFGJl9WRR62H72NwcCgqTyLI-sqHwFXImmOZkgIZQmzwBMf39viL7psRaaQrOXzidZrX5uI"
+      ],
+      "rating": 4.2,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806169,
+        "_nanoseconds": 62490000
+      },
+      "coords": {
+        "longitude": -70.624681,
+        "latitude": -33.433731
+      },
+      "name": "Ají Hostel",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Triana 863, Providencia",
+      "id": "ChIJsdfLp4fFYpYRUevTPec69Vc",
+      "created_at": {
+        "_seconds": 1760806169,
+        "_nanoseconds": 62490000
+      }
+    },
+    "ChIJswI8imXPYpYRj2EkkyEK31U": {
+      "source": "google",
+      "photos": [
+        "AciIO2cpyieOkKx7wTG4ezNVwu_R4Bj3H11oeuSHzzVoI_6xoVY6lXHKlo8NHW39uXlXiUMBqNXae2WbkxGD8o5BZvzRafrGpzhhHi3a4Z0msifDILJhQtkEne95j9eCFrmJIZykFje5Rp5NXFsk4aPbhmgIXpgUC2vfddOfgMsnsciOhdAelDoFks8_9RW2fFk2Rldu3oSAW6hDurWvx_mDH92wKUrmLkZ3HbG_UdJmRBXGIuiqXuuzf6k4_uT0qEGVzx8UCSGEolwXrjt9IooTOhQIrUE3EMY9heQWoL2L0tWUPu1xvoJUSTfQMb09ZR19dORMYyMM2KSoocNmHlN66Kc8Ww1iUG8RgeghLqgK7aaTX_-QYzNoydFh5r1_rUci214f1x1ua4JZGRtlF75RmdVJBRjJbIoR9xBiOqMENAvxxClBcEdNXEPH_F3yZyP40hWkLb3mwFwhXCkisypRscReJ-RFYFbwcvkNL-KsuXUI0zv3aRCRPiwc2XFc3p6QsfVrJ89o8czQnJhB8wMyslbkvd0IsMkKp0ysMDYu0206tW1AL4X1X6dMkSYZQ2LpdL3_CbY47Kl3IMpCXw5iZCayIwAgHx2sKG-XXcU25t6qw8tFVhnApXkQHUOA2YAD_r4HIGZU3aq4esKasResDJdTc6w"
+      ],
+      "rating": 4.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806171,
+        "_nanoseconds": 318377000
+      },
+      "coords": {
+        "longitude": -70.60989889999999,
+        "latitude": -33.4251314
+      },
+      "name": "Eurotel Providencia",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Guardia Vieja 285, Providencia, Providencia",
+      "id": "ChIJswI8imXPYpYRj2EkkyEK31U",
+      "created_at": {
+        "_seconds": 1760806171,
+        "_nanoseconds": 318377000
+      }
+    },
+    "ChIJuS-le2HPYpYR66TpEJDWrUw": {
+      "source": "google",
+      "photos": [
+        "AciIO2cHo-RMkJOCVVbJ4H__RBmnaN354fYhigLd_PI_TJJdBBQWgegVI_enqkx-mZMs9z0gitmQxNm4GaunR2MyesqaUUF5NpF7Qmlk3m-IWt5UYYxCknsujLAq3WN9hATSCQv9LJ0d1lIuV4-wV9OBDYy6TgK2Ck3YWW2RzPARpODVaEVixazOiuJ9_-REAc9zSu5JxBtB91fqsHaL00rdBnsEAFnz8wwdCRylaDCFPabuxlk6yBV5qc2Vat56rSfHxbKNrlCkUBwzlLJTre2N58Icq1yMKUvFeyhfBZD6HufyMvrE0pr7BAB-Eeiy9OulefqW9S2IrVg"
+      ],
+      "rating": 3.9,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806167,
+        "_nanoseconds": 479444000
+      },
+      "coords": {
+        "longitude": -70.6181352,
+        "latitude": -33.4237162
+      },
+      "name": "Hotel Alcala del Rio",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Padre Mariano 331, Providencia",
+      "id": "ChIJuS-le2HPYpYR66TpEJDWrUw",
+      "created_at": {
+        "_seconds": 1760806167,
+        "_nanoseconds": 479444000
+      }
+    },
+    "ChIJudPFBQ_FYpYR0WEFot-Y9aI": {
+      "source": "google",
+      "photos": [
+        "AciIO2d66cPVwsrSyGq8uTI3zLbBOnjQob5qUbioUpuL52iOW-K21wgTMe0pR7ZpuPZeFuuHMJvJUJCWJaFN3ceRQFF08KixHb4foRY2YUUMRukf97Zyl_uf00SRbx1_LpVC7_mCr6y1ipNjhxCy_eFaR82GYmqPw-F3o1b-N_tU6jPhNkYkHk-h8t2QtHzCFDZfWJROYZ6CLIK2SEr18DznNjiMur6oSb5u3r_M-UVSEQ79i6PUJIAXniglxo7nOfP19WTg111wEnu1DI2dDPJNDvLs4R2CJvcwq6P6psxAO3t8hQqNYkSUSBJH8nIFV8GWKHzVI8bbkaI"
+      ],
+      "rating": 3.4,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804600,
+        "_nanoseconds": 818157000
+      },
+      "coords": {
+        "longitude": -70.65526059999999,
+        "latitude": -33.454334
+      },
+      "name": "San Pablo wrecking Ltda.",
+      "categories": [
+        "car_repair",
+        "store",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Diez de Julio 1471, Santiago",
+      "id": "ChIJudPFBQ_FYpYR0WEFot-Y9aI",
+      "created_at": {
+        "_seconds": 1760804600,
+        "_nanoseconds": 818157000
+      }
+    },
+    "ChIJuzrymgbQYpYRl0jtCfRZnYc": {
+      "source": "google",
+      "photos": [
+        "AciIO2ee7BI2CEozhwBrq14UP1vZca40lie_LnjQnarWURc_w0Mo4WNKVUG6ckcWS9wVIZPaty-ikVeu2WXyDIlitFh6HJKUR4N-LHaBZn_MSL564F_mM9teMgbP1gzZf4oaOlLgmZKfLPfZti1dKuuTJEzQkJRLCBOZ_NRVFqQNGXG9AT6KTQe1ewDpiE-3Qh3R4BpdG3hMK__4FzGdqlMgXryDuXlIgUlkSuarQ4XrfXcjqGocCDhsiimQWEgnFylsm21ZEDDk_Sv-RyOU3FsLNzwYoqUazp9DbMKY4L0bMYkyPStU2MzXtMyPkobUdasSuyt7VnC24H3BSLk3M3jORz-XLsQKt_FNX3nKCi4DbjmLocXmhJh2xJ7Ym2n2M_JA4bw_QN7892Byvhp_zAIGWa7DUSVPhzOQrmAbWXzclLGfZ8ulUPrPLyL2bdbE4ivS3_Qunz7lIvpPwHfM1FQPb9JYKzUeFbfCCTCrtxpcXQ8dwt4KCY6GWxVpU3Kd4VQztEzLOE3zE4pMP9lL5chqfzN2IXp9mtyxjLCTbLyC-trav5QDleoOpcKg4CmGreC7QPgJd6uKEZ6OK4cLHmOtFC4hKHk1e5hYxf1NqQc984hVWcGhjRb3AVkEq8DBVolh8nJkiQ"
+      ],
+      "rating": 0,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806084,
+        "_nanoseconds": 939844000
+      },
+      "coords": {
+        "longitude": -70.6573657,
+        "latitude": -33.4452217
+      },
+      "name": "Santiago",
+      "categories": [
+        "locality",
+        "political"
+      ],
+      "address": "Santiago",
+      "id": "ChIJuzrymgbQYpYRl0jtCfRZnYc",
+      "created_at": {
+        "_seconds": 1760806084,
+        "_nanoseconds": 939844000
+      }
+    },
+    "ChIJvdvoG6TXYpYRzx-mSITd8H8": {
+      "source": "google",
+      "photos": [
+        "AciIO2cYlDQnwv_WfwWY0q2pcGSyYr5_WynSrX5-J6RsiwYQn99B8G1sGbi8gCTy3NMMBqgs9IyJMbX78GQLsOF5RdQHvB-K6vceJGNFgQNbNgg17c_lk8K0niSNk-JNpgqMCvnnp81e1q-nI8Ef2FeFS_OyvQ8nSmbc-zW5_9GuQkzYj5yoT5gFNmTZdXC3SapXy4-wiH4UjrFkhfecDR7egj6IKrxQWjRI9qOOOGMFVriIO3jkilEhIVeF0TClnLGqbhtWNpankaDSQn4N7Z6Gen6Pn3Ip5fwlDgac7djAO1HvL5_6Zn1CfqBfomv_QqZ6Hrxc84tDJ8frhqT6Dce_whzCkypw0XriaA2mKD-ojQXedQ1xq6Qw6CIZLe3CyzgC2cwAc6jBlpZ6lzOwX8-GLQ7WvLZA4r0P0CAJE3l9q6NNuONP6TOd3tQRk6EbM8sMRl8EXYX_UjvvitBhhxiyd1m4mUrxtnQ5KCUaYztbHO-DEXyd1UweU8mIv8A7UEyKyl1JNq-bVtkEBAAnChrbvgWPOopzhi1EAr2CghBxoMA5gnKIOjb85wF2FpRNWyQCGbUdHc-FfxN2-Wr_zCnP4iZzsRDKxeaTTLEXdxwop6VRRgh18lZEBcXIGtCidSgaIoU531K-"
+      ],
+      "rating": 4.1,
+      "price_level": 0,
+      "updated_at": {
+        "_seconds": 1760806081,
+        "_nanoseconds": 639488000
+      },
+      "coords": {
+        "longitude": -70.6607805,
+        "latitude": -33.4489738
+      },
+      "name": "UST",
+      "categories": [
+        "university",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Ejército Libertador 146, Santiago",
+      "id": "ChIJvdvoG6TXYpYRzx-mSITd8H8",
+      "created_at": {
+        "_seconds": 1760806081,
+        "_nanoseconds": 639488000
+      }
+    },
+    "ChIJw6wn7f_PYpYRwEkwqkI_F-s": {
+      "source": "google",
+      "photos": [
+        "AciIO2fqeCRMRY82G-AWzurAS6AmXKYEQ0kK-S7eNKGoPaTGdGGmk9ynZGi2RF6Wge3Y9viq7tdxYnS8j4gL6wMzKc8VOQ_-ad3-Moy4UxJnjnlOyoLOmD57ddDyXxaH48h6DpdaXGtmskQEGMzJ7XIbeb5XQQEEaQTGpOVpFpUUkgIZu0Vz1gbYbTwQ3SKS_j8-IsZArV-XhWH3M_HXURqxis-Vw5OgwrVLAk0isNPd_TBF-kt5o1vC6dpi9QQHCX8eCQ3ZqwiZ9NqMvDIY1iiJcPrqlXy40ywA-9cBF_nwSMZJtvt5yDUOwQHJ8VH4Pw6F6jukpVm-ztyCE0hlKlbgzaJu5OHBNNmSM657uIbAUGy2KsRF8MvqhRX27_gLWZOphmwbGjxXLEvirs_0JwhdoSyyzOEckXrswGd8DLO8IpCF27ttEByClk0EBxF8wqHgavJcCfycMi7R5CStRLLIvB74r_pNua1Ja94S92nuVo3fD6si10luEgmxpC87XYViTht_0JccUMEiweiguRaetQVzoG7iducf4uxtJ0PRSXA_P1V4RxYbNiOYksVH6hzSLZTgUeacsziIrKqKiHLLxABYLsEncP7v7H0HFJe-o8nc2W_-4BBNIYnmRH7yGKtM81cfQQ"
+      ],
+      "rating": 3.8,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794066,
+        "_nanoseconds": 375269000
+      },
+      "coords": {
+        "longitude": -70.62053759999999,
+        "latitude": -33.4828891
+      },
+      "name": "Intercarry",
+      "lng": -70.62053759999999,
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Vicuña Mackenna 3350, Macul, Macul",
+      "id": "ChIJw6wn7f_PYpYRwEkwqkI_F-s",
+      "lat": -33.4828891,
+      "created_at": {
+        "_seconds": 1760794066,
+        "_nanoseconds": 375269000
+      }
+    },
+    "ChIJwcwdzGHPYpYRmT_Nub-DPJg": {
+      "source": "google",
+      "photos": [
+        "AciIO2f6us5UkwO_Zco0vVkoA5lkyczp1BI6drNSzIMY-NvhW8d58STC93YCITaItkPgGhOso0prX3-PfwDMSaTfqxaBBuqA1F-B6DHfRPm6qXt4_e2wjawzEKYfk8BebY-yJqhjp2dcdzF_Ur61T_B8GgJC2dGVEjQfqvPaP7HfOVjKcTsJmskpjgXvQp6MR6yAMBn3CCdcFyy2P8oqw7iyf3RKoWCogS_gJRo1BDYxHJtQAqFWkLONeGrzMhWRYpKU4NA9V61pQGcLHTJL2UAyjYZbjuesHSQMI5AfQm7ehig72IJcSi9CcPi4zDGHDcFkcIv0lcxss18"
+      ],
+      "rating": 4.5,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760806165,
+        "_nanoseconds": 242604000
+      },
+      "coords": {
+        "longitude": -70.62104339999999,
+        "latitude": -33.4222109
+      },
+      "name": "Sheraton Santiago Hotel and Convention Center",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida Santa María 1742, Santiago",
+      "id": "ChIJwcwdzGHPYpYRmT_Nub-DPJg",
+      "created_at": {
+        "_seconds": 1760806165,
+        "_nanoseconds": 242604000
+      }
+    },
+    "ChIJy2RPfaDFYpYRwXPx2c8zI5A": {
+      "source": "google",
+      "photos": [
+        "AciIO2dysLbW_ybtZ6WC2zu0-6DPJI-4V7ujfsWXKfuYPycGvVhIDzV1brBo_uKfs7kR0oUof9PWWBEoXyZ2CeBim1aWMyEtvpriN_k_AWtmso8VH0_l1Kotk-LesWLTzTU7FbDGnRL8TQVK3CFtul863N-796TRYfWXxRRFHkvXEzpsTOOQdabHjd5EoXQzS6J8mgrHciKBQl-CwRe0540ShRwDoJKH872MrU-r5Fds05B2OlwW3g55Q34PKC0pq4NekJy12Ip-ArZ-EzoWe9_l7o9QjO_GHwrlst69DKOxnb1gCcEw6XSRhkWpCKyA13dh_mAngnWxlVhlIKqo91rj4djhxhz1Qv09ztkeIWVn2m4j-X4Gv8eJC109T2CEzM2ny5QNiXG6sXdLzQ23XnIbfcGRuWqEb6ZTC8-rpXR2Mz3cwm16HVbNWCFEXlrNPB53-K1hEUIMRNna1IYkiYe7C3GXh8lPaM0nkxd2xNozA7Wvx_UuP_N8SY1lcpYHh_fUmPjB6wC7MJmChO_5wQXvqXm7_Z-1vDPJ54ugC6TzYbMXYYzheeYCuhvABzEiRnd9gECVeLpYdToVPBlikx9lCWPRLzhkNAliFfSFcOBrZeBLNM6MD4eza9U_poaapskvUmdBYFmD"
+      ],
+      "rating": 3.8,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760804600,
+        "_nanoseconds": 49834000
+      },
+      "coords": {
+        "longitude": -70.6484741,
+        "latitude": -33.44468409999999
+      },
+      "name": "Hostal Plaza Londres 77",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Calle Londres 77, Londres 54, Santiago",
+      "id": "ChIJy2RPfaDFYpYRwXPx2c8zI5A",
+      "created_at": {
+        "_seconds": 1760804600,
+        "_nanoseconds": 49834000
+      }
+    },
+    "ChIJywaFM9bPYpYRHQsbIlhizjo": {
+      "source": "google",
+      "photos": [
+        "AciIO2cl2_ug4ess8knqQwx22Qq8S8NW_jHlVz780AZWasSRd_r0aDCC0pIVR94RNvC3gMbtoiEuEZjWUhoxL0rDFD__QHO16zgRGEBZWTdj-tayBQaZmnHWZqaTKt7lrXLb8BJVgEUWS6PXgTNXkv6ZPDZp58b6VRAn-TC-5qqzNEHvssQ3SKfnyTdJ8TCcVES8DSzD3za-JpV0lUufrdWAkAbg1RcN4e0DY0CoSGRkd_i9eTAgqvhezWtONEjaM1vIKvC6RtRMdqBj5e_x2fXoU2zRZzwHeT4Ukyk1Arz8Zk6wV4Sn5nyeehV5iej_Xtdx_8Kp2d3sP0vURRwy6ucIdvO-3DsCpjGzePddkDU-GzAPTAxSyAIBp7YC7QF9RBtI4Zt3OCmh8Drk856v6r0a-8XS1Y021clcOSDgdanutva0rB9V7PBEjn80qUOQ-Dw9VAajsRW8qIE1gsFvHVLu3woME7EEy3DYPIZqzEVaRF2fnqMb3B2wWNDLG7ck1vEuTNqO2Y5J6hhqkzjpRo0MaaGnFvZbSXJ50yMFraj7Yyytphkxg_JKPGMEQMsDpbarmThup_9MhdZkAe7wM19Qhr11DX6pqJ4Zxpa3-TS3o10GegyJK4MsjrwP21vuLVUXste-ng"
+      ],
+      "rating": null,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794901,
+        "_nanoseconds": 882084000
+      },
+      "coords": {
+        "longitude": -70.58279,
+        "latitude": -33.4770567
+      },
+      "name": "VM Hostel",
+      "categories": [
+        "lodging",
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Enrique Molina 4667, Macul, Macul",
+      "id": "ChIJywaFM9bPYpYRHQsbIlhizjo",
+      "created_at": {
+        "_seconds": 1760794901,
+        "_nanoseconds": 882084000
+      }
+    },
+    "ChIJzZptgJXPYpYRVToZ8Qqkq-Y": {
+      "source": "google",
+      "photos": [
+        "AciIO2cmaGnxlQIJyHCmHg0SJArm1q4KHJptlRA62wiggeCVivWAQF3PUlk81x1-CCDlYTQb1iE3gULT-cA_53YXiMRbeSJmMdQq_Ff4aBssdwKP2lAue7o0IAHuMojynDgoklTYjuS0rX70PulyzjmMJnTSJo2LSoRYOKPQi1laoapK7GH_FaXpWaN-tSiFX9wngUCkTgA0nscE0yUwTrpy86tsjcQ5GLHizGIZ3FkkGwdJ_wnfmmmguUje6heBpW4IKkSi6fMb4tn3FDF7osSO2c-BZGJ0QEqu9hAWiBKyNoBk28-Q1VedCYgRz11foIchCJm7IZEnmcs7buaV_OTA0sVSB4LliqO3oGz5pemRtcQUsowJRkaSqZLhxdrTLfc09ukWjsd1E6w2daSTcZGWuFV30V2RhodGzBIW_N_AOBCBtKCarF61XiO_fc2ZAT0f0ABY09zBanpFJgW-BBQrwp1iq3dMqNoMnFRX_hG3Y5Pz4KW0sgzcFEXIQY0NjZMplp4QPQSR-qA9U1s-ZUSaerm4WFgBeuAPdF9OG331puuTzpDvtJufgs8rE_xzQbCtMgHmasZyrVKnrChmarOEZbJhEsO1fE_wqaZ3EH6uFr6Po9drGncbMqqrpq4Mr1hlzXxjmg"
+      ],
+      "rating": 3.3,
+      "price_level": null,
+      "updated_at": {
+        "_seconds": 1760794901,
+        "_nanoseconds": 334343000
+      },
+      "coords": {
+        "longitude": -70.5980658,
+        "latitude": -33.4563802
+      },
+      "name": "Preuniversitario Cpech",
+      "categories": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "address": "Avenida José Pedro Alessandri 155, Ñuñoa",
+      "id": "ChIJzZptgJXPYpYRVToZ8Qqkq-Y",
+      "created_at": {
+        "_seconds": 1760794901,
+        "_nanoseconds": 334343000
+      }
+    }
+  },
+  "users": {
+    "BzuHQEOtXMh9PSDvYtC2TcioHsD2": {
+      "uid": "BzuHQEOtXMh9PSDvYtC2TcioHsD2",
+      "displayName": "123",
+      "email": "123@123.cl",
+      "location": "Santiago, Providencia",
+      "language": "es",
+      "timezone": "America/Santiago",
+      "interests": [],
+      "createdAt": {
+        "_seconds": 1760719371,
+        "_nanoseconds": 373000000
+      }
+    },
+    "ICWDzXDI7BWZ71OfFloNcS61rLU2": {
+      "uid": "ICWDzXDI7BWZ71OfFloNcS61rLU2",
+      "displayName": "José Eskenazi",
+      "email": "jo.eskenazi@duocuc.cl",
+      "location": "Santiago, Providencia",
+      "language": "es",
+      "timezone": "America/Santiago",
+      "interests": [],
+      "createdAt": {
+        "_seconds": 1759964284,
+        "_nanoseconds": 56000000
+      }
+    },
+    "JHTAD0iYfqN5wgH2DUpcLB9qqXC3": {
+      "uid": "JHTAD0iYfqN5wgH2DUpcLB9qqXC3",
+      "displayName": "Jose Eskenazi",
+      "email": "jo.eskenazi@duocuc.cl",
+      "location": "Santiago, Providencia",
+      "language": "es",
+      "timezone": "America/Santiago",
+      "createdAt": {
+        "_seconds": 1760744049,
+        "_nanoseconds": 660000000
+      },
+      "preferences": {
+        "preferredLanguage": "es",
+        "travelStyle": "standard",
+        "groupSize": "solo",
+        "transportPreference": [
+          "walking",
+          "public_transport"
+        ],
+        "accessibility": {
+          "mobilityAssistance": false,
+          "visualAssistance": false,
+          "hearingAssistance": false
+        },
+        "notifications": {
+          "recommendations": true,
+          "priceAlerts": true,
+          "weatherUpdates": true,
+          "eventReminders": true
+        }
+      },
+      "interests": [
+        "museos",
+        "compras"
+      ]
+    },
+    "LrFcGh0EzcOwR2iMmG0fY5PYMOo1": {
+      "uid": "LrFcGh0EzcOwR2iMmG0fY5PYMOo1",
+      "updatedAt": {
+        "_seconds": 1760759636,
+        "_nanoseconds": 182376000
+      },
+      "display_name": "",
+      "email": "mindtrxsh@gmail.com",
+      "photo_url": "",
+      "interests": [],
+      "createdAt": {
+        "_seconds": 1760759636,
+        "_nanoseconds": 182376000
+      }
+    },
+    "NtOYomUseVQdFTaqA3f0QLc8h593": {
+      "displayName": "Usuario",
+      "email": "nico.sotol@duocuc.cl",
+      "language": "es",
+      "timezone": "America/Santiago",
+      "preferences": {
+        "transportPreference": [
+          "walking",
+          "public_transport"
+        ],
+        "budget": null,
+        "notifications": {
+          "eventReminders": true,
+          "weatherUpdates": true,
+          "priceAlerts": true,
+          "recommendations": true
+        },
+        "travelStyle": "standard",
+        "groupSize": "solo",
+        "preferredLanguage": "es",
+        "accessibility": {
+          "hearingAssistance": false,
+          "visualAssistance": false,
+          "mobilityAssistance": false
+        }
+      },
+      "location": "Santiago",
+      "uid": "NtOYomUseVQdFTaqA3f0QLc8h593",
+      "createdAt": {
+        "_seconds": 1758948290,
+        "_nanoseconds": 945000000
+      },
+      "interests": [
+        "compras",
+        "mercados",
+        "vida-nocturna"
+      ],
+      "updatedAt": {
+        "_seconds": 1760806069,
+        "_nanoseconds": 625000000
+      }
+    },
+    "Slb6Li6cDmRuKClSsynX3S2NbzP2": {
+      "createdAt": {
+        "_seconds": 1758986087,
+        "_nanoseconds": 40000000
+      },
+      "role": "user",
+      "displayName": "nicolas",
+      "email": "nicolas.sotol@outlook.com",
+      "status": "active",
+      "timezone": "America/Santiago",
+      "language": "es",
+      "location": "Santiago",
+      "preferences": {
+        "transportPreference": [
+          "walking",
+          "public_transport"
+        ],
+        "notifications": true,
+        "preferredLanguage": "es",
+        "accessibility": {
+          "mobilityAssistance": false,
+          "visualAssistance": false,
+          "hearingAssistance": false
+        },
+        "language": "es",
+        "groupSize": "solo",
+        "travelStyle": "standard"
+      },
+      "interests": [
+        "museos",
+        "bares",
+        "compras"
+      ],
+      "updatedAt": {
+        "_seconds": 1758986229,
+        "_nanoseconds": 832000000
+      }
+    },
+    "rBaf2bEpaSX4r1M7WyJyqyS2eB02": {
+      "uid": "rBaf2bEpaSX4r1M7WyJyqyS2eB02",
+      "displayName": "Nicolás",
+      "email": "ni.sabando@duocuc.cl",
+      "location": "Santiago, Providencia",
+      "language": "es",
+      "timezone": "America/Santiago",
+      "createdAt": {
+        "_seconds": 1760540294,
+        "_nanoseconds": 11000000
+      },
+      "preferences": {
+        "preferredLanguage": "es",
+        "travelStyle": "standard",
+        "groupSize": "solo",
+        "transportPreference": [
+          "walking",
+          "public_transport"
+        ],
+        "accessibility": {
+          "mobilityAssistance": false,
+          "visualAssistance": false,
+          "hearingAssistance": false
+        },
+        "notifications": {
+          "recommendations": true,
+          "priceAlerts": true,
+          "weatherUpdates": true,
+          "eventReminders": true
+        }
+      },
+      "interests": [
+        "museos",
+        "restaurantes",
+        "senderismo",
+        "monumentos",
+        "parques"
+      ],
+      "updatedAt": {
+        "_seconds": 1760541004,
+        "_nanoseconds": 350000000
+      }
+    },
+    "w4Fo6X2NuheA5T4Ao94cgbYwWc53": {
+      "uid": "w4Fo6X2NuheA5T4Ao94cgbYwWc53",
+      "displayName": "nico",
+      "email": "nico@nico.cs",
+      "location": "Santiago, Providencia",
+      "language": "es",
+      "timezone": "America/Santiago",
+      "interests": [],
+      "createdAt": {
+        "_seconds": 1760727072,
+        "_nanoseconds": 609000000
+      }
+    }
+  }
+}
