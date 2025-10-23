@@ -2,6 +2,14 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import type { IMapProvider, MapMarker, MapBounds } from '../MapProvider';
 
+// Fix Leaflet default icon paths issue with bundlers
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: '',
+  iconUrl: '',
+  shadowUrl: '',
+});
+
 export default class LeafletMapProvider implements IMapProvider {
   private map: L.Map | null = null;
   private markers: Map<string, L.Marker> = new Map();

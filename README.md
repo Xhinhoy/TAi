@@ -1,229 +1,224 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 # TAi – Generador Inteligente de Itinerarios Turísticos
 
-![Status](https://img.shields.io/badge/status-en%20desarrollo-yellow)  
-![License](https://img.shields.io/badge/license-MIT-blue)  
-![Stack](https://img.shields.io/badge/stack-React%20Native%20%7C%20Flask%20%7C%20Firebase-green)
+![Status](https://img.shields.io/badge/status-en%20desarrollo-yellow)
+![License](https://img.shields.io/badge/license-MIT-blue)
+![Stack](https://img.shields.io/badge/stack-React%20Native%20%7C%20FastAPI%20%7C%20Firebase-green)
+
+**TAi** es un proyecto académico (Capstone 2025 – Ingeniería en Informática, DUOC UC) que genera **itinerarios turísticos personalizados** mediante IA ligera (Groq/llama-3.x) e integra **APIs externas** (Google Places, TripAdvisor).
 
 ---
 
-## Descripción
-=======
-=======
->>>>>>> origin/NSoto
-# 🗺️ TAi – Generador Inteligente de Itinerarios Turísticos
+## Requisitos
 
-![Status](https://img.shields.io/badge/status-en%20desarrollo-yellow)  
-![License](https://img.shields.io/badge/license-MIT-blue)  
-![Stack](https://img.shields.io/badge/stack-React%20Native%20%7C%20Flask%20%7C%20MongoDB-green)
+- **Node.js** 18+ y **npm** 9+
+- **Python** 3.11+ y **pip**
+- **Git**
+- **Expo CLI** (se instala con npm)
+- Opcional: **make** o **just** para orquestación
 
 ---
 
-## 📖 Descripción
-<<<<<<< HEAD
->>>>>>> origin/Nsoto
-=======
->>>>>>> origin/NSoto
-**TAi** es un proyecto académico desarrollado en el marco de la asignatura **Capstone 2025 – Ingeniería en Informática (DUOC UC)**.  
-El sistema genera **itinerarios turísticos personalizados** mediante un motor de recomendación basado en **IA ligera** e integra **APIs externas** como *Google Places* y *TripAdvisor*.  
+## Instalación (desarrollo local)
 
-La aplicación considera **preferencias del usuario, ubicación actual, horarios y afluencia estimada** para optimizar la experiencia de viaje.
+### 1. Clonar repositorio
+
+```bash
+git clone https://github.com/tu-org/TAi.git
+cd TAi
+```
+
+### 2. Configurar variables de entorno
+
+#### Frontend
+```bash
+cd src/frontend
+cp .env.example .env
+# Editar .env con valores reales o dejar mock
+```
+
+#### Backend
+```bash
+cd src/backend
+cp .env.example .env
+# Editar .env: dejar MOCK_MODE=true para desarrollo sin APIs externas
+```
+
+### 3. Instalar dependencias
+
+```bash
+# Frontend
+cd src/frontend && npm install
+
+# Backend (crear venv recomendado)
+cd src/backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
 
 ---
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-## Objetivos
-=======
-## 🎯 Objetivos
->>>>>>> origin/Nsoto
-=======
-## 🎯 Objetivos
->>>>>>> origin/NSoto
-- **General:**  
-  Desarrollar una aplicación móvil híbrida que genere itinerarios turísticos personalizados integrando APIs externas y un motor de recomendación.  
+## Levantar proyecto (un solo comando)
 
-- **Específicos:**  
-  - Integrar Google Places y TripAdvisor para obtener datos en tiempo real.  
-  - Implementar un motor de recomendación flexible usando el patrón **Strategy**.  
-<<<<<<< HEAD
-<<<<<<< HEAD
-  - Diseñar modelos de datos escalables en **Firebase Firestore**.  
-=======
-  - Diseñar modelos de datos escalables en **MongoDB**.  
->>>>>>> origin/Nsoto
-=======
-  - Diseñar modelos de datos escalables en **MongoDB**.  
->>>>>>> origin/NSoto
-  - Aplicar pruebas de validación bajo buenas prácticas de la industria.  
-  - Gestionar el proyecto bajo metodología **Scrum**, con planificación en fases y evidencias de avance.  
+### Opción A: Scripts cross-platform
+
+#### Windows (PowerShell)
+```powershell
+.\scripts\dev.ps1
+```
+
+#### Linux/Mac
+```bash
+bash scripts/dev.sh
+```
+
+### Opción B: Makefile
+```bash
+make setup    # Primera vez (instala deps)
+make dev      # Levanta frontend + backend
+```
+
+### Opción C: Justfile
+```bash
+just setup
+just dev
+```
+
+### Opción D: Manual
+```bash
+# Terminal 1: Backend
+cd src/backend/TAi_backend
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Terminal 2: Frontend
+cd src/frontend
+npm run dev
+```
 
 ---
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+## Endpoints locales
+
+- **Backend (FastAPI):** http://localhost:8000
+  - Docs interactivos: http://localhost:8000/docs
+  - Health check: http://localhost:8000/health
+- **Frontend (Expo):** http://localhost:8081
+  - Metro bundler: http://localhost:8081
+  - Web: http://localhost:19006
+
+---
+
+## Variables de entorno clave
+
+### Frontend (`.env`)
+```env
+EXPO_PUBLIC_API_URL=http://127.0.0.1:8000/api/v1
+EXPO_PUBLIC_MOCK_MODE=true  # Activa mocks locales
+```
+
+### Backend (`.env`)
+```env
+MOCK_MODE=true              # No llama APIs externas reales
+PORT=8000
+DEBUG=true
+CORS_ORIGINS=http://localhost:8081,http://localhost:19006
+```
+
+---
+
+## Modo Mock (sin APIs externas)
+
+Por defecto, `MOCK_MODE=true` activa:
+- **Firebase:** Simulado (no requiere credenciales reales)
+- **Groq LLM:** Respuestas estáticas locales
+- **Google Places / TripAdvisor:** Datos de `src/backend/TAi_backend/mocks/*.json`
+
+Para producción, desactivar mock y configurar claves reales.
+
+---
+
+## Scripts disponibles
+
+### Frontend
+```bash
+npm run dev       # Levanta Expo dev server
+npm run lint      # ESLint + fix
+npm run format    # Prettier
+npm test          # Jest
+```
+
+### Backend
+```bash
+uvicorn app.main:app --reload   # Dev server
+pytest                          # Tests
+black . && ruff check .         # Linters
+```
+
+---
+
+## Estructura del proyecto
+
+```
+TAi/
+├── src/
+│   ├── frontend/          # React Native (Expo)
+│   │   ├── app/           # Screens
+│   │   ├── components/
+│   │   └── .env
+│   ├── backend/           # FastAPI
+│   │   └── TAi_backend/
+│   │       ├── app/       # API, servicios, modelos
+│   │       ├── mocks/     # Datos mock locales
+│   │       └── .env
+│   └── database/          # Repositorios Firebase (TypeScript)
+├── scripts/
+│   ├── dev.ps1            # Windows
+│   └── dev.sh             # Linux/Mac
+├── Makefile
+├── justfile
+└── README.md
+```
+
+---
+
+## Troubleshooting
+
+### Backend no inicia
+- Verificar que `uvicorn` esté instalado: `pip install uvicorn[standard]`
+- Revisar logs: `uvicorn app.main:app --log-level debug`
+
+### Frontend no conecta al backend
+- Verificar `EXPO_PUBLIC_API_URL` en `.env`
+- Comprobar CORS en backend (puerto 8081/19006 permitido)
+
+### Error de Firebase
+- Si `MOCK_MODE=false`, verificar ruta del archivo de credenciales en `FIREBASE_CREDENTIALS_PATH`
+- En mock, ignorar warnings de Firebase
+
+### Puerto 8000/8081 ocupado
+- Cambiar `PORT` en backend `.env`
+- Expo: usar `--port` flag
+
+---
+
 ## Tecnologías
-- **Frontend:** React Native (TypeScript, Expo, React Query, Zustand).  
-- **Backend:** Python (Flask, Pydantic).
-- **Base de Datos:** Firebase Firestore (con consultas geoespaciales).  
-=======
-=======
->>>>>>> origin/NSoto
-## 🛠️ Tecnologías
-- **Frontend:** React Native (TypeScript, Expo, React Query, Zustand).  
-- **Backend:** Python (Flask, Pydantic, Flask-PyMongo).  
-- **Base de Datos:** MongoDB (con índices geoespaciales 2dsphere).  
-<<<<<<< HEAD
->>>>>>> origin/Nsoto
-=======
->>>>>>> origin/NSoto
-- **APIs externas:** Google Places, TripAdvisor.  
-- **IA / Algoritmos:** Estrategias de recomendación (greedy, cultural, gastronómica).  
-- **Gestión del Proyecto:** Scrum (Jira / GitHub Projects).  
+
+- **Frontend:** React Native, TypeScript, Expo, React Query, Zustand
+- **Backend:** FastAPI, Pydantic, LangChain, Groq (llama-3.x)
+- **Base de Datos:** Firebase Firestore (con mock local)
+- **APIs:** Google Places, TripAdvisor (con mock local)
+- **DX:** Make, Just, ESLint, Prettier, Black, Ruff
 
 ---
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-## Arquitectura
-El sistema se implementa con **Clean Architecture ligera**:  
-- **Presentación (UI):** Pantallas y componentes en React Native.  
-- **Aplicación (Casos de uso):** Hooks en frontend y servicios en backend.  
-- **Datos (Infraestructura):** Repositorios en Firebase Firestore y adaptadores para APIs externas.  
-=======
-=======
->>>>>>> origin/NSoto
-## 🏗️ Arquitectura
-El sistema se implementa con **Clean Architecture ligera**:  
-- **Presentación (UI):** Pantallas y componentes en React Native.  
-- **Aplicación (Casos de uso):** Hooks en frontend y servicios en backend.  
-- **Datos (Infraestructura):** Repositorios en MongoDB y adaptadores para APIs externas.  
-<<<<<<< HEAD
->>>>>>> origin/Nsoto
-=======
->>>>>>> origin/NSoto
-- **Dominio (opcional):** Entidades puras como *Usuario*, *Lugar*, *Itinerario*.  
-
-Patrones de diseño aplicados: **Strategy, Repository, Adapter/Facade, Chain of Responsibility (pipeline de filtros), Observer (eventos)**.
-
----
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-## Plan de Trabajo (Capstone)
-=======
-## 📅 Plan de Trabajo (Capstone)
->>>>>>> origin/Nsoto
-=======
-## 📅 Plan de Trabajo (Capstone)
->>>>>>> origin/NSoto
-El proyecto se organiza en 3 fases:  
-1. **Definición (Semanas 1–4):** Propuesta, objetivos, plan de trabajo y diseño de arquitectura.  
-2. **Desarrollo (Semanas 5–12):** Prototipo funcional con integración de APIs y base de datos.  
-3. **Validación (Semanas 13–18):** Motor de recomendación, pruebas, ajustes y entrega final.  
-
-📊 El plan detallado y la carta Gantt se encuentran en [`/project`](./project).  
-
----
-
-<<<<<<< HEAD
-<<<<<<< HEAD
 ## Equipo
-=======
-## 👥 Equipo
->>>>>>> origin/Nsoto
-=======
-## 👥 Equipo
->>>>>>> origin/NSoto
-- Nicolás Sabando  
-- José Eskenazi  
-- Nicolás Soto  
 
----
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-## Registro de Usuario con Email/Contraseña
-
-### Configuración Inicial
-
-1. **Variables de entorno:** Copia `.env.example` a `.env` y completa con tus credenciales de Firebase
-2. **Firebase Console:**
-   - Crea un proyecto en [Firebase Console](https://console.firebase.google.com/)
-   - Habilita **Authentication > Sign-in method > Email/Password**
-   - Crea una base de datos **Firestore**
-   - Aplica las reglas de seguridad desde `firestore.rules`
-3. **Instalación:** `cd src/frontend && npm install`
-4. **Ejecutar:** `npm start`
-
-### Funcionalidades Implementadas
-
-- ✅ **Registro completo** con validación en tiempo real
-- ✅ **Medidor de fuerza de contraseña** con criterios específicos
-- ✅ **Validación con Zod** (email, contraseña, confirmación, términos)
-- ✅ **Manejo de errores** localizados al español
-- ✅ **Bootstrap automático** de perfil en Firestore
-- ✅ **Navegación post-registro** hacia onboarding o home
-- ✅ **UI accesible** con labels, roles y hints
-- ✅ **Tests unitarios e integración** con Jest
-
-### Flujo de Usuario
-
-1. **Registro:** Email + contraseña + aceptar términos
-2. **Validación:** Cumplir criterios de seguridad (8+ chars, mayús/minús, número, especial)
-3. **Creación:** Usuario en Firebase Auth + perfil en Firestore
-4. **Redirección:** A selección de intereses o pantalla principal
-
-### Pruebas
-
-```bash
-# Tests unitarios (esquemas, validaciones)
-npm test tests/unit/auth.test.ts
-
-# Tests de integración (componente Register)
-npm test tests/integration/register.test.tsx
-```
-
-### Emuladores Firebase (Desarrollo)
-
-```bash
-# Instalar CLI de Firebase
-npm install -g firebase-tools
-
-# Inicializar emuladores
-firebase init emulators
-
-# Ejecutar emuladores locales
-firebase emulators:start
-```
-
----
-
-## Evidencias
-- [Documentos de definición y rúbricas](./docs)
-- [Plan de trabajo y carta Gantt](./project)
-- [Código fuente (frontend/backend)](./src)
-- [Pruebas de validación](./tests)
+- Nicolás Sabando
+- José Eskenazi
+- Nicolás Soto
 
 ---
 
 ## Licencia
-=======
-=======
->>>>>>> origin/NSoto
-## 📂 Evidencias
-- [📄 Documentos de definición y rúbricas](./docs)  
-- [🗓️ Plan de trabajo y carta Gantt](./project)  
-- [💻 Código fuente (frontend/backend)](./src)  
-- [✅ Pruebas de validación](./tests)  
 
----
-
-## 📜 Licencia
-<<<<<<< HEAD
->>>>>>> origin/Nsoto
-=======
->>>>>>> origin/NSoto
-Este proyecto se desarrolla con fines **académicos** dentro de la asignatura **Capstone 2025 – DUOC UC**.  
-Licencia: [MIT](./LICENSE).  
+MIT – Proyecto académico Capstone 2025, DUOC UC

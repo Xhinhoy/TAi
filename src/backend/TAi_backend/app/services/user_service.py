@@ -6,6 +6,8 @@ class UserService:
     def get_profile(self, uid: str) -> Optional[UserProfile]:
         profile_data = user_repository.get_profile(uid)
         if profile_data:
+            # Asegurar que uid esté presente
+            profile_data['uid'] = uid
             return UserProfile(**profile_data)
         return None
     

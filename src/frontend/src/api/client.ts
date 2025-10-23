@@ -4,11 +4,13 @@ import { getAuth } from "firebase/auth";
 
 //  Base URL del backend
 const baseURL =
-  (Constants.expoConfig?.extra as any)?.apiUrl || "http://localhost:8080/api/v1";
+  process.env.EXPO_PUBLIC_API_URL ||
+  (Constants.expoConfig?.extra as any)?.apiUrl ||
+  "http://localhost:8000/api/v1";
 
 export const api = axios.create({
   baseURL,
-  timeout: 30000,
+  timeout: 60000, // 60s para dev/mock
   headers: {
     "Content-Type": "application/json",
   },

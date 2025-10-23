@@ -20,5 +20,7 @@ class ChatAction(BaseModel):
 
 class ChatResponse(BaseModel):
     response: str
+    conversation_id: Optional[str] = None
+    suggestions: Optional[List[str]] = []
     actions: List[ChatAction] = []
     places: List[Place] = []

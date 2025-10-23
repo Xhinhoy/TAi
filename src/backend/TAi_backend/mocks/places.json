@@ -1,0 +1,38 @@
+[
+  {
+    "id": "mock_place_1",
+    "name": "Plaza de Armas de Santiago",
+    "address": "Plaza de Armas, Santiago Centro, Santiago",
+    "lat": -33.4372,
+    "lng": -70.6506,
+    "rating": 4.5,
+    "types": ["tourist_attraction", "park", "point_of_interest"],
+    "price_level": 0,
+    "opening_hours": { "open_now": true },
+    "photo_url": "https://via.placeholder.com/400x300?text=Plaza+de+Armas"
+  },
+  {
+    "id": "mock_place_2",
+    "name": "Cerro San Cristóbal",
+    "address": "Pio Nono 445, Recoleta, Santiago",
+    "lat": -33.4236,
+    "lng": -70.6344,
+    "rating": 4.7,
+    "types": ["tourist_attraction", "park"],
+    "price_level": 1,
+    "opening_hours": { "open_now": true },
+    "photo_url": "https://via.placeholder.com/400x300?text=Cerro+San+Cristobal"
+  },
+  {
+    "id": "mock_place_3",
+    "name": "Museo Nacional de Bellas Artes",
+    "address": "Parque Forestal s/n, Santiago",
+    "lat": -33.4352,
+    "lng": -70.6418,
+    "rating": 4.6,
+    "types": ["museum", "tourist_attraction"],
+    "price_level": 0,
+    "opening_hours": { "open_now": false },
+    "photo_url": "https://via.placeholder.com/400x300?text=Museo+Bellas+Artes"
+  }
+]

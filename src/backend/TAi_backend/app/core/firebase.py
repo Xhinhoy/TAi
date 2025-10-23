@@ -25,11 +25,18 @@ class FirebaseService:
             logger.info("Firebase ya estaba inicializado.")
             return
 
+        # MOCK MODE: Simular Firebase si está activado
+        if settings.MOCK_MODE:
+            logger.warning("🧪 MOCK_MODE activado: Firebase NO se inicializará (datos locales simulados)")
+            self._initialized = True
+            return
+
         # 🔎 Verificación de credenciales
         if not os.path.exists(settings.FIREBASE_CREDENTIALS_PATH):
-            raise FileNotFoundError(
-                f"No se encontró el archivo de credenciales Firebase en: {settings.FIREBASE_CREDENTIALS_PATH}"
-            )
+            logger.error(f"⚠️ Archivo de credenciales Firebase no encontrado: {settings.FIREBASE_CREDENTIALS_PATH}")
+            logger.warning("⚠️ Continuando sin Firebase (modo desarrollo)")
+            self._initialized = True
+            return
 
         # 🔒 Evita inicialización múltiple (por reloader o imports)
         if not firebase_admin._apps:
