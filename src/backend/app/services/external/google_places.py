@@ -97,7 +97,14 @@ class GooglePlacesFacade:
     # INSERTAR AQUÍ el NUEVO MÉTODO text_search()
     # ================================================================
     async def text_search(self, query: str, location: Dict, radius: int = 5000) -> List[Dict]:
-        """Busca lugares con datos detallados (paraleliza requests)."""
+        """Busca lugares con datos detallados (paraleliza requests).
+
+        Returns:
+            List[Dict]: Cada lugar contiene los campos normalizados y la llave
+            ``opening_hours`` siempre como ``{"open_now": Optional[bool],
+            "weekday_text": List[str]}`` cuando la información está
+            disponible.
+        """
         from app.utils.cache import firebase_cache
 
         cache_key = f"text_search_{query}_{location.get('latitude')}_{location.get('longitude')}"
@@ -130,39 +137,46 @@ class GooglePlacesFacade:
                         "fields": "name,geometry,formatted_address,rating,price_level,opening_hours,user_ratings_total,types,photos",
                         "key": self.api_key,
                     }
-                    async with session.get(f"{self.base_url}/details/json", params=details_params, timeout=10) as r:
-                        det = await r.json()
-                        return det.get("result", {})
+                    try:
+                        async with session.get(
+                            f"{self.base_url}/details/json",
+                            params=details_params,
+                            timeout=10,
+                        ) as r:
+                            det = await r.json()
+                            return det.get("result", {})
+                    except Exception as exc:  # pragma: no cover - logging path
+                        logger.warning("Fallo obteniendo detalles de %s: %s", place_id, exc)
+                        return {}
 
                 tasks = [fetch_details(r["place_id"]) for r in results if "place_id" in r]
                 details_list = await asyncio.gather(*tasks, return_exceptions=True)
 
                 enriched = []
                 for base, details in zip(results, details_list):
-                    if not isinstance(details, dict):
-                        continue
+                    detail_data = details if isinstance(details, dict) else {}
+                    if not isinstance(details, dict):  # pragma: no cover - logging path
+                        logger.warning("Detalle inválido para %s: %s", base.get("place_id"), details)
 
                     # Normalizamos los datos
-                    geometry = details.get("geometry", {}).get("location", base.get("geometry", {}).get("location", {}))
+                    geometry = detail_data.get("geometry", {}).get(
+                        "location",
+                        base.get("geometry", {}).get("location", {}),
+                    )
+                    opening = detail_data.get("opening_hours") or base.get("opening_hours")
                     enriched.append({
                         "id": base.get("place_id"),
                         "name": base.get("name"),
                         "address": base.get("formatted_address"),
-                        "rating": base.get("rating") or details.get("rating"),
-                        "price_level": base.get("price_level") or details.get("price_level"),
-                        "opening_hours": details.get("opening_hours"),
+                        "rating": base.get("rating") or detail_data.get("rating"),
+                        "price_level": base.get("price_level") or detail_data.get("price_level"),
+                        "opening_hours": self._normalize_opening_hours(opening),
                         "location": geometry,
                         "photos": [
                             f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={p['photo_reference']}&key={self.api_key}"
-                            for p in (details.get("photos") or base.get("photos") or [])
+                            for p in (detail_data.get("photos") or base.get("photos") or [])
                         ]
                     })
-            opening = details.get("opening_hours") or base.get("opening_hours")
-            if opening:
-                details["opening_hours"] = {
-                    "open_now": opening.get("open_now"),
-                    "weekday_text": opening.get("weekday_text", [])
-                }
             firebase_cache.set("google_places", cache_key, enriched, self.cache_ttl)
             logger.info("Google Places text_search guardado en caché")
             return enriched
@@ -170,6 +184,18 @@ class GooglePlacesFacade:
         except Exception as e:
             logger.error(f"Error en text_search: {e}")
             return []
+
+    @staticmethod
+    def _normalize_opening_hours(opening: Optional[Dict]) -> Optional[Dict]:
+        if not opening:
+            return None
+        weekday_text = opening.get("weekday_text")
+        if weekday_text is None:
+            weekday_text = []
+        return {
+            "open_now": opening.get("open_now"),
+            "weekday_text": weekday_text,
+        }
 
 
     # ================================================================
