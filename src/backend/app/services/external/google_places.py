@@ -142,27 +142,22 @@ class GooglePlacesFacade:
                     if not isinstance(details, dict):
                         continue
 
-                    # Normalizamos los datos
-                    geometry = details.get("geometry", {}).get("location", base.get("geometry", {}).get("location", {}))
-                    enriched.append({
-                        "id": base.get("place_id"),
-                        "name": base.get("name"),
-                        "address": base.get("formatted_address"),
-                        "rating": base.get("rating") or details.get("rating"),
-                        "price_level": base.get("price_level") or details.get("price_level"),
-                        "opening_hours": details.get("opening_hours"),
-                        "location": geometry,
-                        "photos": [
-                            f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={p['photo_reference']}&key={self.api_key}"
-                            for p in (details.get("photos") or base.get("photos") or [])
-                        ]
-                    })
-            opening = details.get("opening_hours") or base.get("opening_hours")
-            if opening:
-                details["opening_hours"] = {
-                    "open_now": opening.get("open_now"),
-                    "weekday_text": opening.get("weekday_text", [])
-                }
+                    merged = {**base, **details}
+
+                    # Fallbacks para datos ausentes en los detalles
+                    if "geometry" not in merged or not merged.get("geometry"):
+                        merged["geometry"] = base.get("geometry", {})
+                    if not merged.get("formatted_address"):
+                        merged["formatted_address"] = base.get("formatted_address") or base.get("vicinity")
+                    if not merged.get("opening_hours") and base.get("opening_hours"):
+                        merged["opening_hours"] = base.get("opening_hours")
+                    if not merged.get("photos") and base.get("photos"):
+                        merged["photos"] = base.get("photos")
+
+                    formatted = self._format_place_details(merged)
+                    if formatted:
+                        enriched.append(formatted)
+
             firebase_cache.set("google_places", cache_key, enriched, self.cache_ttl)
             logger.info("Google Places text_search guardado en caché")
             return enriched
@@ -201,27 +196,124 @@ class GooglePlacesFacade:
   # ================================================================
     # 🔹 INSERTAR AL FINAL el MÉTODO _format_results()
     # ================================================================
+    def _extract_coords(self, geometry: Dict) -> Optional[Dict[str, float]]:
+        location = (geometry or {}).get("location", {})
+        lat = location.get("lat") or location.get("latitude")
+        lng = location.get("lng") or location.get("longitude")
+
+        if lat is None or lng is None:
+            return None
+
+        try:
+            return {"latitude": float(lat), "longitude": float(lng)}
+        except (TypeError, ValueError):
+            return None
+
+    def _format_opening_hours(self, opening_hours: Optional[Dict]) -> Optional[Dict[str, Optional[object]]]:
+        if not isinstance(opening_hours, dict):
+            return None
+
+        formatted = {
+            "open_now": opening_hours.get("open_now"),
+            "weekday_text": opening_hours.get("weekday_text", []),
+        }
+
+        if formatted["open_now"] is None and not formatted["weekday_text"]:
+            return None
+
+        return formatted
+
+    def _build_photo_urls(self, photos: Optional[List[Dict]]) -> List[str]:
+        if not photos or not self.api_key:
+            return []
+
+        urls = []
+        for photo in photos:
+            if not isinstance(photo, dict):
+                continue
+            reference = photo.get("photo_reference")
+            if not reference:
+                continue
+            urls.append(
+                f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={reference}&key={self.api_key}"
+            )
+        return urls
+
+    def _format_reviews(self, reviews: Optional[List[Dict]]) -> List[Dict]:
+        if not isinstance(reviews, list):
+            return []
+
+        formatted_reviews = []
+        for review in reviews:
+            if not isinstance(review, dict):
+                continue
+            formatted_reviews.append({
+                "author_name": review.get("author_name"),
+                "rating": review.get("rating"),
+                "text": review.get("text"),
+                "time": review.get("time"),
+                "relative_time_description": review.get("relative_time_description"),
+                "profile_photo_url": review.get("profile_photo_url"),
+            })
+        return formatted_reviews
+
     def _format_results(self, results: List[Dict]) -> List[Dict]:
         """Formatea los resultados crudos de la API de Google Places"""
-        formatted = []
+        formatted: List[Dict] = []
         for r in results:
+            place_id = r.get("place_id")
+            coords = self._extract_coords(r.get("geometry", {}))
+
+            if not place_id or not coords:
+                continue
+
             formatted.append({
+                "id": place_id,
                 "name": r.get("name"),
-                "address": r.get("vicinity") or r.get("formatted_address"),
+                "coords": coords,
                 "rating": r.get("rating"),
-                "place_id": r.get("place_id"),
-                "types": r.get("types", []),
-                "location": r.get("geometry", {}).get("location", {}),
-                "photos": [
-                    f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={p.get('photo_reference')}&key={settings.GOOGLE_PLACES_API_KEY.get_secret_value()}"
-                    for p in r.get("photos", [])
-                ] if r.get("photos") else [],
-                "opening_hours": {
-                    "open_now": r.get("opening_hours", {}).get("open_now"),
-                    "weekday_text": r.get("opening_hours", {}).get("weekday_text", [])
-                }
+                "address": r.get("vicinity") or r.get("formatted_address"),
+                "price_level": r.get("price_level"),
+                "opening_hours": self._format_opening_hours(r.get("opening_hours")),
+                "photos": self._build_photo_urls(r.get("photos")),
+                "source": "google",
+                "categories": r.get("types", []),
             })
         return formatted
+
+    def _format_place_details(self, result: Dict) -> Optional[Dict]:
+        if not isinstance(result, dict) or not result:
+            return None
+
+        base = self._format_results([result])
+        if not base:
+            return None
+
+        details = base[0]
+
+        if result.get("formatted_address"):
+            details["address"] = result.get("formatted_address")
+
+        opening_hours = result.get("opening_hours") or result.get("current_opening_hours")
+        formatted_opening_hours = self._format_opening_hours(opening_hours)
+        if formatted_opening_hours is not None:
+            details["opening_hours"] = formatted_opening_hours
+
+        photos = self._build_photo_urls(result.get("photos"))
+        if photos:
+            details["photos"] = photos
+
+        details.update(
+            {
+                "phone": result.get("formatted_phone_number")
+                or result.get("international_phone_number"),
+                "website": result.get("website"),
+                "reviews_count": result.get("user_ratings_total") or 0,
+                "reviews": self._format_reviews(result.get("reviews")),
+            }
+        )
+
+        return details
 
     # ================================================================
     # 🔹 FIN DE INSERCIÓN _format_results()
