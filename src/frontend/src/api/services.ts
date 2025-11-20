@@ -28,18 +28,10 @@ export interface UserPreferencesRequest {
 
 export const usersService = {
   /**
-   * Create a new user profile
-   */
-  async create(data: CreateUserRequest) {
-    const response = await api.post('/users', data);
-    return response.data;
-  },
-
-  /**
    * Get user profile by UID
    */
   async getProfile(uid: string) {
-    const response = await api.get(`/users/${uid}`);
+    const response = await api.get(`/users/${uid}/profile`);
     return response.data;
   },
 
@@ -47,31 +39,42 @@ export const usersService = {
    * Update user profile
    */
   async updateProfile(uid: string, data: UpdateUserRequest) {
-    const response = await api.put(`/users/${uid}`, data);
+    const response = await api.put(`/users/${uid}/profile`, data);
     return response.data;
   },
 
   /**
-   * Get user preferences
+   * Update user interests
    */
-  async getPreferences(uid: string): Promise<UserPreferences> {
-    const response = await api.get(`/users/${uid}/preferences`);
+  async updateInterests(uid: string, interests: string[]) {
+    const response = await api.patch(`/users/${uid}/interests`, interests);
     return response.data;
   },
 
   /**
-   * Update user preferences
+   * Get user favorites
    */
-  async updatePreferences(uid: string, data: UserPreferencesRequest) {
-    const response = await api.put(`/users/${uid}/preferences`, data);
+  async getFavorites(uid: string) {
+    const response = await api.get(`/users/${uid}/favorites`);
+    return response.data.favorites;
+  },
+
+  /**
+   * Add place to favorites
+   */
+  async addFavorite(uid: string, placeId: string, placeData: any) {
+    const response = await api.post(`/users/${uid}/favorites`, {
+      place_id: placeId,
+      place_data: placeData,
+    });
     return response.data;
   },
 
   /**
-   * Delete user account
+   * Remove place from favorites
    */
-  async delete(uid: string) {
-    const response = await api.delete(`/users/${uid}`);
+  async removeFavorite(uid: string, placeId: string) {
+    const response = await api.delete(`/users/${uid}/favorites/${placeId}`);
     return response.data;
   },
 };
@@ -81,28 +84,16 @@ export const usersService = {
 // ============================================================================
 
 export interface PlacesSearchParams {
-  query?: string;
-  category?: string;
-  min_rating?: number;
-  max_price_level?: number;
-  limit?: number;
-}
-
-export interface NearbyPlacesParams {
-  latitude: number;
-  longitude: number;
-  radius?: number;
-  category?: string;
-  limit?: number;
-}
-
-export interface PlaceDetailsParams {
-  source?: 'firebase' | 'google';
+  q?: string; // query text
+  lat: number; // latitude
+  lng: number; // longitude
+  radius?: number; // radius in meters (default 5000)
+  place_type?: string; // type of place
 }
 
 export const placesService = {
   /**
-   * Search places with filters
+   * Search places with filters and location
    */
   async search(params: PlacesSearchParams): Promise<Place[]> {
     const response = await api.get('/places/search', { params });
@@ -110,34 +101,23 @@ export const placesService = {
   },
 
   /**
-   * Get nearby places based on coordinates
-   */
-  async nearby(params: NearbyPlacesParams): Promise<Place[]> {
-    const response = await api.get('/places/nearby', { params });
-    return response.data;
-  },
-
-  /**
    * Get place details by ID
    */
-  async getDetails(placeId: string, params?: PlaceDetailsParams) {
-    const response = await api.get(`/places/${placeId}`, { params });
+  async getDetails(placeId: string) {
+    const response = await api.get(`/places/${placeId}`);
     return response.data;
   },
 
   /**
-   * Sync a place from Google Places to Firebase
+   * Get places by category
    */
-  async syncFromGoogle(placeId: string) {
-    const response = await api.post(`/places/${placeId}/sync`);
-    return response.data;
-  },
-
-  /**
-   * Get popular places
-   */
-  async getPopular(limit: number = 10): Promise<Place[]> {
-    const response = await api.get('/places/popular', { params: { limit } });
+  async getByCategory(categories: string[], limit: number = 20): Promise<Place[]> {
+    const response = await api.get('/places/by-category/', {
+      params: {
+        categories: categories.join(','),
+        limit,
+      },
+    });
     return response.data;
   },
 };
@@ -156,39 +136,12 @@ export interface RecommendationsRequest {
   categories?: string[];
 }
 
-export interface PersonalizedRecommendation {
-  place: Place;
-  score: number;
-  reasoning: string;
-  categories_matched: string[];
-}
-
 export const recommendationsService = {
   /**
-   * Get AI-powered recommendations (actual endpoint: /generate)
+   * Generate AI-powered recommendations
    */
-  async getPersonalized(params: RecommendationsRequest): Promise<PersonalizedRecommendation[]> {
+  async generate(params: RecommendationsRequest) {
     const response = await api.post('/recommendations/generate', params);
-    return response.data;
-  },
-
-  /**
-   * Get category-based recommendations
-   */
-  async getByCategory(category: string, limit: number = 10) {
-    const response = await api.get('/recommendations/category', {
-      params: { category, limit },
-    });
-    return response.data;
-  },
-
-  /**
-   * Get trending places
-   */
-  async getTrending(limit: number = 10) {
-    const response = await api.get('/recommendations/trending', {
-      params: { limit },
-    });
     return response.data;
   },
 };
@@ -198,82 +151,23 @@ export const recommendationsService = {
 // ============================================================================
 
 export interface CreateItineraryRequest {
-  user_id: string;
   title: string;
   description?: string;
-  start_date: string;
-  end_date: string;
+  days: number;
   preferences?: {
-    budget?: 'low' | 'medium' | 'high';
-    pace?: 'relaxed' | 'moderate' | 'fast';
+    budget?: string;
     interests?: string[];
   };
-  place_ids?: string[];
-}
-
-export interface UpdateItineraryRequest {
-  title?: string;
-  description?: string;
-  start_date?: string;
-  end_date?: string;
-  place_ids?: string[];
 }
 
 export interface GenerateItineraryRequest {
-  user_id: string;
-  destination: string;
-  start_date: string;
-  end_date: string;
-  preferences: {
-    budget?: 'low' | 'medium' | 'high';
-    pace?: 'relaxed' | 'moderate' | 'fast';
-    interests?: string[];
-  };
+  city: string;
+  days: number;
+  interests?: string[];
+  budget?: string;
 }
 
 export const itinerariesService = {
-  /**
-   * Create a new itinerary
-   */
-  async create(data: CreateItineraryRequest): Promise<Itinerary> {
-    const response = await api.post('/itineraries', data);
-    return response.data;
-  },
-
-  /**
-   * Get itinerary by ID
-   */
-  async get(itineraryId: string): Promise<Itinerary> {
-    const response = await api.get(`/itineraries/${itineraryId}`);
-    return response.data;
-  },
-
-  /**
-   * Update itinerary
-   */
-  async update(itineraryId: string, data: UpdateItineraryRequest): Promise<Itinerary> {
-    const response = await api.put(`/itineraries/${itineraryId}`, data);
-    return response.data;
-  },
-
-  /**
-   * Delete itinerary
-   */
-  async delete(itineraryId: string) {
-    const response = await api.delete(`/itineraries/${itineraryId}`);
-    return response.data;
-  },
-
-  /**
-   * Get all itineraries for a user
-   */
-  async getUserItineraries(userId: string): Promise<Itinerary[]> {
-    const response = await api.get('/itineraries/user', {
-      params: { user_id: userId },
-    });
-    return response.data;
-  },
-
   /**
    * Generate AI-powered itinerary
    */
@@ -283,20 +177,42 @@ export const itinerariesService = {
   },
 
   /**
-   * Add place to itinerary
+   * Get all itineraries for a user
    */
-  async addPlace(itineraryId: string, placeId: string) {
-    const response = await api.post(`/itineraries/${itineraryId}/places`, {
-      place_id: placeId,
-    });
+  async getUserItineraries(userId: string): Promise<Itinerary[]> {
+    const response = await api.get(`/itineraries/user/${userId}`);
     return response.data;
   },
 
   /**
-   * Remove place from itinerary
+   * Get itinerary by ID
    */
-  async removePlace(itineraryId: string, placeId: string) {
-    const response = await api.delete(`/itineraries/${itineraryId}/places/${placeId}`);
+  async getById(itineraryId: string): Promise<Itinerary> {
+    const response = await api.get(`/itineraries/${itineraryId}`);
+    return response.data;
+  },
+
+  /**
+   * Create a new itinerary manually
+   */
+  async create(userId: string, data: CreateItineraryRequest): Promise<Itinerary> {
+    const response = await api.post(`/itineraries/${userId}`, data);
+    return response.data;
+  },
+
+  /**
+   * Update itinerary
+   */
+  async update(itineraryId: string, data: CreateItineraryRequest) {
+    const response = await api.put(`/itineraries/${itineraryId}`, data);
+    return response.data;
+  },
+
+  /**
+   * Delete itinerary
+   */
+  async delete(itineraryId: string) {
+    const response = await api.delete(`/itineraries/${itineraryId}`);
     return response.data;
   },
 };
@@ -313,17 +229,22 @@ export interface ChatMessage {
 
 export interface ChatRequest {
   user_id: string;
-  session_id?: string; // 👈 antes era conversation_id
+  session_id: string;
   message: string;
   context?: Record<string, any>;
 }
 
+export interface ChatAction {
+  type: string;
+  data: Record<string, any>;
+}
+
 export interface ChatResponse {
-  message: string;
-  conversation_id: string;
-  suggestions?: string[];
-  places?: Place[];
-  metadata?: Record<string, any>;
+  response: string;
+  actions: ChatAction[];
+  places: Place[];
+  itinerary?: any;
+  saved_itinerary_id?: string;
 }
 
 export const chatService = {
@@ -338,27 +259,35 @@ export const chatService = {
   /**
    * Get conversation history
    */
-  async getConversation(conversationId: string): Promise<ChatMessage[]> {
-    const response = await api.get(`/chat/${conversationId}`);
-    return response.data;
-  },
-
-  /**
-   * Get all conversations for a user
-   */
-  async getUserConversations(userId: string) {
-    const response = await api.get('/chat/conversations', {
-      params: { user_id: userId },
+  async getHistory(sessionId: string, limit: number = 50): Promise<ChatMessage[]> {
+    const response = await api.get(`/chat/history/${sessionId}`, {
+      params: { limit },
     });
-    return response.data;
+    return response.data.messages;
   },
 
   /**
-   * Delete a conversation
+   * Get all chat sessions for a user
    */
-  async deleteConversation(conversationId: string) {
-    const response = await api.delete(`/chat/${conversationId}`);
-    return response.data;
+  async getUserSessions(userId: string): Promise<any[]> {
+    const response = await api.get(`/chat/sessions/${userId}`);
+    return response.data.sessions;
+  },
+
+  /**
+   * Delete a chat session
+   */
+  async deleteSession(sessionId: string): Promise<void> {
+    await api.delete(`/chat/sessions/${sessionId}`);
+  },
+
+  /**
+   * Connect to WebSocket for real-time chat
+   */
+  connectWebSocket(userId: string, sessionId: string): WebSocket {
+    const wsUrl = api.defaults.baseURL?.replace('http', 'ws').replace('/api/v1', '');
+    const ws = new WebSocket(`${wsUrl}/api/v1/chat/ws/${userId}/${sessionId}`);
+    return ws;
   },
 };
 
@@ -376,18 +305,18 @@ export const cacheService = {
   },
 
   /**
-   * Clear all cache
+   * Clear cache by prefix
    */
-  async clearAll() {
-    const response = await api.delete('/cache');
+  async clearPrefix(prefix: string) {
+    const response = await api.delete(`/cache/clear/${prefix}`);
     return response.data;
   },
 
   /**
-   * Clear cache for specific key
+   * Clean expired cache entries
    */
-  async clearKey(key: string) {
-    const response = await api.delete(`/cache/${key}`);
+  async cleanExpired(prefix: string) {
+    const response = await api.delete(`/cache/clean-expired/${prefix}`);
     return response.data;
   },
 };

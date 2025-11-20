@@ -1,173 +1,369 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform, useWindowDimensions } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import SearchBar from '../../components/search/SearchBar';
-import ResultsList, { Place } from '../../components/search/ResultsList';
-import MapContainer from '../../components/search/MapContainer';
-import placesData from '../../data/places.json';
-import { loadPreferences } from '../../preferences/preferencesModel';
+/**
+ * Pantalla de Exploración
+ * Modo de descubrimiento en tiempo real mientras caminas
+ */
 
-function calculateDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
-  const R = 6371;
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Alert as RNAlert,
+  Platform,
+  ActivityIndicator,
+} from 'react-native';
+import { useAuth } from '../../hooks/useAuth';
+import { useExplorationSession } from '../../hooks/useExplorationSession';
+import { useLocationTracking } from '../../hooks/useLocationTracking';
+import { SessionStatusBar } from './components/SessionStatusBar';
+import { ExplorationControls } from './components/ExplorationControls';
+import { AlertsCarousel } from './components/AlertsCarousel';
+import { SessionSummaryModal } from './components/SessionSummaryModal';
+import { ExplorationMap } from './components/ExplorationMap';
+import { Alert, SessionSummary } from '../../types/exploration';
 
 export default function Search() {
-  const navigation = useNavigation();
-  const { width } = useWindowDimensions();
-  const isMobile = width < 768;
+  const { user } = useAuth();
 
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Place[]>([]);
-  const [selectedId, setSelectedId] = useState<string | undefined>();
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number }>({
-    lat: -33.4489,
-    lng: -70.6693,
-  });
-  const [mapZoom, setMapZoom] = useState(13);
-  const [showMap, setShowMap] = useState(!isMobile);
+  // Estados locales
+  const [showSummary, setShowSummary] = useState(false);
+  const [summary, setSummary] = useState<SessionSummary | null>(null);
+  const [mapReady, setMapReady] = useState(false);
 
+  // Hook de sesión de exploración
+  const {
+    isActive,
+    isPaused,
+    alerts,
+    sessionInfo,
+    isLoading: sessionLoading,
+    error: sessionError,
+    startSession,
+    endSession,
+    togglePause,
+    sendLocation,
+    recordInteraction,
+    dismissAlert,
+  } = useExplorationSession(user?.uid || '');
+
+  // Hook de tracking de ubicación
+  const {
+    location,
+    hasPermission,
+    requestPermission,
+    startTracking,
+    stopTracking,
+    getCurrentLocation,
+  } = useLocationTracking();
+
+  // Obtener ubicación inicial
   useEffect(() => {
-    if (Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        },
-        () => {
-          setUserLocation({ lat: -33.4489, lng: -70.6693 });
-        }
-      );
-    }
+    const initLocation = async () => {
+      if (!hasPermission) {
+        await requestPermission();
+      }
+      await getCurrentLocation();
+      setMapReady(true);
+    };
+
+    initLocation();
   }, []);
 
-  const performSearch = useCallback(() => {
-    const prefs = loadPreferences();
-    let filtered = placesData as Place[];
-
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.category.toLowerCase().includes(q) ||
-          p.address.toLowerCase().includes(q)
-      );
-    }
-
-    if (prefs.categories.length > 0) {
-      filtered = filtered.filter((p) => prefs.categories.includes(p.category));
-    }
-
-    if (prefs.minRating > 0) {
-      filtered = filtered.filter((p) => p.rating >= prefs.minRating);
-    }
-
-    if (userLocation && prefs.radiusKm) {
-      filtered = filtered
-        .map((p) => ({
-          ...p,
-          distance: calculateDistance(userLocation.lat, userLocation.lng, p.lat, p.lng),
-        }))
-        .filter((p) => p.distance! <= prefs.radiusKm);
-    }
-
-    filtered.sort((a, b) => {
-      if (a.distance !== undefined && b.distance !== undefined) {
-        return a.distance - b.distance;
-      }
-      return b.rating - a.rating;
-    });
-
-    setResults(filtered);
-  }, [query, userLocation]);
-
+  // Cleanup al desmontar
   useEffect(() => {
-    performSearch();
-  }, [performSearch]);
+    return () => {
+      if (isActive) {
+        stopTracking();
+      }
+    };
+  }, [isActive]);
 
-  const handleViewOnMap = (id: string) => {
-    setSelectedId(id);
-    if (isMobile) {
-      setShowMap(true);
-    }
-    const place = results.find((p) => p.id === id);
-    if (place) {
-      setUserLocation({ lat: place.lat, lng: place.lng });
-      setMapZoom(16); // Zoom más cercano al seleccionar un lugar
+  /**
+   * Inicia el modo de exploración
+   */
+  const handleStartExploration = async () => {
+    try {
+      // Verificar permisos
+      if (!hasPermission) {
+        const granted = await requestPermission();
+        if (!granted) {
+          RNAlert.alert(
+            'Permisos Requeridos',
+            'Necesitamos acceso a tu ubicación para el modo exploración',
+            [{ text: 'OK' }]
+          );
+          return;
+        }
+      }
+
+      // Iniciar sesión de exploración
+      console.log('🚀 Iniciando modo de exploración...');
+      await startSession(120, 20); // 2 horas, 20 alertas
+
+      // Iniciar tracking de ubicación
+      const trackingStarted = await startTracking({
+        distanceInterval: 10, // Actualizar cada 10 metros
+        timeInterval: 15000, // Actualizar cada 15 segundos
+        onLocationUpdate: (loc) => {
+          console.log('📍 Nueva ubicación:', loc.coords.latitude, loc.coords.longitude);
+          sendLocation(loc.coords.latitude, loc.coords.longitude, loc.coords.accuracy || undefined);
+        },
+      });
+
+      if (trackingStarted) {
+        RNAlert.alert(
+          'Modo Exploración Activado',
+          'Camina y descubre lugares increíbles cerca de ti!',
+          [{ text: 'Entendido' }]
+        );
+      } else {
+        throw new Error('No se pudo iniciar el tracking de ubicación');
+      }
+    } catch (error: any) {
+      console.error('❌ Error iniciando exploración:', error);
+      RNAlert.alert(
+        'Error',
+        error.message || 'No se pudo iniciar el modo de exploración',
+        [{ text: 'OK' }]
+      );
     }
   };
 
-  if (Platform.OS !== 'web') {
+  /**
+   * Finaliza el modo de exploración
+   */
+  const handleEndExploration = async () => {
+    console.log('🔴 handleEndExploration llamado');
+
+    // En web, usar window.confirm en lugar de RNAlert
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(
+        '¿Estás seguro de que quieres finalizar la sesión de exploración?'
+      );
+
+      if (!confirmed) {
+        console.log('❌ Usuario canceló finalizar');
+        return;
+      }
+
+      try {
+        console.log('🏁 Finalizando sesión...');
+
+        // Detener tracking
+        await stopTracking();
+
+        // Finalizar sesión en backend
+        const summaryData = await endSession();
+
+        if (summaryData) {
+          setSummary(summaryData);
+          setShowSummary(true);
+        }
+      } catch (error: any) {
+        console.error('❌ Error finalizando sesión:', error);
+        alert('Error: No se pudo finalizar la sesión');
+      }
+      return;
+    }
+
+    // Para móvil, usar RNAlert normal
+    RNAlert.alert(
+      'Finalizar Sesión',
+      '¿Estás seguro de que quieres finalizar la sesión de exploración?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+          onPress: () => console.log('❌ Usuario canceló finalizar'),
+        },
+        {
+          text: 'Finalizar',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              console.log('🏁 Finalizando sesión...');
+
+              // Detener tracking
+              await stopTracking();
+
+              // Finalizar sesión en backend
+              const summaryData = await endSession();
+
+              if (summaryData) {
+                setSummary(summaryData);
+                setShowSummary(true);
+              }
+            } catch (error: any) {
+              console.error('❌ Error finalizando sesión:', error);
+              RNAlert.alert('Error', 'No se pudo finalizar la sesión', [{ text: 'OK' }]);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  /**
+   * Alterna entre pausar y reanudar
+   */
+  const handleTogglePause = async () => {
+    console.log('⏯️ handleTogglePause llamado, isPaused actual:', isPaused);
+    try {
+      await togglePause();
+
+      if (isPaused) {
+        // Se está reanudando
+        console.log('▶️ Reanudando tracking...');
+        await startTracking({
+          distanceInterval: 10,
+          timeInterval: 15000,
+          onLocationUpdate: (loc) => {
+            sendLocation(loc.coords.latitude, loc.coords.longitude, loc.coords.accuracy || undefined);
+          },
+        });
+      } else {
+        // Se está pausando
+        console.log('⏸️ Pausando tracking...');
+        await stopTracking();
+      }
+    } catch (error) {
+      console.error('❌ Error pausando/reanudando:', error);
+    }
+  };
+
+  /**
+   * Handler cuando el usuario toca una alerta
+   */
+  const handleAlertTap = async (alert: Alert) => {
+    console.log('👆 Usuario tocó alerta:', alert.place.name);
+    await recordInteraction(alert.id, 'tapped');
+
+    // Mostrar detalles del lugar
+    RNAlert.alert(
+      alert.place.name,
+      `${alert.message}\n\nDirección: ${alert.place.address}\nRating: ${alert.place.rating}/5`,
+      [
+        {
+          text: 'Cerrar',
+          style: 'cancel',
+        },
+        {
+          text: 'Ver en Mapa',
+          onPress: () => {
+            console.log('Centrar mapa en:', alert.place.coords);
+          },
+        },
+      ]
+    );
+  };
+
+  /**
+   * Handler cuando el usuario guarda una alerta
+   */
+  const handleSaveAlert = async (alertId: string) => {
+    await recordInteraction(alertId, 'saved');
+    RNAlert.alert('Guardado', 'Lugar guardado en tus favoritos', [{ text: 'OK' }]);
+  };
+
+  /**
+   * Handler cuando el usuario descarta una alerta
+   */
+  const handleDismissAlert = async (alertId: string) => {
+    dismissAlert(alertId);
+  };
+
+  /**
+   * Handler para iniciar nueva sesión desde el modal de resumen
+   */
+  const handleNewSessionFromSummary = () => {
+    setShowSummary(false);
+    setSummary(null);
+    handleStartExploration();
+  };
+
+  // Verificar autenticación
+  if (!user) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Busqueda con mapa solo disponible en web</Text>
+        <View style={styles.centerContent}>
+          <Text style={styles.errorText}>Debes iniciar sesión para usar el modo exploración</Text>
+        </View>
+      </View>
+    );
+  }
+
+  // Mostrar loading mientras carga el mapa
+  if (!mapReady) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.centerContent}>
+          <ActivityIndicator size="large" color="#3b82f6" />
+          <Text style={styles.loadingText}>Cargando mapa...</Text>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Buscar Lugares</Text>
-        <View style={styles.headerButtons}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Preferencias' as never)}
-            style={styles.preferencesButton}
-          >
-            <Text style={styles.preferencesButtonText}>Preferencias</Text>
-          </TouchableOpacity>
-          {isMobile && (
-            <TouchableOpacity
-              onPress={() => setShowMap(!showMap)}
-              style={styles.toggleButton}
-            >
-              <Text style={styles.toggleButtonText}>
-                {showMap ? 'Ver Lista' : 'Ver Mapa'}
-              </Text>
-            </TouchableOpacity>
-          )}
+      {/* Barra de estado de sesión (solo si está activa) */}
+      {isActive && sessionInfo && (
+        <SessionStatusBar sessionInfo={sessionInfo} isPaused={isPaused} />
+      )}
+
+      {/* Mapa */}
+      <ExplorationMap
+        userLocation={
+          location.latitude && location.longitude
+            ? { latitude: location.latitude, longitude: location.longitude }
+            : null
+        }
+        alerts={alerts}
+        onAlertPress={handleAlertTap}
+      />
+
+      {/* Banner de error (si existe) */}
+      {sessionError && (
+        <View style={styles.errorBanner}>
+          <Text style={styles.errorBannerText}>⚠️ {sessionError}</Text>
         </View>
-      </View>
+      )}
 
-      <View style={[styles.content, isMobile && styles.contentMobile]}>
-        {(!isMobile || !showMap) && (
-          <View style={[styles.sidebar, isMobile && styles.sidebarMobile]}>
-            <View style={styles.searchSection}>
-              <SearchBar onSearch={setQuery} />
-            </View>
+      {/* Carrusel de alertas (solo si hay sesión activa y alertas) */}
+      {isActive && alerts.length > 0 && (
+        <AlertsCarousel
+          alerts={alerts}
+          onAlertTap={handleAlertTap}
+          onDismiss={handleDismissAlert}
+          onSave={handleSaveAlert}
+        />
+      )}
 
-            <View style={styles.resultsContainer}>
-              <ResultsList results={results} onViewOnMap={handleViewOnMap} />
-            </View>
-          </View>
-        )}
+      {/* Controles de exploración */}
+      <ExplorationControls
+        isActive={isActive}
+        isPaused={isPaused}
+        isLoading={sessionLoading}
+        onStart={handleStartExploration}
+        onEnd={handleEndExploration}
+        onTogglePause={handleTogglePause}
+      />
 
-        {(!isMobile || showMap) && (
-          <View style={[styles.mapSection, isMobile && styles.mapSectionMobile]}>
-            <MapContainer
-              center={userLocation}
-              zoom={mapZoom}
-              markers={results.map((p) => ({
-                id: p.id,
-                lat: p.lat,
-                lng: p.lng,
-                name: p.name,
-                rating: p.rating,
-              }))}
-              selectedMarkerId={selectedId}
-            />
-          </View>
-        )}
-      </View>
+      {/* Modal de resumen */}
+      <SessionSummaryModal
+        visible={showSummary}
+        summary={summary}
+        onClose={() => setShowSummary(false)}
+        onNewSession={handleNewSessionFromSummary}
+      />
+
+      {/* Indicador de tracking */}
+      {isActive && !isPaused && (
+        <View style={styles.trackingIndicator}>
+          <View style={styles.trackingDot} />
+          <Text style={styles.trackingText}>Explorando...</Text>
+        </View>
+      )}
     </View>
   );
 }
@@ -177,74 +373,79 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  header: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  centerContent: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    padding: 32,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  headerButtons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  preferencesButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#f3f4f6',
-    borderRadius: 6,
-  },
-  preferencesButtonText: {
-    color: '#374151',
+  loadingText: {
+    marginTop: 16,
     fontSize: 14,
-    fontWeight: '600',
+    color: '#6b7280',
   },
-  toggleButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: '#3b82f6',
-    borderRadius: 6,
+  errorText: {
+    fontSize: 14,
+    color: '#ef4444',
+    textAlign: 'center',
   },
-  toggleButtonText: {
+  errorBanner: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 60 : 20,
+    left: 16,
+    right: 16,
+    backgroundColor: '#fee2e2',
+    padding: 12,
+    borderRadius: 8,
+    borderLeftWidth: 4,
+    borderLeftColor: '#ef4444',
+    ...Platform.select({
+      web: {
+        zIndex: 1001,
+      },
+    }),
+  },
+  errorBannerText: {
+    fontSize: 13,
+    color: '#991b1b',
+    textAlign: 'center',
+  },
+  trackingIndicator: {
+    position: 'absolute',
+    top: Platform.OS === 'ios' ? 60 : 20,
+    right: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(16, 185, 129, 0.9)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 6,
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 4,
+      },
+      web: {
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+        zIndex: 1001,
+      },
+    }),
+  },
+  trackingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#fff',
+  },
+  trackingText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
-  },
-  content: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  contentMobile: {
-    flexDirection: 'column',
-  },
-  sidebar: {
-    width: '40%',
-    borderRightWidth: 1,
-    borderRightColor: '#e5e7eb',
-  },
-  sidebarMobile: {
-    width: '100%',
-    borderRightWidth: 0,
-  },
-  searchSection: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-  },
-  resultsContainer: {
-    flex: 1,
-    padding: 16,
-  },
-  mapSection: {
-    flex: 1,
-  },
-  mapSectionMobile: {
-    width: '100%',
-    height: '100%',
   },
 });

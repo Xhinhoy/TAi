@@ -19,13 +19,21 @@ let db;
 
 try {
   console.log("Inicializando Firebase...");
+
   // Evita inicializar varias veces en hot-reload
-  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  const isFirstInit = getApps().length === 0;
+  app = isFirstInit ? initializeApp(firebaseConfig) : getApp();
+
+  // Firebase Auth con persistencia automática
+  // En Firebase v10+, la persistencia es automática en React Native
+  // cuando AsyncStorage está instalado (indexedDB en web)
   auth = getAuth(app);
+  console.log("✅ Firebase Auth inicializado");
+
   db = getFirestore(app);
-  console.log("Firebase inicializado correctamente");
+  console.log("✅ Firebase inicializado correctamente");
 } catch (error) {
-  console.error("Error inicializando Firebase:", error);
+  console.error("❌ Error inicializando Firebase:", error);
   throw error;
 }
 

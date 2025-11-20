@@ -10,10 +10,10 @@ import {
   Modal,
   TextInput,
   ActivityIndicator,
-  SafeAreaView,
   Platform,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Firebase imports - SDK modular v9+
@@ -195,6 +195,7 @@ const ProfileScreen: React.FC = () => {
   const [editTimezone, setEditTimezone] = useState('');
   const [interestsModalVisible, setInterestsModalVisible] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
+  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
 
   // Use centralized preferences system
   const { preferences, updateInterests } = usePreferences();
@@ -320,10 +321,16 @@ const ProfileScreen: React.FC = () => {
 
   const handleSignOut = async () => {
     try {
+      console.log('🚪 Cerrando sesión...');
       await signOut(auth);
+      console.log('✅ Sesión cerrada exitosamente');
     } catch (error) {
-      console.error('Error signing out:', error);
-      Alert.alert('Error', 'No se pudo cerrar sesión');
+      console.error('❌ Error cerrando sesión:', error);
+      if (Platform.OS === 'web') {
+        alert('Error: No se pudo cerrar sesión');
+      } else {
+        Alert.alert('Error', 'No se pudo cerrar sesión');
+      }
     }
   };
 
@@ -379,7 +386,7 @@ const ProfileScreen: React.FC = () => {
             </Pressable>
             <Pressable
               style={styles.headerButton}
-              onPress={() => console.log('Settings')}
+              onPress={() => setSettingsModalVisible(true)}
               accessibilityRole="button"
               accessibilityLabel="Configuración"
             >
@@ -597,7 +604,7 @@ const ProfileScreen: React.FC = () => {
         onRequestClose={() => setInterestsModalVisible(false)}
       >
         <View style={styles.interestsModalOverlay}>
-          <View style={[styles.interestsModalContent, Platform.OS === 'web' && styles.interestsModalContentWeb]}>
+          <View style={styles.interestsModalContent}>
             <View style={styles.interestsModalHeader}>
               <Text style={styles.interestsModalTitle}>
                 Selecciona tus intereses turísticos
@@ -652,6 +659,75 @@ const ProfileScreen: React.FC = () => {
                   </Text>
                 </Pressable>
               </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Settings Modal */}
+      <Modal
+        visible={settingsModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setSettingsModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { maxWidth: 500 }]}>
+            <View style={styles.settingsModalHeader}>
+              <Text style={styles.modalTitle}>Configuración</Text>
+              <Pressable
+                onPress={() => setSettingsModalVisible(false)}
+                style={styles.closeModalButton}
+              >
+                <MaterialCommunityIcons name="close" size={24} color={theme.colors.text.secondary} />
+              </Pressable>
+            </View>
+
+            <View style={styles.settingsList}>
+              <ListItemAjuste
+                icon="shield-check"
+                title="Seguridad y privacidad"
+                onPress={() => {
+                  setSettingsModalVisible(false);
+                  if (Platform.OS === 'web') {
+                    window.alert('Funcionalidad en desarrollo');
+                  } else {
+                    Alert.alert('Info', 'Funcionalidad en desarrollo');
+                  }
+                }}
+              />
+              <ListItemAjuste
+                icon="translate"
+                title="Idioma y accesibilidad"
+                onPress={() => {
+                  setSettingsModalVisible(false);
+                  if (Platform.OS === 'web') {
+                    window.alert('Funcionalidad en desarrollo');
+                  } else {
+                    Alert.alert('Info', 'Funcionalidad en desarrollo');
+                  }
+                }}
+              />
+              <ListItemAjuste
+                icon="help-circle"
+                title="Ayuda y soporte"
+                onPress={() => {
+                  setSettingsModalVisible(false);
+                  if (Platform.OS === 'web') {
+                    window.alert('Funcionalidad en desarrollo');
+                  } else {
+                    Alert.alert('Info', 'Funcionalidad en desarrollo');
+                  }
+                }}
+              />
+              <ListItemAjuste
+                icon="logout"
+                title="Cerrar sesión"
+                onPress={() => {
+                  setSettingsModalVisible(false);
+                  handleSignOut();
+                }}
+              />
             </View>
           </View>
         </View>
@@ -1092,20 +1168,28 @@ const styles = StyleSheet.create({
     }),
   },
   interestsModalContent: {
-    flex: 1,
+    ...Platform.select({
+      web: {
+        flex: 0,
+        maxWidth: 800,
+        maxHeight: '90%',
+        width: '100%',
+        borderRadius: theme.radius.lg,
+        marginTop: 0,
+        ...theme.shadows.md,
+      },
+      default: {
+        flex: 1,
+        marginTop: 60,
+        borderTopLeftRadius: theme.radius.xl,
+        borderTopRightRadius: theme.radius.xl,
+        ...theme.shadows.lg,
+      },
+    }),
     backgroundColor: theme.colors.background.primary,
-    marginTop: 50,
-    borderTopLeftRadius: theme.radius.lg,
-    borderTopRightRadius: theme.radius.lg,
   },
   interestsModalContentWeb: {
-    flex: 0,
-    maxWidth: 800,
-    maxHeight: '90%',
-    width: '100%',
-    borderRadius: theme.radius.lg,
-    marginTop: 0,
-    ...theme.shadows.md,
+    // Ya no es necesario, los estilos web están en interestsModalContent
   },
   interestsModalHeader: {
     padding: theme.spacing.lg,
@@ -1181,6 +1265,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: theme.colors.background.primary,
+  },
+  // Settings Modal styles
+  settingsModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.lg,
+  },
+  closeModalButton: {
+    padding: theme.spacing.xs,
   },
 });
 

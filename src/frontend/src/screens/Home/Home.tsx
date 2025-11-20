@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,15 @@ import {
   ScrollView,
   Image,
   ActivityIndicator,
-  SafeAreaView,
   Platform,
   Pressable,
+  Alert,
+  Modal,
+  TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 
 // Firebase imports
 import {
@@ -40,15 +44,18 @@ import { AnimatedPressable } from '../../components/ui/AnimatedPressable';
 import { usePreferences } from '../../contexts/PreferencesContext';
 import { localRecommendationsService, PlaceRecommendation } from '../../services/recommendations.service';
 import { TOURIST_INTERESTS } from '../../components/ui/InterestSelector';
+import { itinerariesService } from '../../api/services';
+import { useNavigation } from '@react-navigation/native';
 
 // TypeScript interfaces
 
 interface Itinerary {
   id: string;
+  title: string;
   city: string;
-  dateISO: string;
-  image?: string;
-  createdAt: Timestamp;
+  days: any[];
+  created_at: string;
+  user_id?: string;
 }
 
 interface Favorite {
@@ -144,14 +151,15 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation,
 interface CardItinerarioProps {
   itinerary: Itinerary;
   onPress: () => void;
+  onDelete: (id: string) => void;
 }
 
-const CardItinerario: React.FC<CardItinerarioProps> = ({ itinerary, onPress }) => {
-  const formatDate = (dateISO: string) => {
-    return new Date(dateISO).toLocaleDateString('es-ES', {
-      month: 'short',
-      day: 'numeric',
-    });
+const CardItinerario: React.FC<CardItinerarioProps> = ({ itinerary, onPress, onDelete }) => {
+  const daysCount = itinerary.days?.length || 0;
+
+  const handleDelete = (e: any) => {
+    e.stopPropagation(); // Evitar que se dispare el onPress del card
+    onDelete(itinerary.id);
   };
 
   return (
@@ -159,38 +167,49 @@ const CardItinerario: React.FC<CardItinerarioProps> = ({ itinerary, onPress }) =
       style={styles.itineraryCard}
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Itinerary for ${itinerary.city}`}
+      accessibilityLabel={`Itinerario ${itinerary.title}`}
     >
       <View style={styles.itineraryImageContainer}>
-        {itinerary.image ? (
-          <Image source={{ uri: itinerary.image }} style={styles.itineraryImage} />
-        ) : (
-          <View style={[styles.itineraryImage, styles.itineraryImagePlaceholder]}>
-            <MaterialCommunityIcons
-              name="map-marker"
-              size={32}
-              color={theme.colors.primary.main}
-            />
-          </View>
-        )}
+        <View style={[styles.itineraryImage, styles.itineraryImagePlaceholder]}>
+          <MaterialCommunityIcons
+            name="map-marker-path"
+            size={32}
+            color={theme.colors.primary.main}
+          />
+        </View>
         <View style={styles.itineraryDateBadge}>
-          <Text style={styles.itineraryDateText}>
-            {formatDate(itinerary.dateISO)}
-          </Text>
+          <MaterialCommunityIcons name="calendar-range" size={10} color="#fff" />
+          <Text style={styles.itineraryDateText}> {daysCount}d</Text>
         </View>
       </View>
       <View style={styles.itineraryContent}>
-        <Text style={styles.itineraryCity} numberOfLines={1}>
-          {itinerary.city}
+        <Text style={styles.itineraryCity} numberOfLines={2}>
+          {itinerary.title}
         </Text>
         <View style={styles.itineraryMeta}>
           <MaterialCommunityIcons
-            name="calendar"
-            size={14}
+            name="map-marker"
+            size={12}
             color={theme.colors.text.secondary}
           />
-          <Text style={styles.itineraryMetaText}>Próximo viaje</Text>
+          <Text style={styles.itineraryMetaText} numberOfLines={1}>
+            {itinerary.city}
+          </Text>
         </View>
+      </View>
+
+      {/* Botón de eliminar */}
+      <View
+        style={styles.deleteItineraryButton}
+        onTouchEnd={handleDelete}
+        accessibilityRole="button"
+        accessibilityLabel="Eliminar itinerario"
+      >
+        <MaterialCommunityIcons
+          name="delete-outline"
+          size={20}
+          color={theme.colors.error}
+        />
       </View>
     </AnimatedPressable>
   );
@@ -203,9 +222,32 @@ const HomeScreen: React.FC = () => {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [recommendations, setRecommendations] = useState<PlaceRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedItinerary, setSelectedItinerary] = useState<Itinerary | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   // Use new preferences system
   const { preferences } = usePreferences();
+
+  // Load itineraries from backend
+  const loadItineraries = async (userId: string) => {
+    try {
+      console.log('📥 Cargando itinerarios del backend para userId:', userId);
+      const userItineraries = await itinerariesService.getUserItineraries(userId);
+      console.log(`✅ Itinerarios cargados: ${userItineraries.length}`);
+      setItineraries(userItineraries);
+    } catch (error: any) {
+      console.error('❌ Error cargando itinerarios:', error);
+      console.error('❌ Error details:', {
+        message: error?.message,
+        code: error?.code,
+        response: error?.response?.data,
+        status: error?.response?.status,
+      });
+      // No mostrar error al usuario, simplemente dejar la lista vacía
+      setItineraries([]);
+    }
+  };
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -219,6 +261,16 @@ const HomeScreen: React.FC = () => {
 
     return unsubscribeAuth;
   }, []);
+
+  // Recargar itinerarios cada vez que la pantalla gana foco
+  useFocusEffect(
+    useCallback(() => {
+      if (user) {
+        console.log('🔄 Pantalla Home enfocada - recargando itinerarios...');
+        loadItineraries(user.uid);
+      }
+    }, [user])
+  );
 
 // Generate recommendations once per session or when interests truly change
 useEffect(() => {
@@ -257,20 +309,11 @@ useEffect(() => {
 
   const setupUserData = async (user: FirebaseUser) => {
     try {
-      // Setup real-time listeners
+      // Cargar itinerarios desde el backend
+      await loadItineraries(user.uid);
 
-      const itinerariesQuery = query(
-        collection(db, 'users', user.uid, 'itineraries'),
-        orderBy('createdAt', 'desc'),
-        limit(5)
-      );
-      const unsubscribeItineraries = onSnapshot(itinerariesQuery, (snapshot) => {
-        const itinerariesData: Itinerary[] = [];
-        snapshot.forEach((doc) => {
-          itinerariesData.push({ id: doc.id, ...doc.data() } as Itinerary);
-        });
-        setItineraries(itinerariesData);
-      });
+      // Setup real-time listeners para favoritos
+      // (Los itinerarios se cargan una vez al inicio)
 
       const favoritesQuery = query(
         collection(db, 'users', user.uid, 'favorites'),
@@ -289,12 +332,68 @@ useEffect(() => {
 
       // Cleanup function
       return () => {
-        unsubscribeItineraries();
         unsubscribeFavorites();
       };
     } catch (error) {
       console.error('Error setting up user data:', error);
       setLoading(false);
+    }
+  };
+
+  const handleOpenItinerary = (itinerary: Itinerary) => {
+    console.log('🗺️ Abriendo itinerario:', itinerary.title);
+    console.log('📦 Datos del itinerario:', JSON.stringify(itinerary, null, 2));
+
+    setSelectedItinerary(itinerary);
+    setModalVisible(true);
+  };
+
+  const handleDeleteItinerary = async (itineraryId: string) => {
+    if (!user) return;
+
+    // Confirmación multiplataforma
+    const confirmDelete = () => {
+      return new Promise<boolean>((resolve) => {
+        if (Platform.OS === 'web') {
+          resolve(window.confirm('¿Estás seguro de que deseas eliminar este itinerario?'));
+        } else {
+          Alert.alert(
+            'Eliminar itinerario',
+            '¿Estás seguro de que deseas eliminar este itinerario?',
+            [
+              { text: 'Cancelar', style: 'cancel', onPress: () => resolve(false) },
+              { text: 'Eliminar', style: 'destructive', onPress: () => resolve(true) }
+            ]
+          );
+        }
+      });
+    };
+
+    const confirmed = await confirmDelete();
+    if (!confirmed) return;
+
+    try {
+      console.log('🗑️ Eliminando itinerario:', itineraryId);
+      await itinerariesService.delete(itineraryId);
+      console.log('✅ Itinerario eliminado exitosamente');
+
+      // Actualizar la lista local
+      setItineraries(prev => prev.filter(it => it.id !== itineraryId));
+
+      // Mostrar mensaje de éxito
+      if (Platform.OS === 'web') {
+        // En web no hay forma nativa de mostrar toast, usar alert o implementar un toast custom
+        console.log('✅ Itinerario eliminado');
+      } else {
+        Alert.alert('Éxito', 'Itinerario eliminado correctamente');
+      }
+    } catch (error) {
+      console.error('❌ Error eliminando itinerario:', error);
+      if (Platform.OS === 'web') {
+        window.alert('Error al eliminar el itinerario. Por favor, intenta de nuevo.');
+      } else {
+        Alert.alert('Error', 'No se pudo eliminar el itinerario. Por favor, intenta de nuevo.');
+      }
     }
   };
 
@@ -455,7 +554,8 @@ useEffect(() => {
                   <CardItinerario
                     key={itinerary.id}
                     itinerary={itinerary}
-                    onPress={() => console.log('Open itinerary:', itinerary.id)}
+                    onPress={() => handleOpenItinerary(itinerary)}
+                    onDelete={handleDeleteItinerary}
                   />
                 ))}
               </ScrollView>
@@ -554,6 +654,67 @@ useEffect(() => {
           </View>
         )}
       </ScrollView>
+
+      {/* Modal de Itinerario */}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity
+              onPress={() => setModalVisible(false)}
+              style={styles.closeButton}
+            >
+              <MaterialCommunityIcons name="close" size={28} color={theme.colors.text} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>{selectedItinerary?.title}</Text>
+            <View style={styles.modalHeaderRight}>
+              <MaterialCommunityIcons name="map-marker" size={20} color={theme.colors.primary.main} />
+              <Text style={styles.modalCity}>{selectedItinerary?.city}</Text>
+            </View>
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            {selectedItinerary?.days && Array.isArray(selectedItinerary.days) && selectedItinerary.days.map((day: any, dayIndex: number) => (
+              <View key={dayIndex} style={styles.dayContainer}>
+                <View style={styles.dayHeader}>
+                  <MaterialCommunityIcons name="calendar" size={24} color={theme.colors.primary.main} />
+                  <Text style={styles.dayTitle}>Día {day.day}</Text>
+                </View>
+
+                {day.activities && Array.isArray(day.activities) && day.activities.map((activity: any, activityIndex: number) => (
+                  <View key={activityIndex} style={styles.activityCard}>
+                    <View style={styles.activityHeader}>
+                      <View style={styles.activityTime}>
+                        <MaterialCommunityIcons name="clock-outline" size={16} color={theme.colors.textLight} />
+                        <Text style={styles.activityTimeText}>
+                          {activity.start} - {activity.end}
+                        </Text>
+                      </View>
+                      <View style={styles.activityPrice}>
+                        <Text style={styles.activityPriceText}>{activity.price_display}</Text>
+                      </View>
+                    </View>
+
+                    <Text style={styles.activityName}>{activity.place_name}</Text>
+                    <Text style={styles.activityNotes}>{activity.notes}</Text>
+                  </View>
+                ))}
+              </View>
+            ))}
+
+            {selectedItinerary?.reasoning && (
+              <View style={styles.reasoningContainer}>
+                <Text style={styles.reasoningTitle}>💡 Sobre este itinerario</Text>
+                <Text style={styles.reasoningText}>{selectedItinerary.reasoning}</Text>
+              </View>
+            )}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -664,10 +825,22 @@ const styles = StyleSheet.create({
     paddingLeft: theme.spacing.lg,
   },
   itineraryCard: {
-    width: 120,
+    width: 140,
     marginRight: theme.spacing.md,
     backgroundColor: theme.colors.surface.primary,
     borderRadius: theme.radius.md,
+    ...theme.shadows.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.border.primary,
+    position: 'relative',
+  },
+  deleteItineraryButton: {
+    position: 'absolute',
+    top: theme.spacing.xs,
+    right: theme.spacing.xs,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: theme.radius.sm,
+    padding: 6,
     ...theme.shadows.sm,
   },
   itineraryImageContainer: {
@@ -675,25 +848,30 @@ const styles = StyleSheet.create({
   },
   itineraryContent: {
     padding: theme.spacing.sm,
+    minHeight: 60,
   },
   itineraryMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
+    marginTop: 4,
   },
   itineraryMetaText: {
     fontSize: 10,
     color: theme.colors.text.secondary,
     marginLeft: 4,
+    flex: 1,
   },
   itineraryDateBadge: {
     position: 'absolute',
     bottom: theme.spacing.xs,
     right: theme.spacing.xs,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: theme.colors.primary.main,
     paddingHorizontal: theme.spacing.xs,
     paddingVertical: 2,
     borderRadius: theme.radius.xs,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
   },
   itineraryDateText: {
     fontSize: 10,
@@ -711,16 +889,15 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   itineraryImagePlaceholder: {
-    backgroundColor: theme.colors.border.secondary,
+    backgroundColor: theme.colors.primary[50],
     justifyContent: 'center',
     alignItems: 'center',
   },
   itineraryCity: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: 13,
+    fontWeight: '600',
     color: theme.colors.text.primary,
-    padding: theme.spacing.sm,
-    paddingBottom: theme.spacing.xs,
+    lineHeight: 16,
   },
   itineraryDate: {
     fontSize: 12,
@@ -930,6 +1107,126 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '600',
     color: theme.colors.text.inverse,
+  },
+  // Modal styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+  },
+  closeButton: {
+    padding: theme.spacing.xs,
+  },
+  modalTitle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginLeft: theme.spacing.sm,
+  },
+  modalHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+  },
+  modalCity: {
+    fontSize: 14,
+    color: theme.colors.primary.main,
+    fontWeight: '600',
+  },
+  modalContent: {
+    flex: 1,
+    padding: theme.spacing.md,
+  },
+  dayContainer: {
+    marginBottom: theme.spacing.lg,
+  },
+  dayHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    marginBottom: theme.spacing.md,
+    paddingBottom: theme.spacing.sm,
+    borderBottomWidth: 2,
+    borderBottomColor: theme.colors.primary.main,
+  },
+  dayTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: theme.colors.text,
+  },
+  activityCard: {
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.sm,
+    borderLeftWidth: 4,
+    borderLeftColor: theme.colors.primary.main,
+    ...theme.shadows.sm,
+  },
+  activityHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.sm,
+  },
+  activityTime: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.xs,
+  },
+  activityTimeText: {
+    fontSize: 13,
+    color: theme.colors.textLight,
+    fontWeight: '500',
+  },
+  activityPrice: {
+    backgroundColor: theme.colors.accent.light,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 4,
+    borderRadius: theme.radius.sm,
+  },
+  activityPriceText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: theme.colors.accent.main,
+  },
+  activityName: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.text,
+    marginBottom: theme.spacing.xs,
+  },
+  activityNotes: {
+    fontSize: 14,
+    color: theme.colors.textLight,
+    lineHeight: 20,
+  },
+  reasoningContainer: {
+    backgroundColor: theme.colors.primary.light,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginTop: theme.spacing.md,
+    marginBottom: theme.spacing.xl,
+  },
+  reasoningTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: theme.colors.primary.main,
+    marginBottom: theme.spacing.sm,
+  },
+  reasoningText: {
+    fontSize: 14,
+    color: theme.colors.text,
+    lineHeight: 20,
   },
 });
 

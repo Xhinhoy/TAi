@@ -100,4 +100,66 @@ class GooglePlacesFacade:
             
         except Exception as e:
             logger.error(f"Error obteniendo detalles: {str(e)}")
-            
+            return None
+
+    def _format_results(self, places: List[Dict]) -> List[Dict]:
+        """Formatea los resultados de búsqueda"""
+        formatted = []
+        for place in places:
+            formatted_place = {
+                'id': place.get('place_id'),
+                'name': place.get('name'),
+                'coords': {
+                    'latitude': place.get('geometry', {}).get('location', {}).get('lat'),
+                    'longitude': place.get('geometry', {}).get('location', {}).get('lng')
+                },
+                'rating': place.get('rating'),
+                'address': place.get('vicinity'),
+                'price_level': place.get('price_level'),
+                'photos': [
+                    f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference={photo['photo_reference']}&key={settings.GOOGLE_PLACES_API_KEY}"
+                    for photo in place.get('photos', [])[:3]
+                ],
+                'sources': ['google', 'tripadvisor'],
+                'tripadvisor': None,  # Se llenará si hay datos disponibles
+                'categories': place.get('types', [])
+            }
+            formatted.append(formatted_place)
+        return formatted
+
+    def _format_place_details(self, place: Dict) -> Dict:
+        """Formatea los detalles de un lugar"""
+        return {
+            'id': place.get('place_id'),
+            'name': place.get('name'),
+            'coords': {
+                'latitude': place.get('geometry', {}).get('location', {}).get('lat'),
+                'longitude': place.get('geometry', {}).get('location', {}).get('lng')
+            },
+            'rating': place.get('rating'),
+            'address': place.get('formatted_address'),
+            'price_level': place.get('price_level'),
+            'photos': [
+                f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference={photo['photo_reference']}&key={settings.GOOGLE_PLACES_API_KEY}"
+                for photo in place.get('photos', [])[:5]
+            ],
+            'sources': ['google', 'tripadvisor'],
+            'tripadvisor': None,  # Se llenará si hay datos disponibles
+            'categories': place.get('types', []),
+            'phone': place.get('formatted_phone_number'),
+            'website': place.get('website'),
+            'opening_hours': place.get('opening_hours'),
+            'reviews_count': place.get('user_ratings_total', 0),
+            'reviews': [
+                {
+                    'author': review.get('author_name'),
+                    'rating': review.get('rating'),
+                    'text': review.get('text'),
+                    'time': review.get('time')
+                }
+                for review in place.get('reviews', [])[:5]
+            ]
+        }
+
+# Instancia global
+GooglePlacesFacade = GooglePlacesFacade()

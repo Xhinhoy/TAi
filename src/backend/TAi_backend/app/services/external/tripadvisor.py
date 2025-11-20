@@ -13,7 +13,7 @@ class TripAdvisorFacade:
     
     def __init__(self):
         self.api_key = settings.TRIPADVISOR_API_KEY
-        self.base_url = ""
+        self.base_url = settings.TRIPADVISOR_BASE_URL
         self.rate_limit = settings.TRIPADVISOR_RATE_LIMIT
         self.last_request_time = 0
         self.cache_prefix = 'tripadvisor'
@@ -52,17 +52,17 @@ class TripAdvisorFacade:
         # No está en caché, hacer request
         try:
             self._rate_limit_check()
-            
-            url = f"{self.base_url}/search"
+
+            url = f"{self.base_url}/location/search"
+            headers = {'accept': 'application/json'}
             params = {
                 'key': self.api_key,
-                'q': query,
-                'lat': lat,
-                'lng': lng,
-                'limit': 20
+                'searchQuery': query,
+                'latLong': f"{lat},{lng}",
+                'language': 'es'
             }
-            
-            response = requests.get(url, params=params, timeout=10)
+
+            response = requests.get(url, headers=headers, params=params, timeout=10)
             response.raise_for_status()
             
             results = response.json().get('data', [])
@@ -92,14 +92,15 @@ class TripAdvisorFacade:
         # No está en caché
         try:
             self._rate_limit_check()
-            
+
             url = f"{self.base_url}/location/{location_id}/reviews"
+            headers = {'accept': 'application/json'}
             params = {
                 'key': self.api_key,
-                'limit': limit
+                'language': 'es'
             }
-            
-            response = requests.get(url, params=params, timeout=10)
+
+            response = requests.get(url, headers=headers, params=params, timeout=10)
             response.raise_for_status()
             
             reviews = response.json().get('data', [])
@@ -129,11 +130,15 @@ class TripAdvisorFacade:
         # No está en caché
         try:
             self._rate_limit_check()
-            
-            url = f"{self.base_url}/location/{location_id}"
-            params = {'key': self.api_key}
-            
-            response = requests.get(url, params=params, timeout=10)
+
+            url = f"{self.base_url}/location/{location_id}/details"
+            headers = {'accept': 'application/json'}
+            params = {
+                'key': self.api_key,
+                'language': 'es'
+            }
+
+            response = requests.get(url, headers=headers, params=params, timeout=10)
             response.raise_for_status()
             
             details = response.json()

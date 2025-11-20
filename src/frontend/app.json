@@ -3,12 +3,12 @@
     "name": "TAi",
     "slug": "tai-travel",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "extra": {
-      "apiUrl": "http://localhost:8080/api/v1"
+      "apiUrl": "http://localhost:8000/api/v1"
     },
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -16,7 +16,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "config": {
+        "googleMapsApiKey": "TU_GOOGLE_MAPS_API_KEY_AQUI"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -24,10 +27,18 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "config": {
+        "googleMaps": {
+          "apiKey": "TU_GOOGLE_MAPS_API_KEY_AQUI"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-font"
+    ]
   }
 }

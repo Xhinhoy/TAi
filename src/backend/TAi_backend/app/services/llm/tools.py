@@ -68,18 +68,29 @@ class GetReviewsTool(BaseTool):
         return self._run(*args, **kwargs)
     
 class FilterPlacesByInterestsInput(BaseModel):
-    places_json: str = Field(description="JSON string con lista de lugares")
+    places_json: str = Field(description="JSON string con lista de lugares (máximo 15 lugares)")
     user_interests: List[str] = Field(description="Intereses del usuario")
 
 class FilterPlacesByInterestsTool(BaseTool):
     name: str = "filter_by_interests"
     description: str = """Filtra y rankea lugares según los intereses del usuario.
-    Input: places_json (string JSON), user_interests (lista)"""
+    IMPORTANTE: Solo envía los primeros 10-15 lugares para evitar errores.
+    Input: places_json (string JSON, máximo 15 lugares), user_interests (lista)"""
     args_schema: Type[BaseModel] = FilterPlacesByInterestsInput
-    
+
     def _run(self, places_json: str, user_interests: List[str]) -> str:
         try:
+            # Limitar tamaño de input para evitar errores
+            if len(places_json) > 50000:  # ~50KB limit
+                return json.dumps({
+                    'error': 'Input demasiado grande. Por favor envía máximo 15 lugares.'
+                })
+
             places = json.loads(places_json)
+
+            # Limitar cantidad de lugares a procesar
+            if len(places) > 15:
+                places = places[:15]
             
             # Mapa de intereses a categorías de Google Places
             interest_map = {
@@ -171,6 +182,80 @@ class OptimizeRouteTool(BaseTool):
             
         except Exception as e:
             return json.dumps({'error': str(e)})
+    
+    async def _arun(self, *args, **kwargs):
+        return self._run(*args, **kwargs)
+    
+
+# Agregar al final de app/services/llm/tools.py
+
+class SearchPlacesWithReviewsInput(BaseModel):
+    query: str = Field(description="Texto de búsqueda")
+    latitude: float = Field(description="Latitud")
+    longitude: float = Field(description="Longitud")
+    radius: int = Field(default=5000, description="Radio en metros")
+    include_reviews: bool = Field(default=True, description="Incluir reviews de TripAdvisor")
+
+class SearchPlacesWithReviewsTool(BaseTool):
+    name: str = "search_places_with_reviews"
+    description: str = """Busca lugares usando Google Places Y obtiene sus reviews de TripAdvisor.
+    Esta es la herramienta RECOMENDADA para obtener información completa.
+    Input: query, latitude, longitude, radius, include_reviews"""
+    args_schema: Type[BaseModel] = SearchPlacesWithReviewsInput
+    
+    def _run(self, query: str, latitude: float, longitude: float,
+             radius: int = 5000, include_reviews: bool = True) -> str:
+        import json
+        import logging
+        logger = logging.getLogger(__name__)
+
+        # 1. Buscar en Google Places
+        logger.info(f"🔍 Consultando Google Places API para: {query}")
+        location = {'latitude': latitude, 'longitude': longitude}
+        places = GooglePlacesFacade.search_nearby(
+            location=location,
+            radius=radius,
+            keyword=query
+        ) # type: ignore
+        logger.info(f"✅ Google Places retornó {len(places)} lugares")
+
+        if not include_reviews:
+            return json.dumps(places[:10])
+
+        # 2. Enriquecer con reviews de TripAdvisor
+        logger.info(f"🔍 Enriqueciendo con TripAdvisor API...")
+        enriched_places = []
+        tripadvisor_success_count = 0
+
+        for place in places[:10]:  # Limitar a 10 para no abusar de la API
+            place_name = place.get('name', '')
+
+            # Buscar en TripAdvisor
+            tripadvisor_results = tripadvisor_facade.search_location(
+                query=place_name,
+                lat=latitude,
+                lng=longitude
+            )
+
+            # Agregar info de TripAdvisor si existe
+            if tripadvisor_results:
+                tripadvisor_data = tripadvisor_results[0]
+                place['tripadvisor'] = {
+                    'location_id': tripadvisor_data.get('location_id'),
+                    'rating': tripadvisor_data.get('rating'),
+                    'num_reviews': tripadvisor_data.get('num_reviews'),
+                    'ranking': tripadvisor_data.get('ranking')
+                }
+                tripadvisor_success_count += 1
+            else:
+                place['tripadvisor'] = None
+
+            enriched_places.append(place)
+
+        logger.info(f"✅ TripAdvisor: {tripadvisor_success_count}/{len(enriched_places)} lugares con datos")
+        logger.info(f"📊 Resultado final: {len(enriched_places)} lugares (Google + TripAdvisor parcial)")
+
+        return json.dumps(enriched_places)
     
     async def _arun(self, *args, **kwargs):
         return self._run(*args, **kwargs)

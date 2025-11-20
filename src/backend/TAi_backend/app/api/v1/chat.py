@@ -12,10 +12,9 @@ async def send_message(
     request: ChatRequest,
     current_user: dict = Depends(get_current_user)
 ):
-    # En modo mock/dev, omitir validación estricta de user_id
-    # if current_user['uid'] != request.user_id:
-    #     raise HTTPException(status_code=403, detail="No autorizado")
-
+    if current_user['uid'] != request.user_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
+    
     response = await chat_service.send_message(request)
     return response
 
@@ -27,6 +26,34 @@ async def get_history(
 ):
     history = chat_service.get_conversation_history(session_id, limit)
     return {"messages": history}
+
+@router.get("/sessions/{user_id}")
+async def get_user_sessions(
+    user_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Obtiene todas las sesiones de chat de un usuario"""
+    if current_user['uid'] != user_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
+
+    sessions = chat_service.get_user_sessions(user_id)
+    return {"sessions": sessions}
+
+@router.delete("/sessions/{session_id}")
+async def delete_session(
+    session_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Elimina una sesión de chat"""
+    # Opcional: Validar que la sesión pertenezca al usuario actual
+    # Por ahora permitimos que cualquier usuario autenticado pueda eliminar
+
+    success = chat_service.delete_session(session_id)
+
+    if not success:
+        raise HTTPException(status_code=500, detail="Error al eliminar la sesión")
+
+    return {"message": "Sesión eliminada correctamente", "session_id": session_id}
 
 @router.websocket("/ws/{user_id}/{session_id}")
 async def websocket_chat(websocket: WebSocket, user_id: str, session_id: str):

@@ -3,13 +3,12 @@ uvicorn[standard]
 pydantic
 pydantic-settings
 
-# LangChain y LLM (solo Groq)
+# LangChain y LLM (Google AI - Gemini)
 langchain
-langchain-groq
+langchain-google-genai
 
 # Firebase
 firebase-admin
-
 # APIs externas
 googlemaps
 requests
@@ -19,6 +18,7 @@ python-dotenv
 python-jose[cryptography]
 python-multipart
 aiofiles
+geohash2  # Para cache inteligente por zona geográfica
 
 # Testing
 pytest

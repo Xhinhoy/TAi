@@ -1508,9 +1508,133 @@ Estas interfaces permiten:
 
 ---
 
-## Soporte y Contacto
-
-Para reportar problemas o solicitar nuevas funcionalidades, contacta al equipo de desarrollo.
 
 **Versión de la documentación:** 1.0.0
 **Última actualización:** 2024-01-15
+
+
+  🎯 Ideas de Funcionalidades Nuevas
+
+  1. Detección de Clima y Recomendaciones Adaptativas
+
+  - Integrar API de clima (OpenWeatherMap, WeatherAPI)
+  - El agente ajusta recomendaciones según el clima en tiempo real
+  - Sugerencias de actividades indoor cuando llueve
+  - Alertas de clima extremo durante el itinerario
+  - Mejor época para visitar según datos históricos
+
+  2. Sistema de "Compañero de Viaje Virtual"
+
+  - Matchmaking entre usuarios con itinerarios similares
+  - Buscar compañeros de viaje según fechas, destino e intereses
+  - Chat entre usuarios que visitan la misma ciudad
+  - Compartir gastos y experiencias
+  - Grupos de viaje colaborativos
+
+  3. Reconocimiento de Imágenes → Recomendaciones
+
+  - Usuario sube foto de un lugar que le gustó
+  - IA identifica tipo de lugar (arquitectura, naturaleza, comida, etc.)
+  - Agente busca lugares similares en otros destinos
+  - "Encuéntrame lugares como este en París"
+
+  4. Presupuesto Inteligente con Tracking en Tiempo Real
+
+  - Tracking de gastos durante el viaje
+  - Categorización automática (transporte, comida, alojamiento)
+  - Alertas cuando te acercas al límite de presupuesto
+  - Sugerencias de optimización de gastos
+  - Comparador de precios de actividades
+
+  5. Modo "Explorador Local"
+
+  - El agente aprende de las decisiones del usuario
+  - Si el usuario siempre elige cafés pequeños vs cadenas → ajusta preferencias
+  - Sistema de feedback implícito (lugares visitados, tiempo de estadía)
+  - Perfil de viajero que evoluciona con el uso
+  - "Tu estilo es 70% aventurero, 30% cultural"
+
+  6. Asistente de Emergencias y Seguridad
+
+  - Números de emergencia por país
+  - Hospitales y farmacias más cercanas
+  - Alertas de seguridad por zona (integración con datos de seguridad)
+  - Traducción automática de frases de emergencia
+  - Compartir ubicación en tiempo real con contactos
+
+  7. Gamificación de Viajes
+
+  - Logros por visitar lugares ("Coleccionista de Museos")
+  - Challenges (visita 5 mercados locales en 1 semana)
+  - Sistema de puntos canjeables por descuentos
+  - Mapa de lugares visitados (scratch map digital)
+  - Ranking de viajeros por ciudad/país
+
+  8. Audio Tours Generados por IA
+
+  - Generar audio guides personalizados usando TTS
+  - Historias narradas sobre lugares en el itinerario
+  - Diferentes estilos: histórico, anecdótico, familiar
+  - Podcasts automáticos sobre el destino
+  - Disponible offline
+
+  9. Predicción de Multitudes
+
+  - Análisis de patrones de visitas (Google Popular Times mejorado)
+  - "Este museo está menos lleno los martes a las 10am"
+  - Optimización del itinerario para evitar aglomeraciones
+  - Alertas de eventos masivos (conciertos, festivales)
+  - Mejor momento para visitar cada atracción
+
+  10. Generación Automática de Contenido para Redes Sociales
+
+  - El agente genera captions para Instagram basados en el lugar visitado
+  - Sugerencias de hashtags relevantes
+  - "Mejor ángulo para la foto" según fotos de otros usuarios
+  - Generación de carruseles de "Mi viaje en 10 fotos"
+  - Stories templates automáticos
+
+  11. Asistente de Visa y Documentación
+
+  - Verificación de requisitos de visa por nacionalidad
+  - Checklist de documentos necesarios
+  - Recordatorios de vacunas obligatorias
+  - Conversión de moneda con alertas de mejor cambio
+  - Guía de aduanas y restricciones
+
+  12. Modo "Sorpresa Me"
+
+  - Usuario da presupuesto y fechas, el agente elige destino aleatorio
+  - Itinerario completo sin revelar destino hasta el día del viaje
+  - Basado en intereses pero con elemento sorpresa
+  - "Mystery trip generator"
+
+  13. Análisis de Sentimientos Post-Viaje
+
+  - Encuestas automáticas después de cada día
+  - IA analiza fotos y textos para detectar satisfacción
+  - Ajusta futuras recomendaciones según sentimientos
+  - Generación automática de "journal de viaje"
+  - Resumen emocional del viaje
+
+  14. Integración con Calendario y Productividad
+
+  - Sincronización con Google Calendar / Outlook
+  - Bloques de tiempo automáticos para actividades
+  - Recordatorios inteligentes (salir 30 min antes)
+  - Integración con apps de transporte (Uber, transit)
+  - Tiempo de descanso automático en itinerarios largos
+
+  15. Realidad Aumentada (AR) Preview
+
+  - Vista previa de lugares en AR antes de visitarlos
+  - Navegación AR hacia siguiente punto del itinerario
+  - Superposición de información histórica en la cámara
+  - "Cómo se veía este lugar hace 100 años"
+
+  ---
+  🔥 Las 3 Más Innovadoras (Mi Recomendación)
+
+  1. Reconocimiento de Imágenes → Recomendaciones - Muy diferenciador, usa IA visual
+  2. Modo "Explorador Local" - Hace al agente más inteligente con el tiempo
+  3. Predicción de Multitudes - Súper práctico, pocos competidores lo tienen
