@@ -46,6 +46,9 @@ import { localRecommendationsService, PlaceRecommendation } from '../../services
 import { TOURIST_INTERESTS } from '../../components/ui/InterestSelector';
 import { itinerariesService } from '../../api/services';
 import { useNavigation } from '@react-navigation/native';
+import { NotificationBubble } from '../../components/Notifications/NotificationBubble';
+import { useNotifications } from '../../hooks/useNotifications';
+import * as Location from 'expo-location';
 
 // TypeScript interfaces
 
@@ -98,8 +101,63 @@ interface RecommendationCardProps {
 const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation, onPress }) => {
   const getPriceText = (priceLevel?: number) => {
     if (!priceLevel) return 'Precio no disponible';
-    return '€'.repeat(priceLevel) + '€'.repeat(4 - priceLevel);
+    return '$'.repeat(priceLevel) + '$'.repeat(Math.max(0, 4 - priceLevel));
   };
+
+  const getOpenStatusInfo = () => {
+    if (!recommendation.openingHours) {
+      return null;
+    }
+
+    const isOpen = recommendation.openingHours.isOpenNow;
+    const now = new Date();
+    const currentDay = now.getDay();
+    const currentTime = now.getHours() * 100 + now.getMinutes();
+
+    // Encontrar el horario de hoy
+    const todaySchedule = recommendation.openingHours.periods?.find(
+      (period) => period.open.day === currentDay
+    );
+
+    let statusText = '';
+    let statusColor = '';
+    let statusIcon: any = '';
+
+    if (isOpen) {
+      statusText = 'Abierto ahora';
+      statusColor = '#10b981';
+      statusIcon = 'check-circle';
+
+      // Mostrar hora de cierre si está disponible
+      if (todaySchedule?.close) {
+        const closeTime = todaySchedule.close.time;
+        const closeHour = Math.floor(parseInt(closeTime) / 100);
+        const closeMin = parseInt(closeTime) % 100;
+        statusText = `Abierto · Cierra ${closeHour}:${closeMin.toString().padStart(2, '0')}`;
+      }
+    } else {
+      statusText = 'Cerrado';
+      statusColor = '#ef4444';
+      statusIcon = 'close-circle';
+
+      // Buscar próximo horario de apertura
+      const tomorrow = (currentDay + 1) % 7;
+      const nextDaySchedule = recommendation.openingHours.periods?.find(
+        (period) => period.open.day === tomorrow
+      );
+
+      if (nextDaySchedule) {
+        const openTime = nextDaySchedule.open.time;
+        const openHour = Math.floor(parseInt(openTime) / 100);
+        const openMin = parseInt(openTime) % 100;
+        statusText = `Cerrado · Abre ${openHour}:${openMin.toString().padStart(2, '0')}`;
+      }
+    }
+
+    return { statusText, statusColor, statusIcon, isOpen };
+  };
+
+  const openStatus = getOpenStatusInfo();
 
   return (
     <AnimatedPressable
@@ -122,6 +180,20 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation,
             <Text style={styles.ratingText}>{recommendation.rating.toFixed(1)}</Text>
           </View>
         </View>
+
+        {/* Estado de apertura */}
+        {openStatus && (
+          <View style={styles.openStatusContainer}>
+            <MaterialCommunityIcons
+              name={openStatus.statusIcon}
+              size={12}
+              color={openStatus.statusColor}
+            />
+            <Text style={[styles.openStatusText, { color: openStatus.statusColor }]}>
+              {openStatus.statusText}
+            </Text>
+          </View>
+        )}
 
         <Text style={styles.recommendationDescription} numberOfLines={2}>
           {recommendation.description}
@@ -224,10 +296,25 @@ const HomeScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedItinerary, setSelectedItinerary] = useState<Itinerary | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const navigation = useNavigation();
 
   // Use new preferences system
   const { preferences } = usePreferences();
+
+  // Hook de notificaciones
+  const {
+    notifications,
+    markAsRead,
+    dismiss,
+    clearAll,
+  } = useNotifications({
+    userId: user?.uid,
+    userLocation: userLocation || undefined,
+    userInterests: preferences.interests,
+    enableItineraryReminders: true,
+    enableNearbyRecommendations: true,
+  });
 
   // Load itineraries from backend
   const loadItineraries = async (userId: string) => {
@@ -260,6 +347,24 @@ const HomeScreen: React.FC = () => {
     });
 
     return unsubscribeAuth;
+  }, []);
+
+  // Obtener ubicación del usuario para notificaciones contextuales
+  useEffect(() => {
+    (async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === 'granted') {
+          const location = await Location.getCurrentPositionAsync({});
+          setUserLocation({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          });
+        }
+      } catch (error) {
+        console.error('Error obteniendo ubicación:', error);
+      }
+    })();
   }, []);
 
   // Recargar itinerarios cada vez que la pantalla gana foco
@@ -715,6 +820,20 @@ useEffect(() => {
           </ScrollView>
         </SafeAreaView>
       </Modal>
+
+      {/* Burbuja de Notificaciones Flotante */}
+      <NotificationBubble
+        notifications={notifications}
+        onNotificationPress={(notification) => {
+          markAsRead(notification.id);
+          // Manejar navegación según tipo de notificación
+          if (notification.onAction) {
+            notification.onAction();
+          }
+        }}
+        onNotificationDismiss={dismiss}
+        onClearAll={clearAll}
+      />
     </SafeAreaView>
   );
 };
@@ -1057,6 +1176,16 @@ const styles = StyleSheet.create({
     color: theme.colors.text.primary,
     flex: 1,
     marginRight: theme.spacing.sm,
+  },
+  openStatusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.xs,
+    gap: 4,
+  },
+  openStatusText: {
+    fontSize: 11,
+    fontWeight: '500',
   },
   recommendationRating: {
     flexDirection: 'row',

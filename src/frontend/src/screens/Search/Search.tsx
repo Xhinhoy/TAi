@@ -21,6 +21,8 @@ import { AlertsCarousel } from './components/AlertsCarousel';
 import { SessionSummaryModal } from './components/SessionSummaryModal';
 import { ExplorationMap } from './components/ExplorationMap';
 import { Alert, SessionSummary } from '../../types/exploration';
+import { NearbyPlacesMap } from '../../components/Map/NearbyPlacesMap';
+import { Place } from '../../types/domain';
 
 export default function Search() {
   const { user } = useAuth();
@@ -311,16 +313,31 @@ export default function Search() {
         <SessionStatusBar sessionInfo={sessionInfo} isPaused={isPaused} />
       )}
 
-      {/* Mapa */}
-      <ExplorationMap
-        userLocation={
-          location.latitude && location.longitude
-            ? { latitude: location.latitude, longitude: location.longitude }
-            : null
-        }
-        alerts={alerts}
-        onAlertPress={handleAlertTap}
-      />
+      {/* Mapa - Mostrar NearbyPlacesMap cuando NO está en exploración */}
+      {!isActive ? (
+        <NearbyPlacesMap
+          userLocation={
+            location.latitude && location.longitude
+              ? { latitude: location.latitude, longitude: location.longitude }
+              : null
+          }
+          radius={1000}
+          onPlaceSelect={(place: Place) => {
+            console.log('Lugar seleccionado:', place.name);
+            // Aquí puedes navegar a detalles del lugar
+          }}
+        />
+      ) : (
+        <ExplorationMap
+          userLocation={
+            location.latitude && location.longitude
+              ? { latitude: location.latitude, longitude: location.longitude }
+              : null
+          }
+          alerts={alerts}
+          onAlertPress={handleAlertTap}
+        />
+      )}
 
       {/* Banner de error (si existe) */}
       {sessionError && (

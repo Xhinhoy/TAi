@@ -9,8 +9,18 @@ class ChatRepository:
     def __init__(self):
         self.db = firebase_service.realtime_db
     
-    def save_message(self, session_id: str, message: Dict) -> str:
+    def save_message(self, session_id: str, message: Dict, owner_uid: str | None = None) -> str:
         message['timestamp'] = datetime.utcnow().isoformat()
+        if owner_uid:
+            # Guardar metadatos de la sesión (solo se setean la primera vez)
+            meta_ref = self.db.child('conversations').child(session_id).child('meta') # type: ignore
+            existing_meta = meta_ref.get()
+            if not existing_meta or not existing_meta.get('owner_uid'): # type: ignore
+                meta_ref.set({
+                    'owner_uid': owner_uid,
+                    'created_at': message['timestamp']
+                })
+
         ref = self.db.child('conversations').child(session_id).child('messages').push(message) # type: ignore
         return ref.key # type: ignore
     
@@ -49,6 +59,10 @@ class ChatRepository:
             # Verificar si esta sesión pertenece al usuario
             messages = session_data.get('messages', {})
             if not messages:
+                continue
+
+            meta = session_data.get('meta', {})
+            if meta and meta.get('owner_uid') and meta.get('owner_uid') != user_id:
                 continue
 
             # Obtener el primer mensaje para verificar user_id y crear título

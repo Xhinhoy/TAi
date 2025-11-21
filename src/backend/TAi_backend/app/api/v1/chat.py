@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, HTTPExce
 from app.api.deps import get_current_user
 from app.services.chat_service import chat_service
 from app.models.chat import ChatRequest, ChatResponse
+from firebase_admin import auth
 import logging
 
 logger = logging.getLogger(__name__)
@@ -57,6 +58,20 @@ async def delete_session(
 
 @router.websocket("/ws/{user_id}/{session_id}")
 async def websocket_chat(websocket: WebSocket, user_id: str, session_id: str):
+    token = websocket.query_params.get("token")
+    if not token:
+        await websocket.close(code=1008)
+        return
+
+    try:
+        decoded = auth.verify_id_token(token, clock_skew_seconds=60)
+        if decoded.get("uid") != user_id:
+            await websocket.close(code=1008)
+            return
+    except Exception:
+        await websocket.close(code=1008)
+        return
+
     await websocket.accept()
     
     try:

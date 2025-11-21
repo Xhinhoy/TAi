@@ -7,12 +7,16 @@ import logging
 import time
 import hashlib
 import json
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 class GooglePlacesFacade:
     def __init__(self):
-        self.client = googlemaps.Client(key=settings.GOOGLE_PLACES_API_KEY)
+        api_key = settings.GOOGLE_PLACES_API_KEY
+        if not api_key:
+            raise ValueError("GOOGLE_PLACES_API_KEY no configurada")
+        self.client = googlemaps.Client(key=api_key)
         self.rate_limit = settings.GOOGLE_PLACES_RATE_LIMIT
         self.last_request_time = 0
         self.cache_prefix = 'google_places'
@@ -117,7 +121,7 @@ class GooglePlacesFacade:
                 'address': place.get('vicinity'),
                 'price_level': place.get('price_level'),
                 'photos': [
-                    f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference={photo['photo_reference']}&key={settings.GOOGLE_PLACES_API_KEY}"
+                    f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={photo['photo_reference']}&key={settings.GOOGLE_PLACES_API_KEY}"
                     for photo in place.get('photos', [])[:3]
                 ],
                 'sources': ['google', 'tripadvisor'],
@@ -140,7 +144,7 @@ class GooglePlacesFacade:
             'address': place.get('formatted_address'),
             'price_level': place.get('price_level'),
             'photos': [
-                f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference={photo['photo_reference']}&key={settings.GOOGLE_PLACES_API_KEY}"
+                f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photo_reference={photo['photo_reference']}&key={settings.GOOGLE_PLACES_API_KEY}"
                 for photo in place.get('photos', [])[:5]
             ],
             'sources': ['google', 'tripadvisor'],
@@ -162,4 +166,4 @@ class GooglePlacesFacade:
         }
 
 # Instancia global
-GooglePlacesFacade = GooglePlacesFacade()
+google_places_facade = GooglePlacesFacade()

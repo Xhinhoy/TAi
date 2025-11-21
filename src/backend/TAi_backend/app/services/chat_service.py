@@ -14,10 +14,14 @@ class ChatService:
         """Procesa un mensaje del usuario"""
         try:
             # Guardar mensaje del usuario
-            chat_repository.save_message(request.session_id, {
-                'role': 'user',
-                'content': request.message
-            })
+            chat_repository.save_message(
+                request.session_id,
+                {
+                    'role': 'user',
+                    'content': request.message
+                },
+                owner_uid=request.user_id
+            )
             
             # Obtener perfil
             user_profile = user_service.get_profile(request.user_id)
@@ -34,10 +38,14 @@ class ChatService:
             result = await agent.chat(request.message)
             
             # Guardar respuesta
-            chat_repository.save_message(request.session_id, {
-                'role': 'assistant',
-                'content': result['response']
-            })
+            chat_repository.save_message(
+                request.session_id,
+                {
+                    'role': 'assistant',
+                    'content': result['response']
+                },
+                owner_uid=request.user_id
+            )
             
             return ChatResponse(**result)
             

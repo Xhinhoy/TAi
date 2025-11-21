@@ -10,7 +10,7 @@ from typing import Optional, Type, List, Dict, Any
 from pydantic import BaseModel, Field
 import logging
 
-from app.services.external.google_places import GooglePlacesFacade
+from app.services.external.google_places import google_places_facade
 from app.services.external.tripadvisor import tripadvisor_facade
 from app.repositories.user_repository import user_repository
 
@@ -82,7 +82,7 @@ class GooglePlacesSearchTool(BaseTool):
         try:
             logger.info(f"🔍 Google Places Search: ({latitude}, {longitude}), r={radius}m, type={place_type}")
 
-            results = GooglePlacesFacade.search_nearby(
+            results = google_places_facade.search_nearby(
                 location={'latitude': latitude, 'longitude': longitude},
                 radius=radius,
                 place_type=place_type,
@@ -138,7 +138,7 @@ class GooglePlaceDetailsTool(BaseTool):
         try:
             logger.info(f"📄 Google Place Details: {place_id}")
 
-            details = GooglePlacesFacade.get_place_details(place_id)
+            details = google_places_facade.get_place_details(place_id)
 
             if not details:
                 return f"No se encontraron detalles para el lugar {place_id}"

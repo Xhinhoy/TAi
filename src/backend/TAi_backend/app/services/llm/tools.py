@@ -2,7 +2,7 @@
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Type
-from app.services.external.google_places import GooglePlacesFacade
+from app.services.external.google_places import google_places_facade
 from app.services.external.tripadvisor import tripadvisor_facade
 import json
 
@@ -23,12 +23,12 @@ class SearchPlacesTool(BaseTool):
     def _run(self, query: str = None, latitude: float = 0, longitude: float = 0,  # type: ignore
              radius: int = 5000, place_type: str = None) -> str: # type: ignore
         location = {'latitude': latitude, 'longitude': longitude}
-        results = GooglePlacesFacade.search_nearby(
+        results = google_places_facade.search_nearby(
             location=location,
             radius=radius,
             place_type=place_type,
             keyword=query
-        ) # type: ignore
+        )
         return json.dumps(results[:10])
     
     async def _arun(self, *args, **kwargs):
@@ -44,7 +44,7 @@ class GetPlaceDetailsTool(BaseTool):
     args_schema: Type[BaseModel] = GetPlaceDetailsInput
     
     def _run(self, place_id: str) -> str:
-        details = GooglePlacesFacade.get_place_details(place_id) # type: ignore
+        details = google_places_facade.get_place_details(place_id)
         return json.dumps(details) if details else "{}"
     
     async def _arun(self, *args, **kwargs):
@@ -212,11 +212,11 @@ class SearchPlacesWithReviewsTool(BaseTool):
         # 1. Buscar en Google Places
         logger.info(f"🔍 Consultando Google Places API para: {query}")
         location = {'latitude': latitude, 'longitude': longitude}
-        places = GooglePlacesFacade.search_nearby(
+        places = google_places_facade.search_nearby(
             location=location,
             radius=radius,
             keyword=query
-        ) # type: ignore
+        )
         logger.info(f"✅ Google Places retornó {len(places)} lugares")
 
         if not include_reviews:

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(timeout 10 uvicorn:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(env)",
+      "Bash(unset:*)",
+      "Bash(chmod:*)",
+      "Bash(lsof:*)",
+      "Bash(curl:*)",
+      "Bash(source:*)",
+      "Bash(uvicorn:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

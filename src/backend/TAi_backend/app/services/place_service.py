@@ -1,17 +1,20 @@
 from app.repositories.place_repository import place_repository
-from app.services.external.google_places import GooglePlacesFacade
+from app.services.external.google_places import google_places_facade
 from app.services.external.tripadvisor import tripadvisor_facade
 from app.models.place import Place, PlaceDetails, PlaceSearchParams
 from typing import List, Optional
 
 class PlaceService:
+    def __init__(self):
+        self.google_places = google_places_facade
+
     def search_places(self, params: PlaceSearchParams) -> List[Place]:
-        results = GooglePlacesFacade.search_nearby(
+        results = self.google_places.search_nearby(
             location={'latitude': params.location.latitude, 'longitude': params.location.longitude},
             radius=params.radius,
             place_type=params.place_type,
             keyword=params.query
-        ) # type: ignore
+        )
         
         places = []
         for result in results:
@@ -25,7 +28,7 @@ class PlaceService:
         if cached:
             return PlaceDetails(**cached)
         
-        details = GooglePlacesFacade.get_place_details(place_id) # type: ignore
+        details = self.google_places.get_place_details(place_id)
         if details:
             place_repository.save_place(details)
             return PlaceDetails(**details)
@@ -35,37 +38,33 @@ class PlaceService:
     def search_by_category(self, categories: List[str], limit: int = 20) -> List[Place]:
         results = place_repository.search_by_category(categories, limit)
         return [Place(**r) for r in results]
-    # Agregar al final de app/services/place_service.py
-
-def enrich_place_with_tripadvisor(self, place: Place) -> PlaceDetails:
-    """Enriquece un lugar de Google Places con datos de TripAdvisor"""
     
-    # Buscar en TripAdvisor
-    tripadvisor_results = tripadvisor_facade.search_location(
-        query=place.name,
-        lat=place.coords.latitude,
-        lng=place.coords.longitude
-    )
-    
-    place_dict = place.model_dump()
-    
-    if tripadvisor_results:
-        location_id = tripadvisor_results[0].get('location_id')
+    def enrich_place_with_tripadvisor(self, place: Place) -> PlaceDetails:
+        """Enriquece un lugar de Google Places con datos de TripAdvisor"""
+        tripadvisor_results = tripadvisor_facade.search_location(
+            query=place.name,
+            lat=place.coords.latitude,
+            lng=place.coords.longitude
+        )
         
-        # Obtener reviews
-        reviews = tripadvisor_facade.get_reviews(location_id, limit=5) # type: ignore
+        place_dict = place.model_dump()
         
-        # Agregar información de TripAdvisor
-        place_dict['reviews'] = reviews
-        place_dict['reviews_count'] = tripadvisor_results[0].get('num_reviews', 0)
+        if tripadvisor_results:
+            location_id = tripadvisor_results[0].get('location_id')
+            
+            # Obtener reviews
+            reviews = tripadvisor_facade.get_reviews(location_id, limit=5) # type: ignore
+            
+            # Agregar información de TripAdvisor
+            place_dict['reviews'] = reviews
+            place_dict['reviews_count'] = tripadvisor_results[0].get('num_reviews', 0)
+            
+            # Si TripAdvisor tiene mejor rating, usarlo
+            tripadvisor_rating = tripadvisor_results[0].get('rating')
+            if tripadvisor_rating and (not place.rating or tripadvisor_rating > place.rating):
+                place_dict['rating'] = tripadvisor_rating
         
-        # Si TripAdvisor tiene mejor rating, usarlo
-        tripadvisor_rating = tripadvisor_results[0].get('rating')
-        if tripadvisor_rating and (not place.rating or tripadvisor_rating > place.rating):
-            place_dict['rating'] = tripadvisor_rating
-    
-    return PlaceDetails(**place_dict)
+        return PlaceDetails(**place_dict)
 
 place_service = PlaceService()
-
 

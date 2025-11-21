@@ -12,18 +12,7 @@ async def verify_firebase_token(
     """Verifica el token de Firebase y retorna los datos del usuario"""
     try:
         token = credentials.credentials
-        logger.info(f"🔑 Token recibido (primeros 50 chars): {token[:50]}...")
-        logger.info(f"🔑 Token length: {len(token)}")
-
-        # Verificar el token con Firebase Admin
-        # Agregamos clock_skew_seconds=60 para tolerar diferencias de hasta 60 segundos en el reloj
         decoded_token = auth.verify_id_token(token, clock_skew_seconds=60)
-
-        logger.info(f"✅ Token verificado exitosamente")
-        logger.info(f"👤 Usuario UID: {decoded_token.get('uid')}")
-        logger.info(f"📧 Email: {decoded_token.get('email')}")
-        logger.info(f"🔓 Token payload completo: {decoded_token}")
-
         return decoded_token
     except auth.InvalidIdTokenError as e:
         logger.error(f"❌ Token inválido: {str(e)}")
