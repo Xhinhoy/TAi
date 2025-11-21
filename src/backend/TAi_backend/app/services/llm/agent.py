@@ -531,12 +531,12 @@ Genera AHORA el JSON basándote en el itinerario que describiste.
                 "updated_at": datetime.utcnow(),
             }
 
-            # Validar fecha obligatoria
+            # Validar fecha obligatoria (fallback a hoy si falta)
             start_date = itinerary_data.get("start_date")
             if not start_date:
-                raise ValueError("start_date es obligatorio para los itinerarios")
+                start_date = datetime.utcnow().date().isoformat()
+                logger.warning("start_date faltaba; usando fecha actual como fallback")
 
-            # Guardar fecha (string ISO)
             itinerary_to_save["start_date"] = start_date
 
             itinerary_id = itinerary_repository.create_itinerary(itinerary_to_save)

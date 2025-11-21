@@ -63,10 +63,11 @@ export const usersService = {
    * Add place to favorites
    */
   async addFavorite(uid: string, placeId: string, placeData: any) {
-    const response = await api.post(`/users/${uid}/favorites`, {
-      place_id: placeId,
-      place_data: placeData,
-    });
+    const response = await api.post(
+      `/users/${uid}/favorites`,
+      { place_data: placeData },
+      { params: { place_id: placeId } }
+    );
     return response.data;
   },
 

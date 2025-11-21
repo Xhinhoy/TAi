@@ -7,9 +7,52 @@ class ItineraryRepository(BaseRepository):
         super().__init__('itineraries')
     
     def get_user_itineraries(self, uid: str) -> List[dict]:
-        query = self.get_collection().where('owner_uid', '==', uid).order_by('created_at', direction='DESCENDING')
-        docs = query.stream()
-        return [{'id': doc.id, **doc.to_dict()} for doc in docs]
+        """
+        Devuelve todos los itinerarios del usuario.
+        Historicamente algunos documentos se guardaron con owner_uid y otros con user_id,
+        así que traemos ambos y los unificamos.
+        """
+        results: List[dict] = []
+
+        # Itinerarios nuevos con owner_uid
+        try:
+            docs_owner = (
+                self.get_collection()
+                .where('owner_uid', '==', uid)
+                .order_by('created_at', direction='DESCENDING')
+                .stream()
+            )
+            results.extend([{'id': doc.id, **doc.to_dict()} for doc in docs_owner])
+        except Exception:
+            docs_owner = []
+
+        # Itinerarios antiguos con user_id
+        try:
+            docs_user = (
+                self.get_collection()
+                .where('user_id', '==', uid)
+                .order_by('created_at', direction='DESCENDING')
+                .stream()
+            )
+            results.extend([{'id': doc.id, **doc.to_dict()} for doc in docs_user])
+        except Exception:
+            docs_user = []
+
+        # Eliminar duplicados por id
+        unique = {}
+        for item in results:
+            unique[item['id']] = item
+
+        # Ordenar por created_at descendente cuando esté disponible
+        from datetime import datetime
+
+        sorted_items = sorted(
+            unique.values(),
+            key=lambda x: x.get('created_at') or datetime.min,
+            reverse=True,
+        )
+
+        return sorted_items
     
     def create_itinerary(self, itinerary_data: dict) -> str:
         itinerary_data['created_at'] = datetime.utcnow()

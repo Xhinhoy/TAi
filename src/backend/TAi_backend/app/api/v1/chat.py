@@ -92,11 +92,15 @@ async def websocket_chat(websocket: WebSocket, user_id: str, session_id: str):
             
             response = await chat_service.send_message(request)
             
+            itinerary_payload = None
+            if response.itinerary:
+                itinerary_payload = response.itinerary.dict() if hasattr(response.itinerary, "dict") else response.itinerary
+
             await websocket.send_json({
                 'response': response.response,
                 'actions': [a.dict() for a in response.actions],
                 'places': [p.dict() for p in response.places],
-                'itinerary': response.itinerary.dict() if response.itinerary else None,
+                'itinerary': itinerary_payload,
             })
 
     except WebSocketDisconnect:

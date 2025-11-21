@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  Image,
   ActivityIndicator,
   Platform,
   Pressable,
@@ -30,8 +29,7 @@ import { AnimatedPressable } from '../../components/ui/AnimatedPressable';
 import { usePreferences } from '../../contexts/PreferencesContext';
 import { localRecommendationsService, PlaceRecommendation } from '../../services/recommendations.service';
 import { TOURIST_INTERESTS } from '../../components/ui/InterestSelector';
-import { itinerariesService, usersService } from '../../api/services';
-import { useNavigation } from '@react-navigation/native';
+import { itinerariesService, usersService, placesService } from '../../api/services';
 import { NotificationBubble } from '../../components/Notifications/NotificationBubble';
 import { useNotifications } from '../../hooks/useNotifications';
 import * as Location from 'expo-location';
@@ -100,7 +98,6 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation,
     const isOpen = recommendation.openingHours.isOpenNow;
     const now = new Date();
     const currentDay = now.getDay();
-    const currentTime = now.getHours() * 100 + now.getMinutes();
 
     // Encontrar el horario de hoy
     const todaySchedule = recommendation.openingHours.periods?.find(
@@ -275,7 +272,7 @@ const CardItinerario: React.FC<CardItinerarioProps> = ({ itinerary, onPress, onD
         <MaterialCommunityIcons
           name="delete-outline"
           size={20}
-          color={theme.colors.error}
+          color={theme.colors.error.main}
         />
       </AnimatedPressable>
     </View>
@@ -288,15 +285,17 @@ const HomeScreen: React.FC = () => {
   const [itineraries, setItineraries] = useState<Itinerary[]>([]);
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [recommendations, setRecommendations] = useState<PlaceRecommendation[]>([]);
+  const [nearbyPlaces, setNearbyPlaces] = useState<PlaceRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItinerary, setSelectedItinerary] = useState<Itinerary | null>(null);
   const [allItinerariesVisible, setAllItinerariesVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
-  const navigation = useNavigation();
+  const [locationGranted, setLocationGranted] = useState<boolean>(false);
 
   // Use new preferences system
   const { preferences } = usePreferences();
+  const interests = preferences.interests;
 
   // Hook de notificaciones
   const {
@@ -317,8 +316,12 @@ const HomeScreen: React.FC = () => {
     try {
       console.log('📥 Cargando itinerarios del backend para userId:', userId);
       const userItineraries = await itinerariesService.getUserItineraries(userId);
-      console.log(`✅ Itinerarios cargados: ${userItineraries.length}`);
-      setItineraries(userItineraries);
+      const normalized = (userItineraries || []).map((it, idx) => ({
+        ...it,
+        id: it.id || it.itinerary_id || it._id || `it-${idx}-${it.title || 'untitled'}`,
+      }));
+      console.log(`✅ Itinerarios cargados: ${normalized.length}`);
+      setItineraries(normalized);
     } catch (error: any) {
       console.error('❌ Error cargando itinerarios:', error);
       console.error('❌ Error details:', {
@@ -363,23 +366,109 @@ const HomeScreen: React.FC = () => {
     return unsubscribeAuth;
   }, []);
 
-  // Obtener ubicación del usuario para notificaciones contextuales
+  // Solicitar permisos de ubicación y obtenerla
+  const requestLocation = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      setLocationGranted(status === 'granted');
+      if (status === 'granted') {
+        const location = await Location.getCurrentPositionAsync({});
+        setUserLocation({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+      }
+    } catch (error) {
+      console.error('Error obteniendo ubicación:', error);
+      setLocationGranted(false);
+    }
+  };
+
   useEffect(() => {
-    (async () => {
+    requestLocation();
+  }, []);
+
+  // Buscar lugares cercanos según ubicación e intereses
+  useEffect(() => {
+    const fetchNearby = async () => {
+      if (!userLocation) {
+        setNearbyPlaces([]);
+        return;
+      }
+
+      // Mapeo sencillo interés -> tipo de lugar de Google
+      const interestToType: Record<string, string> = {
+        naturaleza: 'park',
+        aventura: 'tourist_attraction',
+        gastronomia: 'restaurant',
+        cultura: 'museum',
+        compras: 'shopping_mall',
+        relax: 'spa',
+        playa: 'beach',
+        historia: 'historical_landmark',
+      };
+
+      // Escoger el primer tipo que matchee algún interés; si no hay intereses, usar tipo genérico
+      const placeType =
+        preferences.interests.reduce<string | undefined>((acc, interest) => {
+          return acc || interestToType[interest];
+        }, undefined) || 'tourist_attraction';
+
       try {
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        if (status === 'granted') {
-          const location = await Location.getCurrentPositionAsync({});
-          setUserLocation({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
+        let results = await placesService.search({
+          lat: userLocation.latitude,
+          lng: userLocation.longitude,
+          radius: 3000,
+          place_type: placeType,
+        });
+
+        // Si no hay resultados con el tipo sugerido, hacer intento amplio sin filtrar
+        if (!results || results.length === 0) {
+          results = await placesService.search({
+            lat: userLocation.latitude,
+            lng: userLocation.longitude,
+            radius: 8000,
           });
         }
+
+        // Último fallback: usar nearby genérico (puede usar otras fuentes como TripAdvisor si backend las expone)
+        if (!results || results.length === 0) {
+          results = await placesService.searchNearby({
+            latitude: userLocation.latitude,
+            longitude: userLocation.longitude,
+            radius: 12000,
+          });
+        }
+
+        const mapped: PlaceRecommendation[] = (results || []).map((place: any) => ({
+          id: place.id || place.place_id || place.name,
+          name: place.name,
+          description: place.address || place.formatted_address || '',
+          category: placeType || place.types?.[0] || place.categories?.[0] || 'spot',
+          location: {
+            latitude: place.coords?.latitude || place.geometry?.location?.lat || 0,
+            longitude: place.coords?.longitude || place.geometry?.location?.lng || 0,
+            address: place.address || place.formatted_address || '',
+          },
+          rating: place.rating || 0,
+          priceLevel: place.price_level || place.priceLevel || 0,
+          photos: place.photos || [],
+          types: place.types || place.categories || [],
+          matchScore: 1,
+          reason: preferences.interests.length
+            ? 'Cerca de tu ubicación y tus intereses'
+            : 'Cerca de tu ubicación',
+        }));
+
+        setNearbyPlaces(mapped.slice(0, 10));
       } catch (error) {
-        console.error('Error obteniendo ubicación:', error);
+        console.error('Error obteniendo lugares cercanos:', error);
+        setNearbyPlaces([]);
       }
-    })();
-  }, []);
+    };
+
+    fetchNearby();
+  }, [userLocation, preferences.interests]);
 
   // Recargar itinerarios cada vez que la pantalla gana foco
   useFocusEffect(
@@ -394,7 +483,7 @@ const HomeScreen: React.FC = () => {
 
 // Generate recommendations when user/interests are ready
 useEffect(() => {
-  if (!user || preferences.interests.length === 0) {
+  if (!user || interests.length === 0) {
     setRecommendations([]);
     return;
   }
@@ -425,7 +514,7 @@ useEffect(() => {
     cancelled = true;
     clearTimeout(timeout);
   };
-}, [user, preferences]);
+}, [user, interests]);
 
 
   const setupUserData = async (user: FirebaseUser) => {
@@ -505,10 +594,12 @@ useEffect(() => {
     if (!user) return;
     try {
       const placeId = place.id || place.placeId || place.name;
+      const address = place.location?.address || '';
+      const subtitle = address || place.description || place.reason || '';
       await usersService.addFavorite(user.uid, placeId, {
         title: place.name,
-        subtitle: place.address || place.reason || '',
-        address: place.address || '',
+        subtitle,
+        address,
         rating: place.rating || 0,
         types: place.types || [],
       });
@@ -619,6 +710,72 @@ useEffect(() => {
           )}
         </View>
 
+        {/* Nearby places based on your location and interests */}
+        {!locationGranted && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Lugares cerca de ti</Text>
+            <View style={styles.noRecommendations}>
+              <MaterialCommunityIcons
+                name="map-marker-off"
+                size={48}
+                color={theme.colors.text.tertiary}
+              />
+              <Text style={styles.noRecommendationsTitle}>
+                Activa la ubicación para sugerencias cercanas
+              </Text>
+              <Text style={styles.noRecommendationsSubtitle}>
+                Solo la pediremos una vez y se ocultará este aviso
+              </Text>
+              <AnimatedPressable style={styles.locationButton} onPress={requestLocation}>
+                <Text style={styles.locationButtonText}>Conceder permisos</Text>
+              </AnimatedPressable>
+            </View>
+          </View>
+        )}
+
+        {locationGranted && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Lugares cerca de ti</Text>
+            {!userLocation ? (
+              <View style={styles.noRecommendations}>
+                <ActivityIndicator size="small" color={theme.colors.primary.main} />
+                <Text style={styles.noRecommendationsTitle}>
+                  Obteniendo tu ubicación...
+                </Text>
+              </View>
+            ) : nearbyPlaces.length > 0 ? (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.horizontalList}
+              >
+                {nearbyPlaces.map((place) => (
+                  <RecommendationCard
+                    key={place.id}
+                    recommendation={place}
+                    onPress={() => console.log('Open nearby place:', place.id)}
+                    onFavorite={() => handleAddFavorite(place)}
+                  />
+                ))}
+              </ScrollView>
+            ) : (
+              <View style={styles.noRecommendations}>
+                <MaterialCommunityIcons
+                  name="map-marker-outline"
+                  size={48}
+                  color={theme.colors.text.tertiary}
+                />
+                <Text style={styles.noRecommendationsTitle}>
+                  Buscando sitios cercanos...
+                </Text>
+                <Text style={styles.noRecommendationsSubtitle}>
+                  Actualiza tus intereses para mejorar las sugerencias
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Activity Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Actividad</Text>
@@ -653,7 +810,7 @@ useEffect(() => {
                 <MaterialCommunityIcons
                   name="map-outline"
                   size={48}
-                  color={theme.colors.textLight}
+                  color={theme.colors.text.tertiary}
                 />
                 <Text style={styles.emptyStateText}>
                   No tienes itinerarios guardados
@@ -713,7 +870,7 @@ useEffect(() => {
                 <MaterialCommunityIcons
                   name="heart-outline"
                   size={48}
-                  color={theme.colors.textLight}
+                  color={theme.colors.text.tertiary}
                 />
                 <Text style={styles.emptyStateText}>
                   No tienes lugares favoritos
@@ -741,7 +898,7 @@ useEffect(() => {
               onPress={() => setModalVisible(false)}
               style={styles.closeButton}
             >
-              <MaterialCommunityIcons name="close" size={28} color={theme.colors.text} />
+              <MaterialCommunityIcons name="close" size={28} color={theme.colors.text.primary} />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>{selectedItinerary?.title}</Text>
             <View style={styles.modalHeaderRight}>
@@ -762,7 +919,7 @@ useEffect(() => {
                   <View key={activityIndex} style={styles.activityCard}>
                     <View style={styles.activityHeader}>
                       <View style={styles.activityTime}>
-                        <MaterialCommunityIcons name="clock-outline" size={16} color={theme.colors.textLight} />
+                        <MaterialCommunityIcons name="clock-outline" size={16} color={theme.colors.text.secondary} />
                         <Text style={styles.activityTimeText}>
                           {activity.start} - {activity.end}
                         </Text>
@@ -816,7 +973,7 @@ useEffect(() => {
               onPress={() => setAllItinerariesVisible(false)}
               style={styles.closeButton}
             >
-              <MaterialCommunityIcons name="close" size={28} color={theme.colors.text} />
+              <MaterialCommunityIcons name="close" size={28} color={theme.colors.text.primary} />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Todos los itinerarios</Text>
             <View style={styles.modalHeaderRight} />
@@ -839,7 +996,7 @@ useEffect(() => {
                 <MaterialCommunityIcons
                   name="map-outline"
                   size={48}
-                  color={theme.colors.textLight}
+                  color={theme.colors.text.tertiary}
                 />
                 <Text style={styles.emptyStateText}>
                   No tienes itinerarios guardados
@@ -957,6 +1114,10 @@ const styles = StyleSheet.create({
   },
   horizontalList: {
     paddingLeft: theme.spacing.lg,
+  },
+  nearbyList: {
+    paddingLeft: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
   },
   itineraryCard: {
     width: 140,
@@ -1260,7 +1421,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     paddingHorizontal: theme.spacing.md,
     paddingVertical: 8,
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surface.primary,
     borderRadius: theme.radius.md,
     borderWidth: 1,
     borderColor: theme.colors.error.main,
@@ -1272,7 +1433,7 @@ const styles = StyleSheet.create({
   // Modal styles
   modalContainer: {
     flex: 1,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.background.primary,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -1280,8 +1441,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: theme.spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    borderBottomColor: theme.colors.border.primary,
+    backgroundColor: theme.colors.surface.primary,
   },
   closeButton: {
     padding: theme.spacing.xs,
@@ -1290,7 +1451,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '700',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     marginLeft: theme.spacing.sm,
   },
   modalHeaderRight: {
@@ -1322,10 +1483,10 @@ const styles = StyleSheet.create({
   dayTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
   },
   activityCard: {
-    backgroundColor: theme.colors.surface,
+    backgroundColor: theme.colors.surface.primary,
     borderRadius: theme.radius.md,
     padding: theme.spacing.md,
     marginBottom: theme.spacing.sm,
@@ -1346,7 +1507,7 @@ const styles = StyleSheet.create({
   },
   activityTimeText: {
     fontSize: 13,
-    color: theme.colors.textLight,
+    color: theme.colors.text.secondary,
     fontWeight: '500',
   },
   activityPrice: {
@@ -1363,12 +1524,12 @@ const styles = StyleSheet.create({
   activityName: {
     fontSize: 16,
     fontWeight: '700',
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     marginBottom: theme.spacing.xs,
   },
   activityNotes: {
     fontSize: 14,
-    color: theme.colors.textLight,
+    color: theme.colors.text.secondary,
     lineHeight: 20,
   },
   reasoningContainer: {
@@ -1386,8 +1547,19 @@ const styles = StyleSheet.create({
   },
   reasoningText: {
     fontSize: 14,
-    color: theme.colors.text,
+    color: theme.colors.text.primary,
     lineHeight: 20,
+  },
+  locationButton: {
+    marginTop: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.lg,
+    backgroundColor: theme.colors.primary.main,
+    borderRadius: theme.radius.sm,
+  },
+  locationButtonText: {
+    color: theme.colors.text.inverse,
+    fontWeight: '600',
   },
 });
 
