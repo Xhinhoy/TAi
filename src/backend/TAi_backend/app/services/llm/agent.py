@@ -4,6 +4,7 @@ from langgraph.graph.message import add_messages
 from typing import Annotated, Sequence, TypedDict
 from langchain_core.messages import BaseMessage, SystemMessage, HumanMessage, ToolMessage, AIMessage
 from langchain_core.runnables import RunnableConfig
+from datetime import datetime
 from app.core.config import settings
 from app.utils.cache import firebase_cache
 from .tools import (
@@ -458,43 +459,88 @@ Genera AHORA el JSON basándote en el itinerario que describiste.
         return json_str
 
     def _save_itinerary_to_firestore(self, itinerary_data: dict, city: str = None) -> str:
-        """Guarda el itinerario en Firestore y retorna el ID"""
+        """Normaliza el itinerario al formato esperado y lo guarda."""
         try:
             from app.repositories.itinerary_repository import itinerary_repository
+            from datetime import datetime
+            import re
 
-            logger.info(f"💾 Guardando itinerario en Firestore...")
-            logger.info(f"📦 Datos recibidos: {list(itinerary_data.keys())}")
+            logger.info("💾 Guardando itinerario en Firestore...")
+            title = itinerary_data.get("title", "Itinerario generado")
+            days_list = itinerary_data.get("days", [])
 
-            # Extraer la ciudad del título o usar la proporcionada
-            title = itinerary_data.get('title', 'Itinerario generado')
+            # Determinar ciudad
             if not city:
-                city = 'Ciudad'
-                if title:
-                    import re
-                    match = re.search(r'en\s+(.+)$', title, re.IGNORECASE)
-                    if match:
-                        city = match.group(1).strip()
+                city = itinerary_data.get("city")
+            if not city and title:
+                match = re.search(r"en\s+(.+)$", title, re.IGNORECASE)
+                if match:
+                    city = match.group(1).strip()
+            city = city or "Ciudad"
 
-            logger.info(f"📍 Ciudad: {city}, Título: {title}")
+            # Normalizar días y actividades al formato esperado
+            normalized_days = []
+            for day_entry in days_list:
+                day_number = day_entry.get("day") or day_entry.get("numero") or day_entry.get("dia")
+                try:
+                    day_number = int(day_number)
+                except Exception:
+                    day_number = None
 
-            # Convertir días del itinerario a estructura de Firestore
-            days_list = itinerary_data.get('days', [])
-            logger.info(f"📅 Procesando {len(days_list)} días...")
+                activities = []
+                for act in day_entry.get("activities", []):
+                    price_level = act.get("price_level")
+                    price_display = act.get("price_display")
 
-            # Preparar datos para guardar directamente
+                    if price_display is None and price_level is not None:
+                        try:
+                            level_int = int(price_level)
+                        except Exception:
+                            level_int = None
+
+                        price_display_map = {
+                            0: "Gratis",
+                            1: "$",
+                            2: "$$",
+                            3: "$$$",
+                            4: "$$$$",
+                        }
+                        price_display = price_display_map.get(level_int)
+
+                    activities.append({
+                        "start": act.get("start"),
+                        "end": act.get("end"),
+                        "notes": act.get("notes"),
+                        "place_id": act.get("place_id"),
+                        "place_name": act.get("place_name"),
+                        "price_display": price_display,
+                        "price_level": price_level,
+                    })
+
+                normalized_days.append({
+                    "day": day_number if day_number else len(normalized_days) + 1,
+                    "activities": activities,
+                })
+
             itinerary_to_save = {
-                'title': title,
-                'city': city,
-                'days': days_list,  # Guardar la estructura completa de días
-                'owner_uid': self.user_id
+                "title": title,
+                "city": city,
+                "days": normalized_days,
+                "owner_uid": self.user_id,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow(),
             }
 
-            logger.info(f"💼 Estructura a guardar: title={title}, city={city}, days={len(days_list)}, owner={self.user_id}")
+            # Validar fecha obligatoria
+            start_date = itinerary_data.get("start_date")
+            if not start_date:
+                raise ValueError("start_date es obligatorio para los itinerarios")
 
-            # Guardar en Firestore
+            # Guardar fecha (string ISO)
+            itinerary_to_save["start_date"] = start_date
+
             itinerary_id = itinerary_repository.create_itinerary(itinerary_to_save)
             logger.info(f"✅ Itinerario guardado en Firestore con ID: {itinerary_id}")
-
             return itinerary_id
 
         except Exception as e:
@@ -643,7 +689,8 @@ Genera AHORA el JSON basándote en el itinerario que describiste.
         try:
             # Usar CHAT_PROMPT para modo chatbot conversacional con perfil del usuario
             system_prompt = CHAT_PROMPT.format(
-                user_profile=json.dumps(self.user_profile, indent=2)
+                user_profile=json.dumps(self.user_profile, indent=2),
+                current_date=datetime.utcnow().strftime("%Y-%m-%d")
             )
 
             logger.info(f"Chat con Google AI ({settings.GOOGLE_MODEL}) para user {self.user_id}...")

@@ -10,21 +10,33 @@ logger = logging.getLogger(__name__)
 class ItineraryService:
     def get_user_itineraries(self, uid: str) -> List[Itinerary]:
         results = itinerary_repository.get_user_itineraries(uid)
-        return [Itinerary(**r) for r in results]
+        normalized = []
+        for r in results:
+            # Datos antiguos pueden no tener start_date; dejar en None para no romper lectura
+            if 'start_date' not in r:
+                r['start_date'] = None
+            normalized.append(Itinerary(**r))
+        return normalized
 
     def get_itinerary_by_id(self, itinerary_id: str) -> Optional[Itinerary]:
         result = itinerary_repository.get(itinerary_id)
         if result:
+            if 'start_date' not in result:
+                result['start_date'] = None
             return Itinerary(**result)
         return None
     
     def create_itinerary(self, uid: str, itinerary: ItineraryCreate) -> Itinerary:
         data = itinerary.model_dump()
+        if not data.get('start_date'):
+            raise ValueError("start_date es obligatorio")
         data['owner_uid'] = uid
         itinerary_id = itinerary_repository.create_itinerary(data)
         return Itinerary(id=itinerary_id, **data)
     
     def update_itinerary(self, itinerary_id: str, itinerary: ItineraryCreate) -> bool:
+        if not itinerary.start_date:
+            raise ValueError("start_date es obligatorio")
         return itinerary_repository.update_itinerary(itinerary_id, itinerary.model_dump())
     
     def delete_itinerary(self, itinerary_id: str) -> bool:
@@ -88,7 +100,8 @@ class ItineraryService:
             itinerary = ItineraryCreate(
                 title=final_title,
                 city=request.city,
-                days=days_list
+                days=days_list,
+                start_date=request.start_date
             )
 
             return self.create_itinerary(user_id, itinerary)

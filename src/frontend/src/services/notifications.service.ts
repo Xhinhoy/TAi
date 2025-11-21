@@ -44,6 +44,25 @@ export class NotificationsService {
       const startDate = new Date(itinerary.start_date);
       const daysUntilStart = Math.ceil((startDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
+      // Burbuja principal de conteo regresivo (solo la más próxima)
+      if (daysUntilStart >= 0 && daysUntilStart <= 7) {
+        const countdownId = `itinerary-countdown-${itinerary.id}`;
+        reminders.push({
+          id: countdownId,
+          type: 'itinerary_reminder',
+          title: 'Próximo viaje',
+          message: daysUntilStart === 0
+            ? `Hoy inicia tu viaje a ${itinerary.city}. ¡Buen viaje!`
+            : `Faltan ${daysUntilStart} día${daysUntilStart === 1 ? '' : 's'} para tu viaje a ${itinerary.city} (inicio ${startDate.toLocaleDateString()}).`,
+          timestamp: now,
+          priority: daysUntilStart <= 2 ? 'high' : 'medium',
+          icon: 'airplane-takeoff',
+          actionText: 'Ver itinerario',
+          onAction: () => console.log('Open itinerary', itinerary.id),
+          read: false,
+        });
+      }
+
       // Notificación 7 días antes
       if (daysUntilStart === 7) {
         reminders.push({
@@ -65,12 +84,28 @@ export class NotificationsService {
         reminders.push({
           id: `itinerary-reminder-3d-${itinerary.id}`,
           type: 'itinerary_reminder',
-          title: 'Viaje en 3 días',
-          message: `Tu aventura en ${itinerary.city} está cerca. Revisa tu itinerario.`,
+          title: 'Prepara tus maletas',
+          message: `Comienza a ordenar tus maletas, se aproxima tu viaje a ${itinerary.city} el ${startDate.toLocaleDateString()}.`,
           timestamp: now,
           priority: 'high',
           icon: 'airplane-takeoff',
           actionText: 'Ver detalles',
+          onAction: () => console.log('Open itinerary', itinerary.id),
+          read: false,
+        });
+      }
+
+      // Notificación 2 días antes
+      if (daysUntilStart === 2) {
+        reminders.push({
+          id: `itinerary-reminder-2d-${itinerary.id}`,
+          type: 'itinerary_reminder',
+          title: 'Prepara tus maletas',
+          message: `Comienza a ordenar tus maletas, se aproxima tu viaje a ${itinerary.city} el ${startDate.toLocaleDateString()}.`,
+          timestamp: now,
+          priority: 'high',
+          icon: 'bag-suitcase',
+          actionText: 'Revisar checklist',
           onAction: () => console.log('Open itinerary', itinerary.id),
           read: false,
         });
@@ -81,8 +116,8 @@ export class NotificationsService {
         reminders.push({
           id: `itinerary-reminder-1d-${itinerary.id}`,
           type: 'itinerary_reminder',
-          title: '¡Mañana empieza tu viaje!',
-          message: `${itinerary.city} te espera. Última revisión de tu itinerario.`,
+          title: 'Prepara tus maletas',
+          message: `Comienza a ordenar tus maletas, se aproxima tu viaje a ${itinerary.city} el ${startDate.toLocaleDateString()}.`,
           timestamp: now,
           priority: 'high',
           icon: 'bag-checked',
@@ -97,8 +132,8 @@ export class NotificationsService {
         reminders.push({
           id: `itinerary-reminder-today-${itinerary.id}`,
           type: 'itinerary_reminder',
-          title: '¡Hoy empieza tu aventura!',
-          message: `Tu viaje a ${itinerary.city} comienza hoy. ¡Disfruta!`,
+          title: 'Prepara tus maletas',
+          message: `Comienza a ordenar tus maletas, se aproxima tu viaje a ${itinerary.city} el ${startDate.toLocaleDateString()}.`,
           timestamp: now,
           priority: 'high',
           icon: 'party-popper',

@@ -91,6 +91,13 @@ export interface PlacesSearchParams {
   place_type?: string; // type of place
 }
 
+export interface PlacesNearbyParams {
+  latitude: number;
+  longitude: number;
+  radius?: number;
+  type?: string;
+}
+
 export const placesService = {
   /**
    * Search places with filters and location
@@ -106,6 +113,29 @@ export const placesService = {
   async getDetails(placeId: string) {
     const response = await api.get(`/places/${placeId}`);
     return response.data;
+  },
+
+  /**
+  * Search nearby places by geolocation (wrapper for /places/search).
+  */
+  async searchNearby(params: PlacesNearbyParams): Promise<Place[]> {
+    const { latitude, longitude, radius = 500, type } = params;
+    const response = await api.get('/places/search', {
+      params: {
+        lat: latitude,
+        lng: longitude,
+        radius,
+        place_type: type,
+      },
+    });
+    return response.data;
+  },
+
+  /**
+  * Alias for searchNearby to keep backward compatibility.
+  */
+  async nearby(params: PlacesNearbyParams): Promise<Place[]> {
+    return this.searchNearby(params);
   },
 
   /**
@@ -144,27 +174,55 @@ export const recommendationsService = {
     const response = await api.post('/recommendations/generate', params);
     return response.data;
   },
+
+  /**
+   * Personalized recommendations for a user
+   */
+  async getPersonalized(params: RecommendationsRequest) {
+    // Alias to the single backend endpoint; keeps backward compatibility
+    const response = await api.post('/recommendations/generate', params);
+    return response.data;
+  },
 };
 
 // ============================================================================
 // ITINERARIES SERVICE
 // ============================================================================
 
+export interface ItineraryActivityRequest {
+  place_id: string;
+  place_name: string;
+  start: string;
+  end: string;
+  price_level?: number;
+  price_display?: string;
+  notes?: string;
+}
+
+export interface ItineraryDayRequest {
+  day: number;
+  activities: ItineraryActivityRequest[];
+}
+
 export interface CreateItineraryRequest {
   title: string;
-  description?: string;
-  days: number;
-  preferences?: {
-    budget?: string;
-    interests?: string[];
-  };
+  city: string;
+  days: ItineraryDayRequest[];
+  start_date: string;
+  reasoning?: string;
 }
 
 export interface GenerateItineraryRequest {
   city: string;
   days: number;
+  start_date: string;
   interests?: string[];
   budget?: string;
+  // Compatibilidad con llamadas existentes
+  user_id?: string;
+  destination?: string;
+  end_date?: string;
+  preferences?: any;
 }
 
 export const itinerariesService = {
@@ -284,9 +342,9 @@ export const chatService = {
   /**
    * Connect to WebSocket for real-time chat
    */
-  connectWebSocket(userId: string, sessionId: string): WebSocket {
+  connectWebSocket(userId: string, sessionId: string, token: string): WebSocket {
     const wsUrl = api.defaults.baseURL?.replace('http', 'ws').replace('/api/v1', '');
-    const ws = new WebSocket(`${wsUrl}/api/v1/chat/ws/${userId}/${sessionId}`);
+    const ws = new WebSocket(`${wsUrl}/api/v1/chat/ws/${userId}/${sessionId}?token=${encodeURIComponent(token)}`);
     return ws;
   },
 };

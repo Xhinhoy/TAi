@@ -21,22 +21,8 @@ import {
   onAuthStateChanged,
   User as FirebaseUser,
 } from 'firebase/auth';
-import {
-  collection,
-  doc,
-  setDoc,
-  getDoc,
-  onSnapshot,
-  updateDoc,
-  addDoc,
-  query,
-  orderBy,
-  limit,
-  Timestamp,
-} from 'firebase/firestore';
-
 // Import Firebase services
-import { auth, db } from '../../services/firebase';
+import { auth } from '../../services/firebase';
 
 // Import components and services
 import { theme } from '../../styles/theme';
@@ -44,7 +30,7 @@ import { AnimatedPressable } from '../../components/ui/AnimatedPressable';
 import { usePreferences } from '../../contexts/PreferencesContext';
 import { localRecommendationsService, PlaceRecommendation } from '../../services/recommendations.service';
 import { TOURIST_INTERESTS } from '../../components/ui/InterestSelector';
-import { itinerariesService } from '../../api/services';
+import { itinerariesService, usersService } from '../../api/services';
 import { useNavigation } from '@react-navigation/native';
 import { NotificationBubble } from '../../components/Notifications/NotificationBubble';
 import { useNotifications } from '../../hooks/useNotifications';
@@ -57,6 +43,7 @@ interface Itinerary {
   title: string;
   city: string;
   days: any[];
+  start_date?: string;
   created_at: string;
   user_id?: string;
 }
@@ -66,7 +53,7 @@ interface Favorite {
   title: string;
   subtitle: string;
   placeId: string;
-  createdAt: Timestamp;
+  createdAt: string;
 }
 
 
@@ -96,9 +83,10 @@ const InterestBadge: React.FC<InterestBadgeProps> = ({ interest }) => {
 interface RecommendationCardProps {
   recommendation: PlaceRecommendation;
   onPress: () => void;
+  onFavorite: () => void;
 }
 
-const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation, onPress }) => {
+const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation, onPress, onFavorite }) => {
   const getPriceText = (priceLevel?: number) => {
     if (!priceLevel) return 'Precio no disponible';
     return '$'.repeat(priceLevel) + '$'.repeat(Math.max(0, 4 - priceLevel));
@@ -215,6 +203,11 @@ const RecommendationCard: React.FC<RecommendationCardProps> = ({ recommendation,
             {Math.round(recommendation.matchScore * 100)}% match
           </Text>
         </View>
+
+        <AnimatedPressable style={styles.favoriteButton} onPress={onFavorite}>
+          <MaterialCommunityIcons name="heart-plus" size={16} color={theme.colors.error.main} />
+          <Text style={styles.favoriteButtonText}>Favorito</Text>
+        </AnimatedPressable>
       </View>
     </AnimatedPressable>
   );
@@ -235,45 +228,47 @@ const CardItinerario: React.FC<CardItinerarioProps> = ({ itinerary, onPress, onD
   };
 
   return (
-    <AnimatedPressable
-      style={styles.itineraryCard}
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={`Itinerario ${itinerary.title}`}
-    >
-      <View style={styles.itineraryImageContainer}>
-        <View style={[styles.itineraryImage, styles.itineraryImagePlaceholder]}>
-          <MaterialCommunityIcons
-            name="map-marker-path"
-            size={32}
-            color={theme.colors.primary.main}
-          />
+    <View style={{ position: 'relative' }}>
+      <AnimatedPressable
+        style={styles.itineraryCard}
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={`Itinerario ${itinerary.title}`}
+      >
+        <View style={styles.itineraryImageContainer}>
+          <View style={[styles.itineraryImage, styles.itineraryImagePlaceholder]}>
+            <MaterialCommunityIcons
+              name="map-marker-path"
+              size={32}
+              color={theme.colors.primary.main}
+            />
+          </View>
+          <View style={styles.itineraryDateBadge}>
+            <MaterialCommunityIcons name="calendar-range" size={10} color="#fff" />
+            <Text style={styles.itineraryDateText}> {daysCount}d</Text>
+          </View>
         </View>
-        <View style={styles.itineraryDateBadge}>
-          <MaterialCommunityIcons name="calendar-range" size={10} color="#fff" />
-          <Text style={styles.itineraryDateText}> {daysCount}d</Text>
-        </View>
-      </View>
-      <View style={styles.itineraryContent}>
-        <Text style={styles.itineraryCity} numberOfLines={2}>
-          {itinerary.title}
-        </Text>
-        <View style={styles.itineraryMeta}>
-          <MaterialCommunityIcons
-            name="map-marker"
-            size={12}
-            color={theme.colors.text.secondary}
-          />
-          <Text style={styles.itineraryMetaText} numberOfLines={1}>
-            {itinerary.city}
+        <View style={styles.itineraryContent}>
+          <Text style={styles.itineraryCity} numberOfLines={2}>
+            {itinerary.title}
           </Text>
+          <View style={styles.itineraryMeta}>
+            <MaterialCommunityIcons
+              name="map-marker"
+              size={12}
+              color={theme.colors.text.secondary}
+            />
+            <Text style={styles.itineraryMetaText} numberOfLines={1}>
+              {itinerary.city}
+            </Text>
+          </View>
         </View>
-      </View>
+      </AnimatedPressable>
 
-      {/* Botón de eliminar */}
-      <View
+      {/* Botón de eliminar (hermano, no hijo del botón principal) */}
+      <AnimatedPressable
         style={styles.deleteItineraryButton}
-        onTouchEnd={handleDelete}
+        onPress={handleDelete}
         accessibilityRole="button"
         accessibilityLabel="Eliminar itinerario"
       >
@@ -282,8 +277,8 @@ const CardItinerario: React.FC<CardItinerarioProps> = ({ itinerary, onPress, onD
           size={20}
           color={theme.colors.error}
         />
-      </View>
-    </AnimatedPressable>
+      </AnimatedPressable>
+    </View>
   );
 };
 
@@ -295,6 +290,7 @@ const HomeScreen: React.FC = () => {
   const [recommendations, setRecommendations] = useState<PlaceRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItinerary, setSelectedItinerary] = useState<Itinerary | null>(null);
+  const [allItinerariesVisible, setAllItinerariesVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const navigation = useNavigation();
@@ -336,6 +332,24 @@ const HomeScreen: React.FC = () => {
     }
   };
 
+  // Load favorites via backend (avoids Firestore client-permission issues)
+  const loadFavorites = async (userId: string) => {
+    try {
+      const data = await usersService.getFavorites(userId);
+      const mapped: Favorite[] = (data || []).map((fav: any) => ({
+        id: fav.id || fav.place_id || fav.placeId || 'fav',
+        title: fav.title || fav.place_data?.title || fav.place_data?.name || 'Favorito',
+        subtitle: fav.subtitle || fav.place_data?.subtitle || fav.place_data?.address || '',
+        placeId: fav.place_id || fav.placeId || fav.id,
+        createdAt: fav.added_at || fav.created_at || new Date().toISOString(),
+      }));
+      setFavorites(mapped.slice(0, 8));
+    } catch (error) {
+      console.error('Error cargando favoritos:', error);
+      setFavorites([]);
+    }
+  };
+
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setUser(user);
@@ -373,23 +387,21 @@ const HomeScreen: React.FC = () => {
       if (user) {
         console.log('🔄 Pantalla Home enfocada - recargando itinerarios...');
         loadItineraries(user.uid);
+        loadFavorites(user.uid);
       }
     }, [user])
   );
 
-// Generate recommendations once per session or when interests truly change
+// Generate recommendations when user/interests are ready
 useEffect(() => {
-  let hasFetched = false;
+  if (!user || preferences.interests.length === 0) {
+    setRecommendations([]);
+    return;
+  }
+
+  let cancelled = false;
 
   const generateRecommendations = async () => {
-    if (hasFetched) return;
-    hasFetched = true;
-
-    if (!user || preferences.interests.length === 0) {
-      setRecommendations([]);
-      return;
-    }
-
     try {
       const recs = await localRecommendationsService.generateRecommendations(
         preferences,
@@ -397,19 +409,23 @@ useEffect(() => {
         undefined,
         10
       );
-      setRecommendations(recs);
+      if (!cancelled) {
+        setRecommendations(recs);
+      }
     } catch (error) {
       console.error('Error generating recommendations:', error);
-      setRecommendations([]);
+      if (!cancelled) {
+        setRecommendations([]);
+      }
     }
   };
 
-  // Ejecutar una vez con un ligero delay (evita render conflict)
   const timeout = setTimeout(() => generateRecommendations(), 300);
-
-  return () => clearTimeout(timeout);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []); // 👈 Se ejecuta solo una vez
+  return () => {
+    cancelled = true;
+    clearTimeout(timeout);
+  };
+}, [user, preferences]);
 
 
   const setupUserData = async (user: FirebaseUser) => {
@@ -417,28 +433,10 @@ useEffect(() => {
       // Cargar itinerarios desde el backend
       await loadItineraries(user.uid);
 
-      // Setup real-time listeners para favoritos
-      // (Los itinerarios se cargan una vez al inicio)
-
-      const favoritesQuery = query(
-        collection(db, 'users', user.uid, 'favorites'),
-        orderBy('createdAt', 'desc'),
-        limit(8)
-      );
-      const unsubscribeFavorites = onSnapshot(favoritesQuery, (snapshot) => {
-        const favoritesData: Favorite[] = [];
-        snapshot.forEach((doc) => {
-          favoritesData.push({ id: doc.id, ...doc.data() } as Favorite);
-        });
-        setFavorites(favoritesData);
-      });
+      // Cargar favoritos desde backend (evita errores de permisos en Firestore del cliente)
+      await loadFavorites(user.uid);
 
       setLoading(false);
-
-      // Cleanup function
-      return () => {
-        unsubscribeFavorites();
-      };
     } catch (error) {
       console.error('Error setting up user data:', error);
       setLoading(false);
@@ -503,37 +501,22 @@ useEffect(() => {
   };
 
 
-  const handleLoadDemo = async () => {
+  const handleAddFavorite = async (place: PlaceRecommendation) => {
     if (!user) return;
-
     try {
-      // Add demo itineraries
-      const itinerariesRef = collection(db, 'users', user.uid, 'itineraries');
-      const demoItineraries = [
-        { city: 'Providencia', dateISO: '2024-03-15', createdAt: Timestamp.now() },
-        { city: 'Las Condes', dateISO: '2024-04-20', createdAt: Timestamp.now() },
-        { city: 'Ñuñoa', dateISO: '2024-05-10', createdAt: Timestamp.now() },
-      ];
-
-      for (const itinerary of demoItineraries) {
-        await addDoc(itinerariesRef, itinerary);
-      }
-
-      // Add demo favorites
-      const favoritesRef = collection(db, 'users', user.uid, 'favorites');
-      const demoFavorites = [
-        { title: 'Cerro San Cristóbal', subtitle: 'Santiago, Chile', placeId: 'place1', createdAt: Timestamp.now() },
-        { title: 'Museo Bellas Artes', subtitle: 'Santiago Centro, Chile', placeId: 'place2', createdAt: Timestamp.now() },
-        { title: 'Barrio Bellavista', subtitle: 'Santiago, Chile', placeId: 'place3', createdAt: Timestamp.now() },
-        { title: 'Costanera Center', subtitle: 'Providencia, Chile', placeId: 'place4', createdAt: Timestamp.now() },
-        { title: 'Mercado Central', subtitle: 'Santiago Centro, Chile', placeId: 'place5', createdAt: Timestamp.now() },
-      ];
-
-      for (const favorite of demoFavorites) {
-        await addDoc(favoritesRef, favorite);
-      }
+      const placeId = place.id || place.placeId || place.name;
+      await usersService.addFavorite(user.uid, placeId, {
+        title: place.name,
+        subtitle: place.address || place.reason || '',
+        address: place.address || '',
+        rating: place.rating || 0,
+        types: place.types || [],
+      });
+      Alert.alert('Agregado a favoritos', `${place.name} se ha guardado en tus favoritos.`);
+      await loadFavorites(user.uid);
     } catch (error) {
-      console.error('Error loading demo data:', error);
+      console.error('Error al agregar favorito:', error);
+      Alert.alert('Error', 'No se pudo agregar a favoritos (permisos o conexión). Intenta de nuevo.');
     }
   };
 
@@ -614,6 +597,7 @@ useEffect(() => {
                     key={recommendation.id}
                     recommendation={recommendation}
                     onPress={() => console.log('Open recommendation:', recommendation.id)}
+                    onFavorite={() => handleAddFavorite(recommendation)}
                   />
                 ))}
               </ScrollView>
@@ -644,7 +628,7 @@ useEffect(() => {
             <View style={styles.subsectionHeader}>
               <Text style={styles.subsectionTitle}>Itinerarios guardados</Text>
               {itineraries.length > 0 && (
-                <Pressable onPress={() => console.log('Ver todos los itinerarios')}>
+                <Pressable onPress={() => setAllItinerariesVisible(true)}>
                   <Text style={styles.seeAllText}>Ver todos</Text>
                 </Pressable>
               )}
@@ -742,22 +726,6 @@ useEffect(() => {
           </View>
         </View>
 
-        {/* Demo Button */}
-        {(itineraries.length === 0 || favorites.length === 0) && (
-          <View style={styles.demoSection}>
-            <AnimatedPressable
-              onPress={handleLoadDemo}
-              style={styles.demoButton}
-            >
-              <MaterialCommunityIcons
-                name="magic-staff"
-                size={20}
-                color={theme.colors.text.inverse}
-              />
-              <Text style={styles.demoButtonText}>Cargar datos de demo</Text>
-            </AnimatedPressable>
-          </View>
-        )}
       </ScrollView>
 
       {/* Modal de Itinerario */}
@@ -834,6 +802,53 @@ useEffect(() => {
         onNotificationDismiss={dismiss}
         onClearAll={clearAll}
       />
+
+      {/* Modal ver todos los itinerarios */}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={allItinerariesVisible}
+        onRequestClose={() => setAllItinerariesVisible(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity
+              onPress={() => setAllItinerariesVisible(false)}
+              style={styles.closeButton}
+            >
+              <MaterialCommunityIcons name="close" size={28} color={theme.colors.text} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Todos los itinerarios</Text>
+            <View style={styles.modalHeaderRight} />
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            {itineraries.map((itinerary) => (
+              <CardItinerario
+                key={itinerary.id}
+                itinerary={itinerary}
+                onPress={() => {
+                  setAllItinerariesVisible(false);
+                  handleOpenItinerary(itinerary);
+                }}
+                onDelete={handleDeleteItinerary}
+              />
+            ))}
+            {itineraries.length === 0 && (
+              <View style={styles.emptyState}>
+                <MaterialCommunityIcons
+                  name="map-outline"
+                  size={48}
+                  color={theme.colors.textLight}
+                />
+                <Text style={styles.emptyStateText}>
+                  No tienes itinerarios guardados
+                </Text>
+              </View>
+            )}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -1236,6 +1251,23 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '600',
     color: theme.colors.text.inverse,
+  },
+  favoriteButton: {
+    marginTop: theme.spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: 8,
+    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.md,
+    borderWidth: 1,
+    borderColor: theme.colors.error.main,
+  },
+  favoriteButtonText: {
+    color: theme.colors.error.main,
+    fontWeight: '600',
   },
   // Modal styles
   modalContainer: {

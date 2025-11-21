@@ -24,6 +24,7 @@ class Itinerary(BaseModel):
     city: str
     days: List[ItineraryDay]  # Array de días con actividades
     owner_uid: str
+    start_date: Optional[str] = None  # opcional al leer (datos antiguos); ver validación en creación
     reasoning: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
@@ -45,10 +46,11 @@ class ItineraryCreate(BaseModel):
     title: str
     city: str
     days: List[ItineraryDay]
+    start_date: str  # obligatorio al crear/actualizar
 
 class ItineraryGenerateRequest(BaseModel):
     title: Optional[str] = None  # Opcional - si no se proporciona, se genera automáticamente
     city: str
     days: int  # Número de días (se convierte a lista de días en el servicio)
-    start_date: Optional[str] = None
+    start_date: str  # obligatorio al generar
     preferences: Optional[Dict] = None

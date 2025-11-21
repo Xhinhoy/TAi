@@ -36,6 +36,14 @@ class ChatService:
             
             # Obtener respuesta
             result = await agent.chat(request.message)
+
+            # Si se guardó un itinerario, avisar explícitamente al usuario
+            if result.get("saved_itinerary_id"):
+                save_notice = (
+                    f"\n\n💾 Itinerario guardado con ID: {result['saved_itinerary_id']} "
+                    "Lo puedes ver en tus itinerarios."
+                )
+                result["response"] = f"{result.get('response','')}{save_notice}"
             
             # Guardar respuesta
             chat_repository.save_message(

@@ -330,6 +330,7 @@ const ChatScreen: React.FC = () => {
   const [sessionId, setSessionId] = useState<string>(() => `session-${Date.now()}`);
   const [isTyping, setIsTyping] = useState(false);
   const [ws, setWs] = useState<WebSocket | null>(null);
+  const [wsDisabled, setWsDisabled] = useState(false); // Si el WS falla (p.ej. en móvil), caemos a HTTP
   const [sidebarVisible, setSidebarVisible] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const sidebarRef = useRef<ChatSidebarRef>(null);
@@ -386,90 +387,105 @@ const ChatScreen: React.FC = () => {
 
   // WebSocket connection (works on web, iOS, and Android)
   useEffect(() => {
-    if (!user || !sessionId) return;
+    if (!user || !sessionId || wsDisabled) return;
 
     try {
-      const websocket = chatService.connectWebSocket(user.uid, sessionId);
+      const connect = async () => {
+        const token = await user.getIdToken();
+        const websocket = chatService.connectWebSocket(user.uid, sessionId, token);
 
-      websocket.onopen = () => {
-        console.log('✅ WebSocket connected on', Platform.OS);
-        setWs(websocket);
-      };
+        websocket.onopen = () => {
+          console.log('✅ WebSocket connected on', Platform.OS);
+          setWs(websocket);
+        };
 
-      websocket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
+        websocket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
 
-          if (data.type === 'typing') {
-            setIsTyping(data.isTyping);
-          } else if (data.response) {
-            console.log('📦 Mensaje WebSocket recibido:', data);
+            if (data.type === 'typing') {
+              setIsTyping(data.isTyping);
+            } else if (data.response) {
+              console.log('📦 Mensaje WebSocket recibido:', data);
 
-            // Extraer contenido limpio (por si el backend devuelve objeto LangChain)
-            let cleanResponse = data.response;
-            if (typeof data.response === 'object' && data.response.content) {
-              console.log('⚠️ WebSocket: Backend devolvió objeto LangChain, extrayendo contenido...');
-              cleanResponse = data.response.content;
+              // Extraer contenido limpio (por si el backend devuelve objeto LangChain)
+              let cleanResponse = data.response;
+              if (typeof data.response === 'object' && data.response.content) {
+                console.log('⚠️ WebSocket: Backend devolvió objeto LangChain, extrayendo contenido...');
+                cleanResponse = data.response.content;
+              }
+
+              const assistantMessage: Message = {
+                id: Date.now().toString(),
+                role: 'assistant',
+                content: cleanResponse,
+                isUser: false,
+                places: data.places || [],
+                actions: data.actions || [],
+                itinerary: data.itinerary || null,
+              };
+              setMessages(prev => [...prev, assistantMessage]);
+              setIsTyping(false);
+              setLoading(false);
+
+              // Refresh automático del sidebar después de recibir mensaje por WebSocket
+              setTimeout(() => {
+                if (sidebarRef.current) {
+                  sidebarRef.current.refresh();
+                }
+              }, 1000);
             }
-
-            const assistantMessage: Message = {
-              id: Date.now().toString(),
-              role: 'assistant',
-              content: cleanResponse,
-              isUser: false,
-              places: data.places || [],
-              actions: data.actions || [],
-              itinerary: data.itinerary || null,
-            };
-            setMessages(prev => [...prev, assistantMessage]);
+          } catch (error) {
+            console.error('❌ Error parsing WebSocket message:', error);
             setIsTyping(false);
             setLoading(false);
-
-            // Refresh automático del sidebar después de recibir mensaje por WebSocket
-            setTimeout(() => {
-              if (sidebarRef.current) {
-                sidebarRef.current.refresh();
-              }
-            }, 1000);
           }
-        } catch (error) {
-          console.error('❌ Error parsing WebSocket message:', error);
-          setIsTyping(false);
-          setLoading(false);
-        }
+        };
+
+        websocket.onerror = (error) => {
+          console.error('❌ WebSocket error:', error);
+          // Don't set ws to null here, let onclose handle it
+        };
+
+        websocket.onclose = (event) => {
+          console.log('🔌 WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
+          setWs(null);
+
+          // Si el cierre fue anómalo, desactivamos WS para esta sesión y usamos HTTP
+          if (event.code === 1006) {
+            console.log('⚠️ WebSocket falló (1006). Usaremos HTTP para este chat.');
+            setWsDisabled(true);
+            setIsTyping(false);
+            setLoading(false);
+            return;
+          }
+
+          // Auto-reconnect after 3 seconds if it wasn't a normal closure
+          if (event.code !== 1000 && user && sessionId) {
+            console.log('🔄 Attempting to reconnect in 3 seconds...');
+            setTimeout(() => {
+              if (!ws || ws.readyState === WebSocket.CLOSED) {
+                console.log('🔄 Reconnecting WebSocket...');
+                // The useEffect will handle reconnection on next render
+              }
+            }, 3000);
+          }
+        };
+
+        return () => {
+          if (websocket.readyState === WebSocket.OPEN || websocket.readyState === WebSocket.CONNECTING) {
+            websocket.close(1000, 'Component unmounting');
+          }
+        };
       };
 
-      websocket.onerror = (error) => {
-        console.error('❌ WebSocket error:', error);
-        // Don't set ws to null here, let onclose handle it
-      };
-
-      websocket.onclose = (event) => {
-        console.log('🔌 WebSocket disconnected. Code:', event.code, 'Reason:', event.reason);
-        setWs(null);
-
-        // Auto-reconnect after 3 seconds if it wasn't a normal closure
-        if (event.code !== 1000 && user && sessionId) {
-          console.log('🔄 Attempting to reconnect in 3 seconds...');
-          setTimeout(() => {
-            if (!ws || ws.readyState === WebSocket.CLOSED) {
-              console.log('🔄 Reconnecting WebSocket...');
-              // The useEffect will handle reconnection on next render
-            }
-          }, 3000);
-        }
-      };
-
-      return () => {
-        if (websocket.readyState === WebSocket.OPEN || websocket.readyState === WebSocket.CONNECTING) {
-          websocket.close(1000, 'Component unmounting');
-        }
-      };
+      connect();
     } catch (error) {
       console.error('❌ Error connecting WebSocket:', error);
       console.log('⚠️ Falling back to HTTP requests');
+      setWsDisabled(true);
     }
-  }, [user, sessionId]);
+  }, [user, sessionId, wsDisabled]);
 
   useEffect(() => {
     // Scroll to bottom when new messages arrive
@@ -497,7 +513,7 @@ const ChatScreen: React.FC = () => {
     setLoading(true);
 
     // If WebSocket is connected, send through it
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (!wsDisabled && ws && ws.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({
         message: messageText,
         user_id: user.uid,
@@ -803,31 +819,35 @@ const ChatScreen: React.FC = () => {
         }
       }
 
-      // Convertir los días del itinerario a items
-      const items = [];
-      if (Array.isArray(itinerary.days)) {
-        for (const day of itinerary.days) {
-          if (day.activities && Array.isArray(day.activities)) {
-            for (const activity of day.activities) {
-              items.push({
-                day: day.day,
-                place_id: activity.place_id || `place_${Date.now()}`,
-                place_name: activity.place_name || 'Lugar sin nombre',
-                start: activity.start || '09:00',
-                end: activity.end || '10:00',
-                notes: activity.notes || '',
-              });
-            }
-          }
-        }
-      }
+      // Normalizar días/actividades al formato del backend
+      const daysPayload = Array.isArray(itinerary.days)
+        ? itinerary.days.map((day: any, idx: number) => ({
+            day: day.day ?? idx + 1,
+            activities: Array.isArray(day.activities)
+              ? day.activities.map((activity: any, aIdx: number) => ({
+                  place_id: activity.place_id || `place_${Date.now()}_${idx}_${aIdx}`,
+                  place_name: activity.place_name || 'Lugar sin nombre',
+                  start: activity.start || '09:00',
+                  end: activity.end || '10:00',
+                  price_level: typeof activity.price_level === 'number' ? activity.price_level : 0,
+                  price_display: activity.price_display || (activity.price_level ? '$'.repeat(activity.price_level) : 'Gratis'),
+                  notes: activity.notes || '',
+                }))
+              : [],
+          }))
+        : [];
+
+      const startDate =
+        itinerary.start_date ||
+        new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10); // fallback: mañana
 
       // Guardar en el backend
       const savedItinerary = await itinerariesService.create(user.uid, {
         title: itinerary.title || 'Itinerario sin título',
-        city: city,
-        days: Array.isArray(itinerary.days) ? itinerary.days.length : 1,
-        items: items,
+        city,
+        days: daysPayload,
+        start_date: startDate,
+        reasoning: itinerary.reasoning,
       });
 
       Alert.alert(

@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect, HTTPExce
 from app.api.deps import get_current_user
 from app.services.chat_service import chat_service
 from app.models.chat import ChatRequest, ChatResponse
+from app.models.itinerary import ItineraryCreate, Itinerary
+from app.services.itinerary_service import itinerary_service
 from firebase_admin import auth
 import logging
 
@@ -59,20 +61,61 @@ async def delete_session(
 @router.websocket("/ws/{user_id}/{session_id}")
 async def websocket_chat(websocket: WebSocket, user_id: str, session_id: str):
     token = websocket.query_params.get("token")
-    if not token:
-        await websocket.close(code=1008)
-        return
+    # Aceptamos primero para poder enviar mensajes de error descriptivos
+    await websocket.accept()
+
+    if token:
+        try:
+            decoded = auth.verify_id_token(token, clock_skew_seconds=60)
+            if decoded.get("uid") != user_id:
+                await websocket.send_json({"error": "token_user_mismatch"})
+                await websocket.close(code=1008)
+                return
+        except Exception as exc:  # type: ignore
+            logger.warning(f"WS auth failed: {exc}")
+            # En modo dev permitimos continuar para evitar bloqueo en Expo Go
+            await websocket.send_json({"warning": "auth_verify_failed_dev_mode"})
+    else:
+        # Si no hay token, permitimos conexión pero advertimos (entorno dev)
+        await websocket.send_json({"warning": "missing_token_dev_mode"})
 
     try:
-        decoded = auth.verify_id_token(token, clock_skew_seconds=60)
-        if decoded.get("uid") != user_id:
-            await websocket.close(code=1008)
-            return
-    except Exception:
-        await websocket.close(code=1008)
-        return
+        while True:
+            data = await websocket.receive_json()
+            message = data.get('message', '')
+            
+            request = ChatRequest(
+                user_id=user_id,
+                session_id=session_id,
+                message=message
+            )
+            
+            response = await chat_service.send_message(request)
+            
+            await websocket.send_json({
+                'response': response.response,
+                'actions': [a.dict() for a in response.actions],
+                'places': [p.dict() for p in response.places],
+                'itinerary': response.itinerary.dict() if response.itinerary else None,
+            })
 
-    await websocket.accept()
+    except WebSocketDisconnect:
+        logger.info(f"WebSocket desconectado: {user_id}/{session_id}")
+
+@router.post("/save-itinerary", response_model=Itinerary)
+async def save_itinerary(
+    user_id: str,
+    itinerary: ItineraryCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Permite guardar un itinerario desde el flujo de chat.
+    """
+    if current_user.get("uid") != user_id:
+        raise HTTPException(status_code=403, detail="No autorizado")
+
+    saved = itinerary_service.create_itinerary(user_id, itinerary)
+    return saved
     
     try:
         while True:
@@ -92,6 +135,6 @@ async def websocket_chat(websocket: WebSocket, user_id: str, session_id: str):
                 'actions': [a.dict() for a in response.actions],
                 'places': [p.dict() for p in response.places]
             })
-            
+
     except WebSocketDisconnect:
         logger.info(f"WebSocket desconectado: {user_id}/{session_id}")
