@@ -47,9 +47,7 @@ class TravelAgent:
             google_api_key=settings.GOOGLE_API_KEY,
             temperature=0.3,  # Más determinista para JSON
             max_tokens=settings.GOOGLE_MAX_TOKENS,
-            model_kwargs={
-                "response_mime_type": "application/json"
-            }
+            response_mime_type="application/json",
         )
 
         logger.info(f"Agente inicializado con Google AI model: {settings.GOOGLE_MODEL}")
