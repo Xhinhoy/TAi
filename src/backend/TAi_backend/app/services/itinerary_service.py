@@ -29,14 +29,16 @@ class ItineraryService:
     def create_itinerary(self, uid: str, itinerary: ItineraryCreate) -> Itinerary:
         data = itinerary.model_dump()
         if not data.get('start_date'):
-            raise ValueError("start_date es obligatorio")
+            from datetime import datetime
+            data['start_date'] = datetime.utcnow().date().isoformat()
         data['owner_uid'] = uid
         itinerary_id = itinerary_repository.create_itinerary(data)
         return Itinerary(id=itinerary_id, **data)
     
     def update_itinerary(self, itinerary_id: str, itinerary: ItineraryCreate) -> bool:
         if not itinerary.start_date:
-            raise ValueError("start_date es obligatorio")
+            from datetime import datetime
+            itinerary.start_date = datetime.utcnow().date().isoformat()
         return itinerary_repository.update_itinerary(itinerary_id, itinerary.model_dump())
     
     def delete_itinerary(self, itinerary_id: str) -> bool:

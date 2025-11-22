@@ -41,6 +41,12 @@ class ItineraryRepository(BaseRepository):
         # Eliminar duplicados por id
         unique = {}
         for item in results:
+            # Normalizar start_date para soportar notificaciones
+            if not item.get('start_date') and item.get('created_at'):
+                try:
+                    item['start_date'] = item['created_at'].date().isoformat()
+                except Exception:
+                    pass
             unique[item['id']] = item
 
         # Ordenar por created_at descendente cuando esté disponible

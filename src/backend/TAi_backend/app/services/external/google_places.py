@@ -7,6 +7,7 @@ import logging
 import time
 import hashlib
 import json
+import requests
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -82,6 +83,51 @@ class GooglePlacesFacade:
             
         except Exception as e:
             logger.error(f"Error buscando lugares: {str(e)}")
+            return []
+
+    def text_search(
+        self,
+        query: str,
+        location: Dict[str, float],
+        radius: int = 5000
+    ) -> List[Dict]:
+        """
+        Búsqueda de texto como fallback cuando nearby devuelve vacío o está limitado.
+        Usa el endpoint REST oficial de Text Search.
+        """
+        cache_params = {
+            'query': query,
+            'lat': location['latitude'],
+            'lng': location['longitude'],
+            'radius': radius,
+        }
+        cache_key = self._generate_cache_key('text_search', cache_params)
+
+        cached_result = firebase_cache.get(self.cache_prefix, cache_key)
+        if cached_result:
+            logger.info("Google Places text_search obtenido del caché")
+            return cached_result
+
+        try:
+            self._rate_limit_check()
+            url = "https://maps.googleapis.com/maps/api/place/textsearch/json"
+            params = {
+                "query": query,
+                "location": f"{location['latitude']},{location['longitude']}",
+                "radius": radius,
+                "key": settings.GOOGLE_PLACES_API_KEY.get_secret_value()  # type: ignore
+            }
+            response = requests.get(url, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            results = data.get("results", [])
+            formatted_results = self._format_results(results)
+
+            firebase_cache.set(self.cache_prefix, cache_key, formatted_results, self.cache_ttl)
+            logger.info("Google Places text_search guardado en caché")
+            return formatted_results
+        except Exception as e:
+            logger.error(f"Error en text_search: {str(e)}")
             return []
     
     def get_place_details(self, place_id: str) -> Optional[Dict]:

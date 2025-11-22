@@ -17,6 +17,7 @@ class Itinerary(BaseModel):
     items: List[ItineraryItem] = []
     owner_uid: str
     score: Optional[float] = None
+    start_date: Optional[str] = None  # ISO date string (YYYY-MM-DD)
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -25,6 +26,7 @@ class ItineraryCreate(BaseModel):
     city: str
     days: int
     items: List[ItineraryItem] = []
+    start_date: Optional[str] = None  # ISO date string (YYYY-MM-DD)
 
 class ItineraryGenerateRequest(BaseModel):
     user_id: str

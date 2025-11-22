@@ -22,6 +22,31 @@ class PlaceService:
             place_repository.save_place(result)
             places.append(Place(**result))
 
+        # 1b) Reintento amplio si Google devolvió vacío: sin place_type y con keyword genérico
+        if len(places) == 0:
+            fallback_query = params.query or "tourist attraction"
+            retry_results = self.google_places.search_nearby(
+                location={'latitude': params.location.latitude, 'longitude': params.location.longitude},
+                radius=max(params.radius, 8000),
+                place_type=None,
+                keyword=fallback_query
+            )
+            for result in retry_results:
+                place_repository.save_place(result)
+                places.append(Place(**result))
+
+        # 1c) Fallback a text_search si aún está vacío (para API key legacy habilitada)
+        if len(places) == 0:
+            text_query = params.query or "puntos de interés"
+            text_results = self.google_places.text_search(
+                query=text_query,
+                location={'latitude': params.location.latitude, 'longitude': params.location.longitude},
+                radius=max(params.radius, 5000),
+            )
+            for result in text_results:
+                place_repository.save_place(result)
+                places.append(Place(**result))
+
         # 2) Fallback con TripAdvisor si Google no devolvió nada
         if len(places) == 0:
             fallback_query = params.query or "lugares de interés"

@@ -14,6 +14,8 @@ import {
   Modal,
   Pressable,
   Platform,
+  TextInput,
+  KeyboardAvoidingView,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { theme } from '../../styles/theme';
@@ -46,6 +48,10 @@ export const NotificationBubble: React.FC<NotificationBubbleProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [badgeAnimation] = useState(new Animated.Value(1));
+  const [chatMessages, setChatMessages] = useState<
+    { id: string; sender: 'bot' | 'user'; text: string; notification?: NotificationItem }[]
+  >([]);
+  const [inputText, setInputText] = useState('');
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -66,6 +72,47 @@ export const NotificationBubble: React.FC<NotificationBubbleProps> = ({
       ]).start();
     }
   }, [unreadCount]);
+
+  // Sincronizar notificaciones con el estilo chat (bot)
+  useEffect(() => {
+    const existingIds = new Set(chatMessages.filter(m => m.sender === 'bot').map(m => m.id));
+    const newBotMessages = notifications
+      .filter((n) => !existingIds.has(n.id))
+      .map((n) => ({
+        id: n.id,
+        sender: 'bot' as const,
+        text: `${n.title}: ${n.message}`,
+        notification: n,
+      }));
+
+    if (newBotMessages.length > 0) {
+      setChatMessages((prev) => [...prev, ...newBotMessages]);
+    }
+  }, [notifications, chatMessages]);
+
+  const handleSend = () => {
+    if (!inputText.trim()) return;
+    const userMessage = {
+      id: `user-${Date.now()}`,
+      sender: 'user' as const,
+      text: inputText.trim(),
+    };
+    setChatMessages((prev) => [...prev, userMessage]);
+    setInputText('');
+
+    // Respuesta simple del "bot" basada en notificaciones
+    const botReplyText =
+      notifications.length > 0
+        ? `Aquí tienes ${notifications.length} notificación(es). Toca cualquier mensaje para ver detalles.`
+        : 'No tengo notificaciones nuevas ahora mismo, te aviso cuando llegue algo.';
+
+    const botReply = {
+      id: `bot-reply-${Date.now()}`,
+      sender: 'bot' as const,
+      text: botReplyText,
+    };
+    setChatMessages((prev) => [...prev, botReply]);
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -135,7 +182,7 @@ export const NotificationBubble: React.FC<NotificationBubbleProps> = ({
             {/* Header */}
             <View style={styles.modalHeader}>
               <View>
-                <Text style={styles.modalTitle}>Notificaciones</Text>
+                <Text style={styles.modalTitle}>Asistente de notificaciones</Text>
                 {unreadCount > 0 && (
                   <Text style={styles.unreadCount}>
                     {unreadCount} sin leer
@@ -167,72 +214,58 @@ export const NotificationBubble: React.FC<NotificationBubbleProps> = ({
               </View>
             </View>
 
-            {/* Lista de Notificaciones */}
-            {notifications.length === 0 ? (
-              <View style={styles.emptyState}>
-                <MaterialCommunityIcons
-                  name="bell-off-outline"
-                  size={48}
-                  color={theme.colors.text.tertiary}
-                />
-                <Text style={styles.emptyText}>No tienes notificaciones</Text>
-                <Text style={styles.emptySubtext}>
-                  Te avisaremos sobre tus itinerarios y lugares cercanos
-                </Text>
-              </View>
-            ) : (
+            {/* Vista tipo chat */}
+            <KeyboardAvoidingView
+              behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+              style={{ flex: 1 }}
+            >
               <ScrollView
-                style={styles.notificationsList}
+                style={styles.chatList}
                 showsVerticalScrollIndicator={false}
               >
-                {notifications.map((notification) => (
-                  <TouchableOpacity
-                    key={notification.id}
-                    style={[
-                      styles.notificationItem,
-                      !notification.read && styles.notificationItemUnread,
-                    ]}
-                    onPress={() => {
-                      onNotificationPress?.(notification);
-                      setIsExpanded(false);
-                    }}
-                    activeOpacity={0.7}
-                  >
+                {chatMessages.length === 0 && (
+                  <View style={styles.emptyState}>
+                    <MaterialCommunityIcons
+                      name="chat-alert-outline"
+                      size={48}
+                      color={theme.colors.text.tertiary}
+                    />
+                    <Text style={styles.emptyText}>Sin mensajes</Text>
+                    <Text style={styles.emptySubtext}>
+                      Aquí verás tus notificaciones como mensajes. Escribe si necesitas ayuda.
+                    </Text>
+                  </View>
+                )}
+
+                {chatMessages.map((msg) => {
+                  const isBot = msg.sender === 'bot';
+                  const notification = msg.notification;
+                  return (
                     <View
+                      key={msg.id}
                       style={[
-                        styles.notificationIcon,
-                        {
-                          backgroundColor: getPriorityColor(notification.priority) + '20',
-                        },
+                        styles.chatBubble,
+                        isBot ? styles.chatBubbleBot : styles.chatBubbleUser,
                       ]}
                     >
-                      <MaterialCommunityIcons
-                        name={notification.icon as any}
-                        size={20}
-                        color={getPriorityColor(notification.priority)}
-                      />
-                    </View>
-
-                    <View style={styles.notificationContent}>
-                      <View style={styles.notificationHeader}>
-                        <Text style={styles.notificationTitle} numberOfLines={1}>
-                          {notification.title}
-                        </Text>
-                        <Text style={styles.notificationTime}>
-                          {formatTimestamp(notification.timestamp)}
+                      <View style={styles.chatHeader}>
+                        <MaterialCommunityIcons
+                          name={isBot ? 'robot-outline' : 'account'}
+                          size={14}
+                          color={isBot ? theme.colors.primary.main : theme.colors.text.primary}
+                        />
+                        <Text style={styles.chatSender}>
+                          {isBot ? 'Asistente' : 'Tú'}
                         </Text>
                       </View>
+                      <Text style={styles.chatText}>{msg.text}</Text>
 
-                      <Text style={styles.notificationMessage} numberOfLines={2}>
-                        {notification.message}
-                      </Text>
-
-                      {notification.actionText && (
+                      {notification && notification.actionText && (
                         <TouchableOpacity
                           style={styles.notificationAction}
-                          onPress={(e) => {
-                            e.stopPropagation();
-                            notification.onAction?.();
+                          onPress={() => {
+                            onNotificationPress?.(notification);
+                            onNotificationDismiss?.(notification.id);
                             setIsExpanded(false);
                           }}
                         >
@@ -247,26 +280,32 @@ export const NotificationBubble: React.FC<NotificationBubbleProps> = ({
                         </TouchableOpacity>
                       )}
                     </View>
-
-                    <TouchableOpacity
-                      style={styles.dismissButton}
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        onNotificationDismiss?.(notification.id);
-                      }}
-                    >
-                      <MaterialCommunityIcons
-                        name="close"
-                        size={18}
-                        color={theme.colors.text.tertiary}
-                      />
-                    </TouchableOpacity>
-
-                    {!notification.read && <View style={styles.unreadDot} />}
-                  </TouchableOpacity>
-                ))}
+                  );
+                })}
               </ScrollView>
-            )}
+
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="Escribe para pedir ayuda o ver notificaciones"
+                  value={inputText}
+                  onChangeText={setInputText}
+                  onSubmitEditing={handleSend}
+                  returnKeyType="send"
+                />
+                <TouchableOpacity
+                  style={styles.sendButton}
+                  onPress={handleSend}
+                  disabled={!inputText.trim()}
+                >
+                  <MaterialCommunityIcons
+                    name="send"
+                    size={20}
+                    color={inputText.trim() ? theme.colors.text.inverse : theme.colors.text.tertiary}
+                  />
+                </TouchableOpacity>
+              </View>
+            </KeyboardAvoidingView>
           </Pressable>
         </Pressable>
       </Modal>
@@ -367,58 +406,45 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: theme.spacing.xs,
   },
-  notificationsList: {
+  chatList: {
     flex: 1,
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
   },
-  notificationItem: {
-    flexDirection: 'row',
+  chatBubble: {
+    maxWidth: '85%',
+    borderRadius: 16,
     padding: theme.spacing.md,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border.secondary,
-    backgroundColor: theme.colors.surface.primary,
-    position: 'relative',
+    marginBottom: theme.spacing.md,
   },
-  notificationItemUnread: {
-    backgroundColor: theme.colors.primary[50] + '40',
+  chatBubbleBot: {
+    alignSelf: 'flex-start',
+    backgroundColor: theme.colors.background.secondary,
   },
-  notificationIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: theme.spacing.sm,
+  chatBubbleUser: {
+    alignSelf: 'flex-end',
+    backgroundColor: theme.colors.primary[50],
   },
-  notificationContent: {
-    flex: 1,
-  },
-  notificationHeader: {
+  chatHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 4,
-  },
-  notificationTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: theme.colors.text.primary,
-    flex: 1,
-    marginRight: theme.spacing.xs,
-  },
-  notificationTime: {
-    fontSize: 12,
-    color: theme.colors.text.tertiary,
-  },
-  notificationMessage: {
-    fontSize: 14,
-    color: theme.colors.text.secondary,
-    lineHeight: 20,
+    alignItems: 'center',
+    gap: theme.spacing.xs,
     marginBottom: theme.spacing.xs,
+  },
+  chatSender: {
+    fontSize: 12,
+    color: theme.colors.text.secondary,
+    fontWeight: '600',
+  },
+  chatText: {
+    fontSize: 14,
+    color: theme.colors.text.primary,
+    lineHeight: 20,
   },
   notificationAction: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: theme.spacing.xs,
+    marginTop: theme.spacing.sm,
   },
   notificationActionText: {
     fontSize: 13,
@@ -426,17 +452,28 @@ const styles = StyleSheet.create({
     color: theme.colors.primary.main,
     marginRight: 4,
   },
-  dismissButton: {
-    padding: theme.spacing.xs,
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border.secondary,
+    backgroundColor: theme.colors.surface.primary,
   },
-  unreadDot: {
-    position: 'absolute',
-    top: theme.spacing.md + 4,
-    right: theme.spacing.md,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  input: {
+    flex: 1,
+    backgroundColor: theme.colors.background.tertiary,
+    borderRadius: theme.radius.md,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: Platform.OS === 'ios' ? theme.spacing.md : theme.spacing.sm,
+    marginRight: theme.spacing.sm,
+    color: theme.colors.text.primary,
+  },
+  sendButton: {
     backgroundColor: theme.colors.primary.main,
+    borderRadius: theme.radius.full,
+    padding: theme.spacing.md,
   },
   emptyState: {
     alignItems: 'center',

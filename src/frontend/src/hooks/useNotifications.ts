@@ -42,8 +42,7 @@ export const useNotifications = (options: UseNotificationsOptions = {}) => {
       const reminders = notificationsService.generateItineraryReminders(itineraries);
 
       reminders.forEach((reminder) => {
-        // Solo agregar si no existe ya
-        const exists = notifications.some((n) => n.id === reminder.id);
+        const exists = notificationsService.getNotifications().some((n) => n.id === reminder.id);
         if (!exists) {
           notificationsService.addNotification(reminder);
         }

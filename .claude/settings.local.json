@@ -10,7 +10,15 @@
       "Bash(lsof:*)",
       "Bash(curl:*)",
       "Bash(source:*)",
-      "Bash(uvicorn:*)"
+      "Bash(uvicorn:*)",
+      "Bash(npm start)",
+      "Bash(kill:*)",
+      "Bash(npx expo start:*)",
+      "Bash(pip install:*)",
+      "Bash(xargs kill:*)",
+      "Bash(pkill:*)",
+      "Bash(npx expo install expo-image-picker)",
+      "Bash(npx expo install:*)"
     ],
     "deny": [],
     "ask": []

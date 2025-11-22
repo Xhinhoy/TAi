@@ -289,9 +289,15 @@ const HomeScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedItinerary, setSelectedItinerary] = useState<Itinerary | null>(null);
   const [allItinerariesVisible, setAllItinerariesVisible] = useState(false);
+  const [allFavoritesVisible, setAllFavoritesVisible] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [locationGranted, setLocationGranted] = useState<boolean>(false);
+
+  // Reviews modal state
+  const [reviewsModalVisible, setReviewsModalVisible] = useState(false);
+  const [selectedPlaceDetails, setSelectedPlaceDetails] = useState<any>(null);
+  const [loadingReviews, setLoadingReviews] = useState(false);
 
   // Use new preferences system
   const { preferences } = usePreferences();
@@ -346,7 +352,7 @@ const HomeScreen: React.FC = () => {
         placeId: fav.place_id || fav.placeId || fav.id,
         createdAt: fav.added_at || fav.created_at || new Date().toISOString(),
       }));
-      setFavorites(mapped.slice(0, 8));
+      setFavorites(mapped);
     } catch (error) {
       console.error('Error cargando favoritos:', error);
       setFavorites([]);
@@ -611,6 +617,57 @@ useEffect(() => {
     }
   };
 
+  const showPlaceReview = async (
+    placeData: { id?: string; placeId?: string; place_id?: string; name?: string },
+    fallbackTitle?: string
+  ) => {
+    const placeId = placeData.placeId || placeData.place_id || placeData.id;
+    const title = placeData.name || fallbackTitle || 'Lugar';
+
+    if (!placeId) {
+      Alert.alert('Lugar sin detalles', 'No se encontró un id para consultar reseñas.');
+      return;
+    }
+
+    setLoadingReviews(true);
+    setReviewsModalVisible(true);
+
+    try {
+      const details = await placesService.getDetails(placeId);
+      setSelectedPlaceDetails({
+        ...details,
+        displayTitle: details?.name || title,
+      });
+      setLoadingReviews(false);
+    } catch (error: any) {
+      setLoadingReviews(false);
+      const status = error?.response?.status;
+      if (status === 404) {
+        setSelectedPlaceDetails({
+          displayTitle: title,
+          error: 'No se encontraron detalles para este lugar.',
+        });
+      } else {
+        setSelectedPlaceDetails({
+          displayTitle: title,
+          error: 'No se pudo cargar la información. Inténtalo de nuevo más tarde.',
+        });
+      }
+      console.error('Error obteniendo detalles del lugar:', error);
+    }
+  };
+
+  const handleRemoveFavorite = async (placeId: string) => {
+    if (!user) return;
+    try {
+      await usersService.removeFavorite(user.uid, placeId);
+      await loadFavorites(user.uid);
+    } catch (error) {
+      console.error('Error al eliminar favorito:', error);
+      Alert.alert('Error', 'No se pudo eliminar el favorito. Intenta de nuevo.');
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -687,7 +744,7 @@ useEffect(() => {
                   <RecommendationCard
                     key={recommendation.id}
                     recommendation={recommendation}
-                    onPress={() => console.log('Open recommendation:', recommendation.id)}
+                    onPress={() => showPlaceReview(recommendation, recommendation.name)}
                     onFavorite={() => handleAddFavorite(recommendation)}
                   />
                 ))}
@@ -753,7 +810,7 @@ useEffect(() => {
                   <RecommendationCard
                     key={place.id}
                     recommendation={place}
-                    onPress={() => console.log('Open nearby place:', place.id)}
+                    onPress={() => showPlaceReview(place, place.name)}
                     onFavorite={() => handleAddFavorite(place)}
                   />
                 ))}
@@ -827,7 +884,7 @@ useEffect(() => {
             <View style={styles.subsectionHeader}>
               <Text style={styles.subsectionTitle}>Favoritos</Text>
               {favorites.length > 0 && (
-                <Pressable onPress={() => console.log('Ver todos los favoritos')}>
+                <Pressable onPress={() => setAllFavoritesVisible(true)}>
                   <Text style={styles.seeAllText}>Ver todos</Text>
                 </Pressable>
               )}
@@ -838,7 +895,7 @@ useEffect(() => {
                   <View key={favorite.id}>
                     <AnimatedPressable
                       style={styles.favoriteItem}
-                      onPress={() => console.log('Open favorite:', favorite.id)}
+                      onPress={() => showPlaceReview(favorite, favorite.title)}
                       accessibilityRole="button"
                       accessibilityLabel={`Favorite place ${favorite.title}`}
                     >
@@ -859,6 +916,17 @@ useEffect(() => {
                         color={theme.colors.text.tertiary}
                       />
                     </AnimatedPressable>
+                    <Pressable
+                      onPress={() => handleRemoveFavorite(favorite.placeId)}
+                      style={styles.removeFavoriteButton}
+                      accessibilityLabel="Eliminar favorito"
+                    >
+                      <MaterialCommunityIcons
+                        name="delete-outline"
+                        size={18}
+                        color={theme.colors.error.main}
+                      />
+                    </Pressable>
                     {index < Math.min(favorites.length, 4) - 1 && (
                       <View style={styles.favoritesDivider} />
                     )}
@@ -960,6 +1028,75 @@ useEffect(() => {
         onClearAll={clearAll}
       />
 
+      {/* Modal ver todos los favoritos */}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={allFavoritesVisible}
+        onRequestClose={() => setAllFavoritesVisible(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity
+              onPress={() => setAllFavoritesVisible(false)}
+              style={styles.closeButton}
+            >
+              <MaterialCommunityIcons name="close" size={28} color={theme.colors.text.primary} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Todos los favoritos</Text>
+            <View style={styles.modalHeaderRight} />
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            {favorites.map((favorite) => (
+              <View key={favorite.id} style={styles.favoriteItemContainer}>
+                <AnimatedPressable
+                  style={styles.favoriteItem}
+                  onPress={() => showPlaceReview(favorite, favorite.title)}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Favorite place ${favorite.title}`}
+                >
+                  <View style={styles.favoriteIconContainer}>
+                    <MaterialCommunityIcons
+                      name="heart"
+                      size={20}
+                      color={theme.colors.error.main}
+                    />
+                  </View>
+                  <View style={styles.favoriteInfo}>
+                    <Text style={styles.favoriteTitle}>{favorite.title}</Text>
+                    <Text style={styles.favoriteSubtitle}>{favorite.subtitle}</Text>
+                  </View>
+                </AnimatedPressable>
+                <Pressable
+                  onPress={() => handleRemoveFavorite(favorite.placeId)}
+                  style={styles.removeFavoriteButton}
+                  accessibilityLabel="Eliminar favorito"
+                >
+                  <MaterialCommunityIcons
+                    name="delete-outline"
+                    size={20}
+                    color={theme.colors.error.main}
+                  />
+                </Pressable>
+              </View>
+            ))}
+            {favorites.length === 0 && (
+              <View style={styles.emptyState}>
+                <MaterialCommunityIcons
+                  name="heart-outline"
+                  size={48}
+                  color={theme.colors.text.tertiary}
+                />
+                <Text style={styles.emptyStateText}>
+                  No tienes lugares favoritos
+                </Text>
+              </View>
+            )}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+
       {/* Modal ver todos los itinerarios */}
       <Modal
         animationType="slide"
@@ -1002,6 +1139,178 @@ useEffect(() => {
                   No tienes itinerarios guardados
                 </Text>
               </View>
+            )}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+
+      {/* Modal de reseñas */}
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={reviewsModalVisible}
+        onRequestClose={() => setReviewsModalVisible(false)}
+      >
+        <SafeAreaView style={styles.modalContainer}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity
+              onPress={() => setReviewsModalVisible(false)}
+              style={styles.closeButton}
+            >
+              <MaterialCommunityIcons name="close" size={28} color={theme.colors.text.primary} />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>
+              {selectedPlaceDetails?.displayTitle || 'Detalles del lugar'}
+            </Text>
+            <View style={styles.modalHeaderRight} />
+          </View>
+
+          <ScrollView style={styles.modalContent}>
+            {loadingReviews ? (
+              <View style={styles.loadingReviewsContainer}>
+                <ActivityIndicator size="large" color={theme.colors.primary.main} />
+                <Text style={styles.loadingReviewsText}>Cargando información...</Text>
+              </View>
+            ) : selectedPlaceDetails?.error ? (
+              <View style={styles.errorContainer}>
+                <MaterialCommunityIcons
+                  name="alert-circle-outline"
+                  size={48}
+                  color={theme.colors.error.main}
+                />
+                <Text style={styles.errorText}>{selectedPlaceDetails.error}</Text>
+              </View>
+            ) : (
+              <>
+                {/* Información general */}
+                {selectedPlaceDetails && (
+                  <View style={styles.placeDetailsContainer}>
+                    {/* Rating */}
+                    {selectedPlaceDetails.rating && (
+                      <View style={styles.placeRatingContainer}>
+                        <MaterialCommunityIcons
+                          name="star"
+                          size={24}
+                          color="#FFD700"
+                        />
+                        <Text style={styles.placeRatingText}>
+                          {selectedPlaceDetails.rating.toFixed(1)}
+                        </Text>
+                        {selectedPlaceDetails.user_ratings_total && (
+                          <Text style={styles.placeRatingCount}>
+                            ({selectedPlaceDetails.user_ratings_total} reseñas)
+                          </Text>
+                        )}
+                      </View>
+                    )}
+
+                    {/* Dirección */}
+                    {selectedPlaceDetails.formatted_address && (
+                      <View style={styles.placeInfoRow}>
+                        <MaterialCommunityIcons
+                          name="map-marker"
+                          size={20}
+                          color={theme.colors.text.secondary}
+                        />
+                        <Text style={styles.placeInfoText}>
+                          {selectedPlaceDetails.formatted_address}
+                        </Text>
+                      </View>
+                    )}
+
+                    {/* Teléfono */}
+                    {selectedPlaceDetails.formatted_phone_number && (
+                      <View style={styles.placeInfoRow}>
+                        <MaterialCommunityIcons
+                          name="phone"
+                          size={20}
+                          color={theme.colors.text.secondary}
+                        />
+                        <Text style={styles.placeInfoText}>
+                          {selectedPlaceDetails.formatted_phone_number}
+                        </Text>
+                      </View>
+                    )}
+
+                    {/* Horario actual */}
+                    {selectedPlaceDetails.opening_hours?.open_now !== undefined && (
+                      <View style={styles.placeInfoRow}>
+                        <MaterialCommunityIcons
+                          name={selectedPlaceDetails.opening_hours.open_now ? "clock-check" : "clock-alert"}
+                          size={20}
+                          color={selectedPlaceDetails.opening_hours.open_now ? "#10b981" : "#ef4444"}
+                        />
+                        <Text style={[
+                          styles.placeInfoText,
+                          { color: selectedPlaceDetails.opening_hours.open_now ? "#10b981" : "#ef4444" }
+                        ]}>
+                          {selectedPlaceDetails.opening_hours.open_now ? "Abierto ahora" : "Cerrado"}
+                        </Text>
+                      </View>
+                    )}
+
+                    {/* Resumen editorial */}
+                    {(selectedPlaceDetails.editorial_summary?.overview || selectedPlaceDetails.summary) && (
+                      <View style={styles.summaryContainer}>
+                        <Text style={styles.summaryTitle}>Acerca de este lugar</Text>
+                        <Text style={styles.summaryText}>
+                          {selectedPlaceDetails.editorial_summary?.overview || selectedPlaceDetails.summary}
+                        </Text>
+                      </View>
+                    )}
+
+                    {/* Reseñas */}
+                    <View style={styles.reviewsSection}>
+                      <Text style={styles.reviewsSectionTitle}>Reseñas</Text>
+                      {(() => {
+                        const reviews = selectedPlaceDetails.reviews || selectedPlaceDetails.tripadvisor_reviews || [];
+                        if (!Array.isArray(reviews) || reviews.length === 0) {
+                          return (
+                            <View style={styles.noReviewsContainer}>
+                              <MaterialCommunityIcons
+                                name="comment-text-outline"
+                                size={48}
+                                color={theme.colors.text.tertiary}
+                              />
+                              <Text style={styles.noReviewsText}>
+                                No hay reseñas disponibles para este lugar
+                              </Text>
+                            </View>
+                          );
+                        }
+
+                        return reviews.map((review: any, index: number) => (
+                          <View key={index} style={styles.reviewCard}>
+                            <View style={styles.reviewHeader}>
+                              <Text style={styles.reviewAuthor}>
+                                {review.author_name || review.user?.name || 'Usuario anónimo'}
+                              </Text>
+                              {review.rating && (
+                                <View style={styles.reviewRating}>
+                                  <MaterialCommunityIcons
+                                    name="star"
+                                    size={14}
+                                    color="#FFD700"
+                                  />
+                                  <Text style={styles.reviewRatingText}>{review.rating}</Text>
+                                </View>
+                              )}
+                            </View>
+                            {review.relative_time_description && (
+                              <Text style={styles.reviewTime}>
+                                {review.relative_time_description}
+                              </Text>
+                            )}
+                            <Text style={styles.reviewText}>
+                              {review.text || review.description || 'Sin comentarios'}
+                            </Text>
+                          </View>
+                        ));
+                      })()}
+                    </View>
+                  </View>
+                )}
+              </>
             )}
           </ScrollView>
         </SafeAreaView>
@@ -1208,6 +1517,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: theme.spacing.md,
   },
+  favoriteItemContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing.lg,
+    paddingVertical: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border.secondary,
+  },
   favoriteIconContainer: {
     width: 32,
     height: 32,
@@ -1229,6 +1547,9 @@ const styles = StyleSheet.create({
   favoriteSubtitle: {
     fontSize: 12,
     color: theme.colors.text.secondary,
+  },
+  removeFavoriteButton: {
+    padding: theme.spacing.xs,
   },
   favoritesDivider: {
     height: 1,
@@ -1560,6 +1881,145 @@ const styles = StyleSheet.create({
   locationButtonText: {
     color: theme.colors.text.inverse,
     fontWeight: '600',
+  },
+  // Reviews modal styles
+  loadingReviewsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.xxxl,
+  },
+  loadingReviewsText: {
+    marginTop: theme.spacing.md,
+    fontSize: 14,
+    color: theme.colors.text.secondary,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: theme.spacing.xxxl,
+    paddingHorizontal: theme.spacing.lg,
+  },
+  errorText: {
+    marginTop: theme.spacing.md,
+    fontSize: 14,
+    color: theme.colors.error.main,
+    textAlign: 'center',
+  },
+  placeDetailsContainer: {
+    paddingBottom: theme.spacing.xl,
+  },
+  placeRatingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.lg,
+    paddingBottom: theme.spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border.primary,
+  },
+  placeRatingText: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: theme.colors.text.primary,
+    marginLeft: theme.spacing.xs,
+  },
+  placeRatingCount: {
+    fontSize: 14,
+    color: theme.colors.text.secondary,
+    marginLeft: theme.spacing.sm,
+  },
+  placeInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: theme.spacing.md,
+  },
+  placeInfoText: {
+    fontSize: 14,
+    color: theme.colors.text.secondary,
+    marginLeft: theme.spacing.sm,
+    flex: 1,
+  },
+  summaryContainer: {
+    backgroundColor: theme.colors.surface.secondary,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginVertical: theme.spacing.lg,
+  },
+  summaryTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.sm,
+  },
+  summaryText: {
+    fontSize: 14,
+    color: theme.colors.text.secondary,
+    lineHeight: 20,
+  },
+  reviewsSection: {
+    marginTop: theme.spacing.lg,
+  },
+  reviewsSectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: theme.colors.text.primary,
+    marginBottom: theme.spacing.md,
+  },
+  noReviewsContainer: {
+    alignItems: 'center',
+    paddingVertical: theme.spacing.xxxl,
+  },
+  noReviewsText: {
+    marginTop: theme.spacing.md,
+    fontSize: 14,
+    color: theme.colors.text.secondary,
+    textAlign: 'center',
+  },
+  reviewCard: {
+    backgroundColor: theme.colors.surface.primary,
+    borderRadius: theme.radius.md,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    borderLeftWidth: 3,
+    borderLeftColor: theme.colors.primary.main,
+    ...theme.shadows.sm,
+  },
+  reviewHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.xs,
+  },
+  reviewAuthor: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.text.primary,
+    flex: 1,
+  },
+  reviewRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: theme.colors.background.secondary,
+    paddingHorizontal: theme.spacing.xs,
+    paddingVertical: 2,
+    borderRadius: theme.radius.xs,
+  },
+  reviewRatingText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: theme.colors.text.primary,
+    marginLeft: 2,
+  },
+  reviewTime: {
+    fontSize: 12,
+    color: theme.colors.text.tertiary,
+    marginBottom: theme.spacing.sm,
+  },
+  reviewText: {
+    fontSize: 14,
+    color: theme.colors.text.secondary,
+    lineHeight: 20,
   },
 });
 

@@ -1,3 +1,154 @@
+# ==================== EXPERIENCE VALIDATION PROMPTS ====================
+
+SCREENSHOT_QUALITY_CHECK_PROMPT = """
+Analiza este screenshot de un post de red social y verifica si tiene la información necesaria para identificar un lugar turístico.
+
+Responde ÚNICAMENTE en este formato JSON (sin bloques de código):
+{
+  "es_valido": true o false,
+  "tiene_imagen_lugar": true o false,
+  "tiene_texto_descripcion": true o false,
+  "tiene_ubicacion_visible": true o false,
+  "tiene_nombre_visible": true o false,
+  "plataforma_detectada": "instagram" o "tiktok" o "facebook" o "desconocida",
+  "confianza_extraccion": 0-100,
+  "problemas": ["lista de problemas si es_valido=false"],
+  "sugerencia": "qué debe hacer el usuario para mejorar"
+}
+
+Marca es_valido=false si:
+- No se ve ninguna imagen del lugar
+- No hay texto descriptivo visible
+- La imagen está muy borrosa o cortada
+- Claramente no es un post de red social sobre viajes/lugares
+"""
+
+PLACE_IDENTIFICATION_PROMPT = """
+Eres un experto en análisis de contenido turístico y reconocimiento de lugares. Analiza este screenshot de un post de red social (Instagram/TikTok/Facebook) y extrae TODA la información posible sobre el lugar mostrado.
+
+TU OBJETIVO: Extraer suficiente información para poder buscar el lugar en Google Places y TripAdvisor.
+
+INSTRUCCIONES DE ANÁLISIS:
+1. BUSCA texto visible en la imagen: nombres de lugares, etiquetas de ubicación, carteles, señalizaciones
+2. ANALIZA características visuales distintivas: tipo de edificio, arquitectura, elementos únicos
+3. IDENTIFICA el tipo de lugar por contexto visual (hotel, restaurante, atracción turística, etc.)
+4. EXTRAE cualquier texto en el caption, descripción, hashtags o ubicación etiquetada
+5. INFIERE la ubicación geográfica si hay pistas visuales (monumentos reconocibles, paisajes característicos)
+
+IMPORTANTE:
+- Extrae TODO lo que veas, incluso si no estás 100% seguro
+- Si ves un nombre parcial o borroso, inclúyelo de todas formas
+- Si reconoces el lugar por características visuales, menciónalo
+- Sé GENEROSO al extraer información - más datos = mejor búsqueda
+
+Responde ÚNICAMENTE en formato JSON (sin bloques de código):
+{{
+  "nombre": "nombre del lugar (si es visible, si no, usa descripción genérica como 'Hotel en playa', 'Restaurante italiano')",
+  "tipo": "hotel" o "restaurant" o "tourist_attraction" o "tour_operator" o "bar" o "cafe" o "spa" o "museum",
+  "ubicacion": {{
+    "ciudad": "ciudad visible, mencionada o inferida por contexto visual",
+    "pais": "país visible, mencionado o inferido",
+    "region": "estado/provincia si es visible",
+    "zona": "zona específica (ej: centro histórico, zona costera, barrio específico)",
+    "referencias_visuales": "landmarks o referencias geográficas visibles en la imagen"
+  }},
+  "query_busqueda": "string optimizado para buscar en Google Places - combina: nombre + tipo + ciudad + características únicas",
+  "confianza_identificacion": 0-100
+}}
+
+REGLA DE CONFIANZA:
+- Ubicación etiquetada + nombre visible + características claras: 85-95
+- Nombre visible + ciudad mencionada: 70-85
+- Características distintivas reconocibles: 60-75
+- Tipo de lugar claro pero sin nombre específico: 50-65
+- Solo imagen genérica sin textos: 30-50
+
+RECUERDA: Es mejor tener información aproximada que nada. Extrae TODO lo que puedas ver o inferir razonablemente.
+"""
+
+EXPERIENCE_ANALYSIS_PROMPT = """
+Eres un analista experto de experiencias turísticas. Evalúa este lugar basándote en datos reales de Google Places y TripAdvisor.
+
+LUGAR IDENTIFICADO:
+- Nombre: {nombre_lugar}
+- Dirección: {direccion}
+- Tipo: {tipo}
+
+IMAGEN PROMOCIONAL ANALIZADA:
+{elementos_visuales}
+
+--- DATOS DE GOOGLE PLACES ---
+Rating: {rating_google}/5 ({total_reviews_google} reseñas)
+Nivel de precio: {price_level}
+
+RESEÑAS RECIENTES DE GOOGLE (últimas 20):
+{reviews_google}
+
+{tripadvisor_section}
+
+---
+
+ANÁLISIS REQUERIDO (responde en JSON sin bloques de código):
+
+{{
+  "score_realidad": 0-100,
+  "justificacion_score": "3 razones concretas del score",
+
+  "red_flags": [
+    {{
+      "severidad": "alta" o "media" o "baja",
+      "descripcion": "descripción específica del problema",
+      "frecuencia": "cuántas veces se menciona o % de reseñas",
+      "fuente": "google" o "tripadvisor" o "ambas"
+    }}
+  ],
+
+  "aspectos_positivos": [
+    {{
+      "aspecto": "nombre del aspecto positivo",
+      "descripcion": "breve descripción",
+      "mencionado_en": "% de reseñas que lo mencionan",
+      "fuente": "google" o "tripadvisor" o "ambas"
+    }}
+  ],
+
+  "aspectos_negativos": [
+    {{
+      "aspecto": "nombre del aspecto negativo",
+      "descripcion": "breve descripción",
+      "mencionado_en": "% de reseñas que lo mencionan",
+      "fuente": "google" o "tripadvisor" o "ambas"
+    }}
+  ],
+
+  "discrepancia_imagen_realidad": {{
+    "hay_discrepancia": true o false,
+    "elementos_no_coinciden": ["elementos promocionados que no coinciden con reviews"],
+    "elementos_coinciden": ["elementos que SÍ se cumplen según reviews"]
+  }},
+
+  "tendencia_temporal": {{
+    "mejorando": true o false,
+    "estable": true o false,
+    "empeorando": true o false,
+    "evidencia": "breve explicación basada en fechas de reviews"
+  }},
+
+  "recomendacion": "RESERVAR_CON_CONFIANZA" o "CONSIDERAR_ALTERNATIVAS" o "NO_RECOMENDADO",
+  "razon_recomendacion": "1-2 frases explicando la recomendación"
+}}
+
+CRITERIOS PARA SCORE DE REALIDAD:
+- 90-100: Expectativa = Realidad, reviews muy positivas, pocas quejas consistentes
+- 70-89: Ligeramente diferente, algunos aspectos no cumplen pero es aceptable
+- 50-69: Diferencias notables entre imagen y realidad, varios red flags
+- 0-49: Muy diferente a lo promocionado, muchas quejas recurrentes
+
+{data_source_note}
+"""
+
+# ==================== TRAVEL AGENT PROMPTS ====================
+
 TRAVEL_AGENT_SYSTEM_PROMPT = """
 Eres un agente de viajes experto especializado EXCLUSIVAMENTE en crear itinerarios personalizados y dar recomendaciones turísticas.
 

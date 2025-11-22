@@ -15,12 +15,19 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Location from 'expo-location';
+import * as Localization from 'expo-localization';
 
 // Firebase imports - SDK modular v9+
 import {
   onAuthStateChanged,
   signOut,
   updateProfile,
+  updateEmail,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  sendEmailVerification,
   User as FirebaseUser,
 } from 'firebase/auth';
 import {
@@ -190,12 +197,20 @@ const ProfileScreen: React.FC = () => {
   const [profile, setProfile] = useState<UserProfileDoc | null>(null);
   const [loading, setLoading] = useState(true);
   const [editModalVisible, setEditModalVisible] = useState(false);
-  const [editLocation, setEditLocation] = useState('');
-  const [editLanguage, setEditLanguage] = useState('');
-  const [editTimezone, setEditTimezone] = useState('');
+  const [editDisplayName, setEditDisplayName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [emailVerificationSent, setEmailVerificationSent] = useState(false);
   const [interestsModalVisible, setInterestsModalVisible] = useState(false);
   const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
-  const [settingsModalVisible, setSettingsModalVisible] = useState(false);
+
+  // Real-time device information
+  const [currentLocation, setCurrentLocation] = useState<string>('Obteniendo ubicación...');
+  const [deviceLanguage, setDeviceLanguage] = useState<string>('');
+  const [deviceTimezone, setDeviceTimezone] = useState<string>('');
+  const [currentTime, setCurrentTime] = useState<string>('');
 
   // Use centralized preferences system
   const { preferences, updateInterests } = usePreferences();
@@ -204,6 +219,64 @@ const ProfileScreen: React.FC = () => {
   useEffect(() => {
     setSelectedInterests(preferences.interests);
   }, [preferences.interests]);
+
+  // Get device location on mount
+  useEffect(() => {
+    const getLocation = async () => {
+      try {
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          setCurrentLocation('Ubicación no disponible');
+          return;
+        }
+
+        const location = await Location.getCurrentPositionAsync({});
+        const [address] = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+
+        if (address) {
+          const locationString = [address.city, address.region, address.country]
+            .filter(Boolean)
+            .join(', ');
+          setCurrentLocation(locationString || 'Ubicación desconocida');
+        } else {
+          setCurrentLocation(`${location.coords.latitude.toFixed(4)}, ${location.coords.longitude.toFixed(4)}`);
+        }
+      } catch (error) {
+        console.error('Error getting location:', error);
+        setCurrentLocation('Ubicación no disponible');
+      }
+    };
+
+    getLocation();
+  }, []);
+
+  // Get device language and timezone
+  useEffect(() => {
+    const locale = Localization.getLocales()[0];
+    setDeviceLanguage(locale.languageCode || 'es');
+    setDeviceTimezone(Localization.timezone || 'America/Santiago');
+  }, []);
+
+  // Update current time every second
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleTimeString('es-CL', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      }));
+    };
+
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -248,9 +321,8 @@ const ProfileScreen: React.FC = () => {
         profileData = userDoc.data() as UserProfileDoc;
       }
       setProfile(profileData);
-      setEditLocation(profileData.location);
-      setEditLanguage(profileData.language);
-      setEditTimezone(profileData.timezone);
+      setEditDisplayName(profileData.displayName);
+      setEditEmail(profileData.email);
       setSelectedInterests(profileData.interests || []);
 
       setLoading(false);
@@ -265,24 +337,92 @@ const ProfileScreen: React.FC = () => {
     if (!user || !profile) return;
 
     try {
-      const userDocRef = doc(db, 'users', user.uid);
-      await updateDoc(userDocRef, {
-        location: editLocation,
-        language: editLanguage,
-        timezone: editTimezone,
-      });
+      let hasChanges = false;
 
-      setProfile({
-        ...profile,
-        location: editLocation,
-        language: editLanguage,
-        timezone: editTimezone,
-      });
+      // Validar que si se cambia email o contraseña, se proporcione la contraseña actual
+      const needsReauth = editEmail !== user.email || newPassword.trim() !== '';
 
-      setEditModalVisible(false);
-    } catch (error) {
+      if (needsReauth && !currentPassword) {
+        Alert.alert('Contraseña requerida', 'Debes ingresar tu contraseña actual para cambiar tu email o contraseña');
+        return;
+      }
+
+      // Validar nueva contraseña si se proporciona
+      if (newPassword.trim() !== '') {
+        if (newPassword.length < 6) {
+          Alert.alert('Contraseña inválida', 'La contraseña debe tener al menos 6 caracteres');
+          return;
+        }
+        if (newPassword !== confirmPassword) {
+          Alert.alert('Error', 'Las contraseñas no coinciden');
+          return;
+        }
+      }
+
+      // Reautenticar si es necesario
+      if (needsReauth) {
+        const credential = EmailAuthProvider.credential(user.email || '', currentPassword);
+        await reauthenticateWithCredential(user, credential);
+      }
+
+      // Actualizar nombre de usuario
+      if (editDisplayName !== user.displayName) {
+        await updateProfile(user, { displayName: editDisplayName });
+        const userDocRef = doc(db, 'users', user.uid);
+        await updateDoc(userDocRef, { displayName: editDisplayName });
+        setProfile({ ...profile, displayName: editDisplayName });
+        hasChanges = true;
+      }
+
+      // Actualizar email (requiere verificación)
+      if (editEmail !== user.email) {
+        await updateEmail(user, editEmail);
+        await sendEmailVerification(user);
+        setEmailVerificationSent(true);
+        const userDocRef = doc(db, 'users', user.uid);
+        await updateDoc(userDocRef, { email: editEmail });
+        setProfile({ ...profile, email: editEmail });
+        hasChanges = true;
+        Alert.alert(
+          'Verificación de email enviada',
+          `Se ha enviado un correo de verificación a ${editEmail}. Por favor verifica tu email para completar el cambio.`
+        );
+      }
+
+      // Actualizar contraseña
+      if (newPassword.trim() !== '') {
+        await updatePassword(user, newPassword);
+        hasChanges = true;
+        Alert.alert('Éxito', 'Contraseña actualizada correctamente');
+      }
+
+      if (hasChanges) {
+        // Limpiar campos de contraseña
+        setCurrentPassword('');
+        setNewPassword('');
+        setConfirmPassword('');
+        setEditModalVisible(false);
+        if (!emailVerificationSent) {
+          Alert.alert('Éxito', 'Perfil actualizado correctamente');
+        }
+      } else {
+        setEditModalVisible(false);
+      }
+    } catch (error: any) {
       console.error('Error updating profile:', error);
-      Alert.alert('Error', 'No se pudo actualizar el perfil');
+      let errorMessage = 'No se pudo actualizar el perfil';
+
+      if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Contraseña actual incorrecta';
+      } else if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'El email ya está en uso por otra cuenta';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Email inválido';
+      } else if (error.code === 'auth/requires-recent-login') {
+        errorMessage = 'Por seguridad, debes cerrar sesión y volver a iniciarla para realizar este cambio';
+      }
+
+      Alert.alert('Error', errorMessage);
     }
   };
 
@@ -374,24 +514,20 @@ const ProfileScreen: React.FC = () => {
           <View style={styles.headerActions}>
             <Pressable
               style={styles.headerButton}
-              onPress={() => setEditModalVisible(true)}
+              onPress={() => {
+                setEditDisplayName(profile?.displayName || '');
+                setEditEmail(user?.email || '');
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+                setEmailVerificationSent(false);
+                setEditModalVisible(true);
+              }}
               accessibilityRole="button"
               accessibilityLabel="Editar perfil"
             >
               <MaterialCommunityIcons
                 name="pencil"
-                size={20}
-                color={theme.colors.textSecondary}
-              />
-            </Pressable>
-            <Pressable
-              style={styles.headerButton}
-              onPress={() => setSettingsModalVisible(true)}
-              accessibilityRole="button"
-              accessibilityLabel="Configuración"
-            >
-              <MaterialCommunityIcons
-                name="cog"
                 size={20}
                 color={theme.colors.textSecondary}
               />
@@ -409,9 +545,7 @@ const ProfileScreen: React.FC = () => {
                 size={16}
                 color={theme.colors.textSecondary}
               />
-              <Text style={styles.infoText}>
-                {profile.location || 'Santiago, Providencia'}
-              </Text>
+              <Text style={styles.infoText}>{currentLocation}</Text>
             </View>
             <View style={styles.infoItem}>
               <MaterialCommunityIcons
@@ -419,7 +553,7 @@ const ProfileScreen: React.FC = () => {
                 size={16}
                 color={theme.colors.textSecondary}
               />
-              <Text style={styles.infoText}>{profile.language}</Text>
+              <Text style={styles.infoText}>{deviceLanguage}</Text>
             </View>
             <View style={styles.infoItem}>
               <MaterialCommunityIcons
@@ -427,7 +561,15 @@ const ProfileScreen: React.FC = () => {
                 size={16}
                 color={theme.colors.textSecondary}
               />
-              <Text style={styles.infoText}>{profile.timezone}</Text>
+              <Text style={styles.infoText}>{deviceTimezone}</Text>
+            </View>
+            <View style={styles.infoItem}>
+              <MaterialCommunityIcons
+                name="clock-outline"
+                size={16}
+                color={theme.colors.textSecondary}
+              />
+              <Text style={styles.infoText}>{currentTime}</Text>
             </View>
           </View>
         </View>
@@ -509,19 +651,9 @@ const ProfileScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>Privacidad y cuenta</Text>
           <View style={styles.settingsList}>
             <ListItemAjuste
-              icon="shield-check"
-              title="Seguridad y privacidad"
-              onPress={() => console.log('Security settings')}
-            />
-            <ListItemAjuste
-              icon="translate"
-              title="Idioma y accesibilidad"
-              onPress={() => console.log('Language settings')}
-            />
-            <ListItemAjuste
-              icon="help-circle"
-              title="Ayuda y soporte"
-              onPress={() => console.log('Help')}
+              icon="heart-outline"
+              title="Editar intereses"
+              onPress={() => setInterestsModalVisible(true)}
             />
             <ListItemAjuste
               icon="logout"
@@ -539,49 +671,123 @@ const ProfileScreen: React.FC = () => {
         visible={editModalVisible}
         transparent
         animationType="slide"
-        onRequestClose={() => setEditModalVisible(false)}
+        onRequestClose={() => {
+          setEditModalVisible(false);
+          setCurrentPassword('');
+          setNewPassword('');
+          setConfirmPassword('');
+        }}
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Editar perfil</Text>
-
-            <View style={styles.modalField}>
-              <Text style={styles.modalLabel}>Ubicación</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editLocation}
-                onChangeText={setEditLocation}
-                placeholder="Santiago, Providencia"
-                placeholderTextColor={theme.colors.textLight}
-              />
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Editar perfil</Text>
+              <Pressable
+                onPress={() => {
+                  setEditModalVisible(false);
+                  setCurrentPassword('');
+                  setNewPassword('');
+                  setConfirmPassword('');
+                }}
+                style={styles.closeModalButton}
+              >
+                <MaterialCommunityIcons name="close" size={24} color={theme.colors.textSecondary} />
+              </Pressable>
             </View>
 
-            <View style={styles.modalField}>
-              <Text style={styles.modalLabel}>Idioma</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editLanguage}
-                onChangeText={setEditLanguage}
-                placeholder="Idioma preferido"
-                placeholderTextColor={theme.colors.textLight}
-              />
-            </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {/* Nombre de usuario */}
+              <View style={styles.modalField}>
+                <Text style={styles.modalLabel}>Nombre de usuario</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={editDisplayName}
+                  onChangeText={setEditDisplayName}
+                  placeholder="Ingresa tu nombre"
+                  placeholderTextColor={theme.colors.textLight}
+                />
+              </View>
 
-            <View style={styles.modalField}>
-              <Text style={styles.modalLabel}>Zona horaria</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editTimezone}
-                onChangeText={setEditTimezone}
-                placeholder="America/Santiago"
-                placeholderTextColor={theme.colors.textLight}
-              />
-            </View>
+              {/* Email */}
+              <View style={styles.modalField}>
+                <Text style={styles.modalLabel}>Email</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={editEmail}
+                  onChangeText={setEditEmail}
+                  placeholder="tu@email.com"
+                  placeholderTextColor={theme.colors.textLight}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+                {editEmail !== user?.email && (
+                  <Text style={styles.fieldHint}>
+                    Se enviará un correo de verificación al nuevo email
+                  </Text>
+                )}
+              </View>
+
+              {/* Separador */}
+              <View style={styles.sectionSeparator}>
+                <Text style={styles.sectionSeparatorText}>Cambiar contraseña (opcional)</Text>
+              </View>
+
+              {/* Contraseña actual */}
+              {(editEmail !== user?.email || newPassword.trim() !== '') && (
+                <View style={styles.modalField}>
+                  <Text style={styles.modalLabel}>Contraseña actual *</Text>
+                  <TextInput
+                    style={styles.modalInput}
+                    value={currentPassword}
+                    onChangeText={setCurrentPassword}
+                    placeholder="Ingresa tu contraseña actual"
+                    placeholderTextColor={theme.colors.textLight}
+                    secureTextEntry
+                    autoCapitalize="none"
+                  />
+                </View>
+              )}
+
+              {/* Nueva contraseña */}
+              <View style={styles.modalField}>
+                <Text style={styles.modalLabel}>Nueva contraseña</Text>
+                <TextInput
+                  style={styles.modalInput}
+                  value={newPassword}
+                  onChangeText={setNewPassword}
+                  placeholder="Mínimo 6 caracteres"
+                  placeholderTextColor={theme.colors.textLight}
+                  secureTextEntry
+                  autoCapitalize="none"
+                />
+              </View>
+
+              {/* Confirmar contraseña */}
+              {newPassword.trim() !== '' && (
+                <View style={styles.modalField}>
+                  <Text style={styles.modalLabel}>Confirmar nueva contraseña</Text>
+                  <TextInput
+                    style={styles.modalInput}
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    placeholder="Repite la nueva contraseña"
+                    placeholderTextColor={theme.colors.textLight}
+                    secureTextEntry
+                    autoCapitalize="none"
+                  />
+                </View>
+              )}
+            </ScrollView>
 
             <View style={styles.modalActions}>
               <Pressable
                 style={[styles.modalButton, styles.modalButtonSecondary]}
-                onPress={() => setEditModalVisible(false)}
+                onPress={() => {
+                  setEditModalVisible(false);
+                  setCurrentPassword('');
+                  setNewPassword('');
+                  setConfirmPassword('');
+                }}
               >
                 <Text style={styles.modalButtonTextSecondary}>Cancelar</Text>
               </Pressable>
@@ -589,7 +795,7 @@ const ProfileScreen: React.FC = () => {
                 style={[styles.modalButton, styles.modalButtonPrimary]}
                 onPress={handleEditProfile}
               >
-                <Text style={styles.modalButtonTextPrimary}>Guardar</Text>
+                <Text style={styles.modalButtonTextPrimary}>Guardar cambios</Text>
               </Pressable>
             </View>
           </View>
@@ -664,74 +870,6 @@ const ProfileScreen: React.FC = () => {
         </View>
       </Modal>
 
-      {/* Settings Modal */}
-      <Modal
-        visible={settingsModalVisible}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setSettingsModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { maxWidth: 500 }]}>
-            <View style={styles.settingsModalHeader}>
-              <Text style={styles.modalTitle}>Configuración</Text>
-              <Pressable
-                onPress={() => setSettingsModalVisible(false)}
-                style={styles.closeModalButton}
-              >
-                <MaterialCommunityIcons name="close" size={24} color={theme.colors.text.secondary} />
-              </Pressable>
-            </View>
-
-            <View style={styles.settingsList}>
-              <ListItemAjuste
-                icon="shield-check"
-                title="Seguridad y privacidad"
-                onPress={() => {
-                  setSettingsModalVisible(false);
-                  if (Platform.OS === 'web') {
-                    window.alert('Funcionalidad en desarrollo');
-                  } else {
-                    Alert.alert('Info', 'Funcionalidad en desarrollo');
-                  }
-                }}
-              />
-              <ListItemAjuste
-                icon="translate"
-                title="Idioma y accesibilidad"
-                onPress={() => {
-                  setSettingsModalVisible(false);
-                  if (Platform.OS === 'web') {
-                    window.alert('Funcionalidad en desarrollo');
-                  } else {
-                    Alert.alert('Info', 'Funcionalidad en desarrollo');
-                  }
-                }}
-              />
-              <ListItemAjuste
-                icon="help-circle"
-                title="Ayuda y soporte"
-                onPress={() => {
-                  setSettingsModalVisible(false);
-                  if (Platform.OS === 'web') {
-                    window.alert('Funcionalidad en desarrollo');
-                  } else {
-                    Alert.alert('Info', 'Funcionalidad en desarrollo');
-                  }
-                }}
-              />
-              <ListItemAjuste
-                icon="logout"
-                title="Cerrar sesión"
-                onPress={() => {
-                  setSettingsModalVisible(false);
-                  handleSignOut();
-                }}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
     </SafeAreaView>
   );
 };
@@ -1014,13 +1152,21 @@ const styles = StyleSheet.create({
     padding: theme.spacing.xxl,
     width: '100%',
     maxWidth: 400,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.lg,
   },
   modalTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: theme.colors.text,
-    marginBottom: theme.spacing.xl,
-    textAlign: 'center',
+  },
+  closeModalButton: {
+    padding: theme.spacing.xs,
   },
   modalField: {
     marginBottom: theme.spacing.lg,
@@ -1069,6 +1215,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
     color: theme.colors.background,
+  },
+  fieldHint: {
+    fontSize: 12,
+    color: theme.colors.primary,
+    marginTop: theme.spacing.xs,
+    fontStyle: 'italic',
+  },
+  sectionSeparator: {
+    marginVertical: theme.spacing.lg,
+    paddingTop: theme.spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.borderLight,
+  },
+  sectionSeparatorText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: theme.colors.textSecondary,
   },
   // Tourist Interests styles
   interestsContainer: {

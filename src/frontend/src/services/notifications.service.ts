@@ -46,7 +46,7 @@ export class NotificationsService {
 
       // Burbuja principal de conteo regresivo (solo la más próxima)
       if (daysUntilStart >= 0 && daysUntilStart <= 7) {
-        const countdownId = `itinerary-countdown-${itinerary.id}`;
+        const countdownId = `itinerary-countdown-${itinerary.id}-${startDate.getTime()}`;
         reminders.push({
           id: countdownId,
           type: 'itinerary_reminder',
@@ -66,7 +66,7 @@ export class NotificationsService {
       // Notificación 7 días antes
       if (daysUntilStart === 7) {
         reminders.push({
-          id: `itinerary-reminder-7d-${itinerary.id}`,
+          id: `itinerary-reminder-7d-${itinerary.id}-${startDate.getTime()}`,
           type: 'itinerary_reminder',
           title: 'Viaje próximo',
           message: `Tu viaje a ${itinerary.city} empieza en 7 días. ¡Prepárate!`,
@@ -82,7 +82,7 @@ export class NotificationsService {
       // Notificación 3 días antes
       if (daysUntilStart === 3) {
         reminders.push({
-          id: `itinerary-reminder-3d-${itinerary.id}`,
+          id: `itinerary-reminder-3d-${itinerary.id}-${startDate.getTime()}`,
           type: 'itinerary_reminder',
           title: 'Prepara tus maletas',
           message: `Comienza a ordenar tus maletas, se aproxima tu viaje a ${itinerary.city} el ${startDate.toLocaleDateString()}.`,
@@ -98,7 +98,7 @@ export class NotificationsService {
       // Notificación 2 días antes
       if (daysUntilStart === 2) {
         reminders.push({
-          id: `itinerary-reminder-2d-${itinerary.id}`,
+          id: `itinerary-reminder-2d-${itinerary.id}-${startDate.getTime()}`,
           type: 'itinerary_reminder',
           title: 'Prepara tus maletas',
           message: `Comienza a ordenar tus maletas, se aproxima tu viaje a ${itinerary.city} el ${startDate.toLocaleDateString()}.`,
@@ -114,7 +114,7 @@ export class NotificationsService {
       // Notificación 1 día antes
       if (daysUntilStart === 1) {
         reminders.push({
-          id: `itinerary-reminder-1d-${itinerary.id}`,
+          id: `itinerary-reminder-1d-${itinerary.id}-${startDate.getTime()}`,
           type: 'itinerary_reminder',
           title: 'Prepara tus maletas',
           message: `Comienza a ordenar tus maletas, se aproxima tu viaje a ${itinerary.city} el ${startDate.toLocaleDateString()}.`,
@@ -130,7 +130,7 @@ export class NotificationsService {
       // Notificación el día del viaje
       if (daysUntilStart === 0) {
         reminders.push({
-          id: `itinerary-reminder-today-${itinerary.id}`,
+          id: `itinerary-reminder-today-${itinerary.id}-${startDate.getTime()}`,
           type: 'itinerary_reminder',
           title: 'Prepara tus maletas',
           message: `Comienza a ordenar tus maletas, se aproxima tu viaje a ${itinerary.city} el ${startDate.toLocaleDateString()}.`,
@@ -310,14 +310,35 @@ export class NotificationsService {
    * Obtiene todas las notificaciones activas
    */
   public getNotifications(): NotificationItem[] {
-    return this.notifications;
+    // Normalizar y devolver una copia ordenada por timestamp desc
+    const unique: Record<string, NotificationItem> = {};
+
+    this.notifications.forEach((n) => {
+      const normalized: NotificationItem = {
+        ...n,
+        timestamp: n.timestamp instanceof Date ? n.timestamp : new Date(n.timestamp),
+      };
+      unique[normalized.id] = normalized;
+    });
+
+    return Object.values(unique).sort(
+      (a, b) => b.timestamp.getTime() - a.timestamp.getTime()
+    );
   }
 
   /**
    * Agrega una notificación
    */
   public addNotification(notification: NotificationItem): void {
-    this.notifications.unshift(notification);
+    const normalized: NotificationItem = {
+      ...notification,
+      // Asegurar que timestamp sea Date (puede venir como string del backend)
+      timestamp: notification.timestamp instanceof Date
+        ? notification.timestamp
+        : new Date(notification.timestamp),
+    };
+
+    this.notifications.unshift(normalized);
   }
 
   /**
