@@ -1,6 +1,7 @@
 ﻿import React, { useEffect, useState } from "react";
-import { View, Text, ActivityIndicator } from "react-native";
+import { View, Text, ActivityIndicator, Platform } from "react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import RootNav from "./navigation";
 import { PreferencesProvider } from "./contexts/PreferencesContext";
 
@@ -12,16 +13,27 @@ export default function App() {
   useEffect(() => {
     console.log("App.tsx cargado correctamente");
 
-    // Verificar si hay errores en el proceso de carga
-    window.addEventListener('error', (e) => {
-      console.error("Error global capturado:", e.error);
-      setError(e.error?.message || "Error desconocido");
-    });
+    // Solo agregar listeners de errores en plataforma web
+    if (Platform.OS === 'web') {
+      const handleError = (e: ErrorEvent) => {
+        console.error("Error global capturado:", e.error);
+        setError(e.error?.message || "Error desconocido");
+      };
 
-    window.addEventListener('unhandledrejection', (e) => {
-      console.error("Promise rechazada sin manejar:", e.reason);
-      setError(e.reason?.message || "Error en Promise");
-    });
+      const handleUnhandledRejection = (e: PromiseRejectionEvent) => {
+        console.error("Promise rechazada sin manejar:", e.reason);
+        setError(e.reason?.message || "Error en Promise");
+      };
+
+      window.addEventListener('error', handleError);
+      window.addEventListener('unhandledrejection', handleUnhandledRejection);
+
+      // Cleanup: remover listeners cuando el componente se desmonte
+      return () => {
+        window.removeEventListener('error', handleError);
+        window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+      };
+    }
   }, []);
 
   if (error) {
@@ -38,10 +50,12 @@ export default function App() {
   }
 
   return (
-    <QueryClientProvider client={client}>
-      <PreferencesProvider>
-        <RootNav />
-      </PreferencesProvider>
-    </QueryClientProvider>
+    <SafeAreaProvider>
+      <QueryClientProvider client={client}>
+        <PreferencesProvider>
+          <RootNav />
+        </PreferencesProvider>
+      </QueryClientProvider>
+    </SafeAreaProvider>
   );
 }

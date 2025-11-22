@@ -1,4 +1,3 @@
-import LeafletMapProvider from './providers/leaflet';
 import GoogleMapProvider from './providers/google';
 
 export interface MapMarker {
@@ -30,13 +29,12 @@ export interface IMapProvider {
 }
 
 export async function createMapProvider(): Promise<IMapProvider> {
-  // Expo usa process.env en lugar de import.meta.env
-  const provider = process.env.EXPO_PUBLIC_MAP_PROVIDER || 'leaflet';
+  // Solo se usa Google Maps ahora
   const apiKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY;
 
-  if (provider === 'google' && apiKey) {
+  if (apiKey) {
     return new GoogleMapProvider();
   }
 
-  return new LeafletMapProvider();
+  throw new Error('Google Maps API key is required. Set EXPO_PUBLIC_GOOGLE_MAPS_API_KEY in your environment.');
 }

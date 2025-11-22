@@ -1,6 +1,7 @@
-﻿import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
-import { getAuth, Auth } from "firebase/auth";
-import { getFirestore, Firestore } from "firebase/firestore";
+﻿// src/services/firebase.ts
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAHbDoCNtcZM6aa8tHvnT4LwMUPjeLg77w",
@@ -9,17 +10,26 @@ const firebaseConfig = {
   storageBucket: "proyectotai-cb31a.firebasestorage.app",
   messagingSenderId: "246782162173",
   appId: "1:246782162173:web:671c430045f43c0c2e3a94",
-  measurementId: "G-GVFPPMC6VD",
+  measurementId: "G-GVFPPMC6VD"
 };
 
-let app: FirebaseApp;
-let auth: Auth;
-let db: Firestore;
+let app;
+let auth;
+let db;
 
 try {
   console.log("Inicializando Firebase...");
-  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+
+  // Evita inicializar varias veces en hot-reload
+  const isFirstInit = getApps().length === 0;
+  app = isFirstInit ? initializeApp(firebaseConfig) : getApp();
+
+  // Firebase Auth con persistencia automática
+  // En Firebase v10+, la persistencia es automática en React Native
+  // cuando AsyncStorage está instalado (indexedDB en web)
   auth = getAuth(app);
+  console.log("✅ Firebase Auth inicializado");
+
   db = getFirestore(app);
   console.log("✅ Firebase inicializado correctamente");
 } catch (error) {

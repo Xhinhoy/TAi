@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(timeout 10 uvicorn:*)",
+      "Bash(cat:*)",
+      "Bash(find:*)",
+      "Bash(env)",
+      "Bash(unset:*)",
+      "Bash(chmod:*)",
+      "Bash(lsof:*)",
+      "Bash(curl:*)",
+      "Bash(source:*)",
+      "Bash(uvicorn:*)",
+      "Bash(npm start)",
+      "Bash(kill:*)",
+      "Bash(npx expo start:*)",
+      "Bash(pip install:*)",
+      "Bash(xargs kill:*)",
+      "Bash(pkill:*)",
+      "Bash(npx expo install expo-image-picker)",
+      "Bash(npx expo install:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

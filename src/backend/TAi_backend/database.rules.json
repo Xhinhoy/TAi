@@ -1,0 +1,25 @@
+{
+  "rules": {
+    "conversations": {
+      "$sessionId": {
+        "messages": {
+          ".indexOn": ["timestamp"],
+          ".read": "auth != null",
+          ".write": "auth != null"
+        },
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+    "cache": {
+      "$category": {
+        "$key": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    },
+    ".read": false,
+    ".write": false
+  }
+}

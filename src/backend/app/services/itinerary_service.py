@@ -14,6 +14,9 @@ class ItineraryService:
     
     def create_itinerary(self, uid: str, itinerary: ItineraryCreate) -> Itinerary:
         data = itinerary.model_dump()
+        if not data.get('start_date'):
+            from datetime import datetime
+            data['start_date'] = datetime.utcnow().date().isoformat()
         data['owner_uid'] = uid
         itinerary_id = itinerary_repository.create_itinerary(data)
         return Itinerary(id=itinerary_id, **data)

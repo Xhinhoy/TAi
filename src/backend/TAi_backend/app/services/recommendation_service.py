@@ -11,8 +11,12 @@ class RecommendationService:
             user_profile = user_service.get_profile(request.user_id)
             if not user_profile:
                 raise ValueError("Usuario no encontrado")
-            
-            agent = TravelAgent(user_profile.model_dump())
+
+            # Crear agente con user_id (aunque no usa historial en recomendaciones)
+            agent = TravelAgent(
+                user_profile=user_profile.model_dump(),
+                user_id=request.user_id
+            )
             
             location = request.location or {'city': user_profile.location}
             result = await agent.generate_recommendations(location, request.limit)

@@ -28,8 +28,8 @@ class UserPreferences(BaseModel):
 
 class UserProfile(BaseModel):
     uid: str
-    display_name: str
-    email: str
+    display_name: Optional[str] = None  # Opcional - se puede obtener del token de Firebase
+    email: Optional[str] = None  # Opcional - se puede obtener del token de Firebase
     photo_url: Optional[str] = None
     location: str = ""
     language: str = "es"

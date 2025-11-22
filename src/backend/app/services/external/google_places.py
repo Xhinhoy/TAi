@@ -7,23 +7,16 @@ import logging
 import time
 import hashlib
 import json
-import requests
-import re
-import asyncio
-import aiohttp
-
 
 logger = logging.getLogger(__name__)
 
 class GooglePlacesFacade:
     def __init__(self):
-        self.api_key = (
-            settings.GOOGLE_PLACES_API_KEY.get_secret_value()
-            if settings.GOOGLE_PLACES_API_KEY
-            else None
-        )
-        self.client = googlemaps.Client(key=self.api_key)
-        self.base_url = "https://maps.googleapis.com/maps/api/place"  
+        self.client = googlemaps.Client(
+                key=settings.GOOGLE_PLACES_API_KEY.get_secret_value()
+                if settings.GOOGLE_PLACES_API_KEY
+                else None
+            )
         self.rate_limit = settings.GOOGLE_PLACES_RATE_LIMIT
         self.last_request_time = 0
         self.cache_prefix = 'google_places'
@@ -42,9 +35,7 @@ class GooglePlacesFacade:
     def _generate_cache_key(self, operation: str, params: Dict) -> str:
         params_str = json.dumps(params, sort_keys=True)
         key_str = f"{operation}_{params_str}"
-        # ✅ Elimina caracteres ilegales
-        safe_key = re.sub(r'[^a-zA-Z0-9]', '_', key_str)
-        return hashlib.md5(safe_key.encode()).hexdigest()
+        return hashlib.md5(key_str.encode()).hexdigest()
     
     def search_nearby(
         self,
@@ -96,82 +87,43 @@ class GooglePlacesFacade:
     # ================================================================
     # INSERTAR AQUÍ el NUEVO MÉTODO text_search()
     # ================================================================
-    async def text_search(self, query: str, location: Dict, radius: int = 5000) -> List[Dict]:
-        """Busca lugares con datos detallados (paraleliza requests)."""
-        from app.utils.cache import firebase_cache
+    def text_search(
+        self,
+        query: str,
+        location: Optional[Dict[str, float]] = None,
+        radius: int = 5000
+    ) -> List[Dict]:
+        """
+        Búsqueda de lugares por texto libre (ejemplo: 'restaurantes en Santiago')
+        Usa la API oficial 'places' de googlemaps.
+        """
+        cache_params = {'query': query, 'location': location, 'radius': radius}
+        cache_key = self._generate_cache_key('text_search', cache_params)
 
-        cache_key = f"text_search_{query}_{location.get('latitude')}_{location.get('longitude')}"
-        cached = firebase_cache.get("google_places", cache_key)
-        if cached:
+        cached_result = firebase_cache.get(self.cache_prefix, cache_key)
+        if cached_result:
             logger.info("Google Places text_search obtenido del caché")
-            return cached
+            return cached_result
 
         try:
             self._rate_limit_check()
 
-            params = {
-                "query": query,
-                "location": f"{location['latitude']},{location['longitude']}",
-                "radius": radius,
-                "key": self.api_key,
-            }
+            params = {'query': query}
+            if location:
+                params['location'] = (location['latitude'], location['longitude'])
+                params['radius'] = radius
 
-            # --- Primera request: búsqueda base ---
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{self.base_url}/textsearch/json", params=params, timeout=10) as resp:
-                    data = await resp.json()
+            results = self.client.places(**params)
+            formatted_results = self._format_results(results.get('results', []))
 
-                results = data.get("results", [])[:5]  # limitamos a 5 resultados buenos
-
-                # --- Peticiones paralelas para obtener detalles de cada lugar ---
-                async def fetch_details(place_id):
-                    details_params = {
-                        "place_id": place_id,
-                        "fields": "name,geometry,formatted_address,rating,price_level,opening_hours,user_ratings_total,types,photos",
-                        "key": self.api_key,
-                    }
-                    async with session.get(f"{self.base_url}/details/json", params=details_params, timeout=10) as r:
-                        det = await r.json()
-                        return det.get("result", {})
-
-                tasks = [fetch_details(r["place_id"]) for r in results if "place_id" in r]
-                details_list = await asyncio.gather(*tasks, return_exceptions=True)
-
-                enriched = []
-                for base, details in zip(results, details_list):
-                    if not isinstance(details, dict):
-                        continue
-
-                    # Normalizamos los datos
-                    geometry = details.get("geometry", {}).get("location", base.get("geometry", {}).get("location", {}))
-                    enriched.append({
-                        "id": base.get("place_id"),
-                        "name": base.get("name"),
-                        "address": base.get("formatted_address"),
-                        "rating": base.get("rating") or details.get("rating"),
-                        "price_level": base.get("price_level") or details.get("price_level"),
-                        "opening_hours": details.get("opening_hours"),
-                        "location": geometry,
-                        "photos": [
-                            f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={p['photo_reference']}&key={self.api_key}"
-                            for p in (details.get("photos") or base.get("photos") or [])
-                        ]
-                    })
-            opening = details.get("opening_hours") or base.get("opening_hours")
-            if opening:
-                details["opening_hours"] = {
-                    "open_now": opening.get("open_now"),
-                    "weekday_text": opening.get("weekday_text", [])
-                }
-            firebase_cache.set("google_places", cache_key, enriched, self.cache_ttl)
+            firebase_cache.set(self.cache_prefix, cache_key, formatted_results, self.cache_ttl)
             logger.info("Google Places text_search guardado en caché")
-            return enriched
+
+            return formatted_results
 
         except Exception as e:
-            logger.error(f"Error en text_search: {e}")
+            logger.error(f"Error en text_search: {str(e)}")
             return []
-
-
     # ================================================================
     # 🔹 FIN DE INSERCIÓN text_search()
     # ================================================================
@@ -215,17 +167,9 @@ class GooglePlacesFacade:
                 "photos": [
                     f"https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference={p.get('photo_reference')}&key={settings.GOOGLE_PLACES_API_KEY.get_secret_value()}"
                     for p in r.get("photos", [])
-                ] if r.get("photos") else [],
-                "opening_hours": {
-                    "open_now": r.get("opening_hours", {}).get("open_now"),
-                    "weekday_text": r.get("opening_hours", {}).get("weekday_text", [])
-                }
+                ] if r.get("photos") else []
             })
         return formatted
-
     # ================================================================
     # 🔹 FIN DE INSERCIÓN _format_results()
     # ================================================================
-
-    # 👇 ESTA LÍNEA ES LA QUE FALTABA
-google_places_facade = GooglePlacesFacade()

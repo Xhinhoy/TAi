@@ -157,7 +157,7 @@ class TravelAgent:
 
             Perfil actual del usuario:
             {profile_str}
-            No repitas la misma herramienta más de una vez seguida y no vuelvas a usar una herramienta si ya obtuviste resultados válidos.
+
             Responde SIEMPRE siguiendo el formato indicado, sin saltarte las etiquetas.
             """
 
@@ -176,24 +176,6 @@ class TravelAgent:
             # 🔹 Crea el agente compatible con herramientas
             react_agent = create_react_agent(self.llm, self.tools, prompt)
 
-            # 🚫 Evitar repeticiones innecesarias de la misma herramienta
-            # Este wrapper intercepta llamadas duplicadas consecutivas del mismo tipo
-            last_action = {"tool": None}
-
-            async def limited_invoke(input_data):
-                nonlocal last_action
-                if "Action:" in input_data.get("input", ""):
-                    current_tool = None
-                    for tool in ["search_places", "filter_by_interests", "get_place_details", "optimize_route"]:
-                        if tool in input_data["input"]:
-                            current_tool = tool
-                            break
-                    if current_tool == last_action["tool"]:
-                        logger.warning(f"🛑 Repetición evitada de herramienta: {current_tool}")
-                        return {"output": "Agent stopped: repeated tool usage prevented."}
-                    last_action["tool"] = current_tool
-                return await executor.ainvoke(input_data)
-
             # 🔹 Executor con memoria y control
             executor = AgentExecutor(
                 agent=react_agent,
@@ -201,147 +183,39 @@ class TravelAgent:
                 verbose=True,
                 memory=self.memory,
                 handle_parsing_errors=True,
-                max_iterations=3,
-                early_stopping_method="force"
+                max_iterations=4,  # sigue igual
+                early_stopping_method="force"  # ✅ fuerza salida limpia
             )
-            # 🧠 Preprocesamiento adicional antes de ejecutar
-            # Si el mensaje del usuario menciona "lugares" o "recomiendas", el agente se prepara para devolver JSON limpio
-            if any(keyword in message.lower() for keyword in ["lugar", "recomienda", "recomendación"]):
-                message = (
-                    f"{message.strip()}\n\n"
-                    "IMPORTANTE: Cuando devuelvas los resultados de 'search_places', "
-                    "usa formato JSON con la estructura exacta:\n"
-                    "[{'name': 'Nombre', 'address': 'Dirección', 'rating': 4.5}].\n"
-                    "Evita listas numeradas o texto plano. Esto permitirá usar 'filter_by_interests' correctamente."
-                )
 
-            # 🔹 Ejecuta el flujo ReAct
-            response = await limited_invoke({"input": message})
+            # 🔹 Ejecución moderna
+            response = await executor.ainvoke({"input": message})
             final_text = response.get("output", "").strip()
-                        # 🔍 Interceptar JSON_RESULT si el modelo lo generó dentro del texto
-            if "JSON_RESULT=" in final_text:
-                try:
-                    json_part = final_text.split("JSON_RESULT=")[-1].strip()
-                    if json_part.startswith("[") and "]" in json_part:
-                        json_data = json_part.split("]")[0] + "]"
-                        places_json = json.loads(json_data)
 
-                        # 🔹 Filtrar los lugares por intereses del usuario
-                        from app.services.llm.tools import FilterPlacesByInterestsTool
-                        filter_tool = FilterPlacesByInterestsTool()
-                        filtered_json = filter_tool._run(
-                            input={
-                                "places": places_json,
-                                "interests": self.user_profile.get("interests", ["museos", "parques", "monumentos"])
-                            }
-                        )
+            #  Limpieza del texto final (soporta o no "Final Answer:")
+            if "Final Answer:" in final_text:
+                final_text = final_text.split("Final Answer:")[-1].strip()
 
-                        filtered_places = json.loads(filtered_json)
+            #  Detección de lugares con estrellas o resultados
+            if "Encontré algunos lugares" in final_text or "⭐" in final_text:
+                return {
+                    "response": final_text,
+                    "actions": ["search_places"],
+                    "places": self._extract_places_from_text(final_text)
+                }
 
-                        # 🔹 Preparar texto final para el usuario
-                        if filtered_places:
-                            top_places = [p["name"] for p in filtered_places[:2]]
-                            place_list = " y ".join(top_places)
-                            final_text = (
-                                f"Te recomiendo visitar {place_list}. "
-                                "¿Quieres que te prepare un itinerario con ellos?"
-                            )
-                        else:
-                            top_places = [p["name"] for p in places_json[:2]]
-                            place_list = " y ".join(top_places)
-                            final_text = (
-                                f"Encontré algunos lugares interesantes como {place_list}. "
-                                "¿Quieres que te prepare un itinerario con ellos?"
-                            )
+            #  Si el agente no llegó a una respuesta final, intentamos rescatar los lugares del último resultado
+            if not final_text or "agent stopped" in final_text.lower():
+                # Buscar lugares en caché o dentro del texto de ejecución
+                extracted_places = self._extract_places_from_text(final_text)
+                
+                # Si no se extrajeron, buscar en memoria del agente (últimos mensajes)
+                if not extracted_places and hasattr(self.memory, "chat_memory"):
+                    for msg in reversed(self.memory.chat_memory.messages):
+                        if isinstance(msg.content, str) and "Encontré algunos lugares" in msg.content:
+                            extracted_places = self._extract_places_from_text(msg.content)
+                            break
 
-                        return {
-                            "response": final_text,
-                            "actions": ["search_places", "filter_by_interests"],
-                            "places": filtered_places or places_json
-                        }
-
-                except Exception as e:
-                    logger.warning(f"Error procesando JSON_RESULT inline: {e}")
-            # ✅ Procesamiento inline de JSON_RESULT detectado en la salida
-            if "JSON_RESULT=" in final_text:
-                try:
-                    json_part = final_text.split("JSON_RESULT=")[-1].strip()
-                    if json_part.startswith("[") and "]" in json_part:
-                        json_data = json_part.split("]")[0] + "]"
-                        places_json = json.loads(json_data)
-
-                        from app.services.llm.tools import FilterPlacesByInterestsTool
-                        filter_tool = FilterPlacesByInterestsTool()
-                        filtered_json = filter_tool._run(
-                            input={
-                                "places": places_json,
-                                "interests": self.user_profile.get("interests", ["museos", "parques", "monumentos"])
-                            }
-                        )
-
-                        filtered_places = json.loads(filtered_json)
-
-                        if filtered_places:
-                            top_places = [p["name"] for p in filtered_places[:2]]
-                            place_list = " y ".join(top_places)
-                            final_text = (
-                                f"Te recomiendo visitar {place_list}. "
-                                "¿Quieres que te prepare un itinerario con ellos?"
-                            )
-                        else:
-                            top_places = [p["name"] for p in places_json[:2]]
-                            place_list = " y ".join(top_places)
-                            final_text = (
-                                f"Encontré algunos lugares interesantes como {place_list}. "
-                                "¿Quieres que te prepare un itinerario con ellos?"
-                            )
-
-                        return {
-                            "response": final_text,
-                            "actions": ["search_places", "filter_by_interests"],
-                            "places": filtered_places or places_json
-                        }
-
-                except Exception as e:
-                    logger.warning(f"Error procesando JSON_RESULT inline: {e}")
-
-            # ⚙️ Si el agente se detuvo sin "Final Answer", rescatar lugares del texto
-                        # ⚙️ Si el agente se detuvo sin "Final Answer", intentar rescatar lugares del texto o JSON embebido
-            if "Agent stopped" in final_text or not final_text:
-                extracted_places = self._extract_places_from_text(str(response))
-
-                # 🧩 Si existe JSON_RESULT, procesarlo directamente
-                if "JSON_RESULT=" in str(response):
-                    try:
-                        json_data = str(response).split("JSON_RESULT=")[-1].strip()
-                        if json_data.endswith("]") or json_data.endswith("}"):
-                            places_json = json.loads(json_data.split("JSON_RESULT=")[-1])
-                            # 🔹 Llamar automáticamente al filtro por intereses
-                            from app.services.llm.tools import FilterPlacesByInterestsTool
-                            filter_tool = FilterPlacesByInterestsTool()
-                            filtered_json = filter_tool._run(
-                                input={
-                                    "places": places_json,
-                                    "interests": self.user_profile.get("interests", ["museos", "parques", "monumentos"])
-                                }
-                            )
-                            filtered_places = json.loads(filtered_json)
-                            if filtered_places:
-                                top_places = [p["name"] for p in filtered_places[:2]]
-                                place_list = " y ".join(top_places)
-                                final_text = (
-                                    f"Te recomiendo visitar {place_list}. "
-                                    "¿Quieres que te prepare un itinerario con ellos?"
-                                )
-                                return {
-                                    "response": final_text,
-                                    "actions": ["search_places", "filter_by_interests"],
-                                    "places": filtered_places
-                                }
-                    except Exception as e:
-                        logger.warning(f"Error procesando JSON_RESULT: {e}")
-
-                # 🔹 Si no hay JSON, usa la extracción por texto
+                # Tomar los primeros 2 lugares válidos
                 if extracted_places:
                     top_places = [p["name"] for p in extracted_places[:2]]
                     place_list = " y ".join(top_places)
@@ -351,103 +225,16 @@ class TravelAgent:
                     )
                 else:
                     final_text = (
-                        "Parece que no logré completar la búsqueda, pero puedo ofrecerte nuevas recomendaciones. "
-                        "¿Quieres que lo intente nuevamente?"
+                        "No logré obtener los lugares exactos, pero puedo buscar opciones cercanas. "
+                        "¿Quieres que te recomiende algunos?"
                     )
-
-            # ✅ Limpieza del texto final
-            if "Final Answer:" in final_text:
-                final_text = final_text.split("Final Answer:")[-1].strip()
-
-            # ✅ Detecta lugares con estrellas o listado
-            if "Encontré algunos lugares" in final_text or "⭐" in final_text:
-                return {
-                    "response": final_text,
-                    "actions": ["search_places"],
-                    "places": self._extract_places_from_text(final_text)
-                }
-
-            # 🧩 Si el agente no llegó a una respuesta final, intenta recuperar los lugares
-            extracted_places = self._extract_places_from_text(final_text)
-
-            if not extracted_places and hasattr(self.memory, "chat_memory"):
-                for msg in reversed(self.memory.chat_memory.messages):
-                    if isinstance(msg.content, str) and "Encontré algunos lugares" in msg.content:
-                        extracted_places = self._extract_places_from_text(msg.content)
-                        break
-
-            # ✅ Si hay lugares, genera una respuesta amigable con los dos primeros
-            if extracted_places:
-                top_places = [p["name"] for p in extracted_places[:2]]
-                place_list = " y ".join(top_places)
-                final_text = (
-                    f"Encontré algunos lugares interesantes como {place_list}. "
-                    "¿Quieres que te prepare un itinerario con ellos?"
-                )
-
-                        # ✅ Si llegamos aquí y hay JSON_RESULT en el texto, procesarlo automáticamente
-                        # ✅ Detección automática del JSON_RESULT (sin depender del modelo)
-            if "JSON_RESULT=" in str(response) or "JSON_RESULT=" in final_text:
-                try:
-                    raw_text = str(response) if "JSON_RESULT=" in str(response) else final_text
-                    json_part = raw_text.split("JSON_RESULT=")[-1].strip()
-
-                    # Extraer JSON limpio
-                    if json_part.startswith("[") and "]" in json_part:
-                        json_data = json_part.split("]")[0] + "]"
-                        places_json = json.loads(json_data)
-
-                        # 🔹 Ejecutar el filtrado localmente (bypass del LLM)
-                        from app.services.llm.tools import FilterPlacesByInterestsTool
-                        filter_tool = FilterPlacesByInterestsTool()
-                        filtered_json = filter_tool._run(
-                            input={
-                                "places": places_json,
-                                "interests": self.user_profile.get("interests", ["museos", "parques", "monumentos"])
-                            }
-                        )
-
-                        filtered_places = json.loads(filtered_json)
-
-                        if filtered_places:
-                            top_places = [p["name"] for p in filtered_places[:2]]
-                            place_list = " y ".join(top_places)
-                            final_text = (
-                                f"Te recomiendo visitar {place_list}. "
-                                "¿Quieres que te prepare un itinerario con ellos?"
-                            )
-
-                            return {
-                                "response": final_text,
-                                "actions": ["search_places", "filter_by_interests"],
-                                "places": filtered_places
-                            }
-                        else:
-                            # fallback si el filtro no encontró coincidencias
-                            top_places = [p["name"] for p in places_json[:2]]
-                            place_list = " y ".join(top_places)
-                            final_text = (
-                                f"Encontré algunos lugares interesantes como {place_list}. "
-                                "¿Quieres que te prepare un itinerario con ellos?"
-                            )
-
-                            return {
-                                "response": final_text,
-                                "actions": ["search_places"],
-                                "places": places_json
-                            }
-
-                except Exception as e:
-                    logger.warning(f"Error procesando JSON_RESULT: {e}")
-
-
-            # ✅ Si no hubo JSON_RESULT o no se filtró nada
+            # ✅ Si llegó hasta aquí, devolvemos una respuesta segura
             return {
                 "response": final_text or "No tengo información disponible en este momento.",
-                "actions": ["search_places"] if extracted_places else [],
-                "places": extracted_places or []
+                "actions": [],
+                "places": self._extract_places_from_text(final_text) or []
             }
-
+        
         except Exception as e:
             logger.error(f"Error en chat: {str(e)}")
             return {
@@ -455,7 +242,7 @@ class TravelAgent:
                 "actions": [],
                 "places": []
             }
-
+        
     def _extract_places_from_text(self, text: str) -> list[dict]:
         """Extrae nombres y direcciones de lugares desde el texto del bot"""
         places = []

@@ -3,6 +3,7 @@ import { View, Text, ActivityIndicator } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "../hooks/useAuth";
 import Login from "../screens/Auth/Login";
@@ -29,6 +30,8 @@ const Screen = (title: string) => () => (
 );
 
 function TabsNavigator() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs.Navigator
       screenOptions={{
@@ -39,8 +42,8 @@ function TabsNavigator() {
           borderTopWidth: 1,
           borderTopColor: colors.neutral[200],
           paddingTop: 8,
-          paddingBottom: 8,
-          height: 60,
+          paddingBottom: Math.max(insets.bottom, 8),
+          height: 60 + Math.max(insets.bottom - 8, 0),
         },
         tabBarLabelStyle: {
           fontSize: 12,

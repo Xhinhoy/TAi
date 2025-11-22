@@ -10,15 +10,40 @@ export type Place = {
   photos?: string[];
   source: "google"|"tripadvisor"|"hybrid";
   categories: string[];
-  opening_hours?: {
-  open_now?: boolean;
-  weekday_text?: string[];
-  };
-  openNow?: boolean;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
 };
 
+export type ItineraryActivity = {
+  place_id: string;
+  place_name: string;
+  start: string;
+  end: string;
+  price_level: number;
+  price_display: string;
+  notes: string;
+};
+
+export type ItineraryDay = {
+  day: number;
+  activities: ItineraryActivity[];
+};
+
+export type Itinerary = {
+  id: string;
+  title: string;
+  city: string;
+  days: ItineraryDay[];
+  owner_uid?: string;
+  ownerUid?: string;  // Alias para compatibilidad
+  reasoning?: string;
+  created_at?: any;
+  createdAt?: Timestamp;
+  updated_at?: any;
+  updatedAt?: Timestamp;
+};
+
+// Tipo legacy para compatibilidad con código antiguo
 export type ItineraryItem = {
   day: number;
   placeId: string;
@@ -26,21 +51,3 @@ export type ItineraryItem = {
   end: string;
   notes?: string;
 };
-
-export type Itinerary = {
-  id: string;
-  title: string;
-  city: string;
-  days: number;
-  items: ItineraryItem[];
-  ownerUid: string;
-  score?: number;
-  createdAt?: Timestamp;
-  updatedAt?: Timestamp;
-};
-export interface UserPreferences {
-  budget?: 'low' | 'medium' | 'high';
-  interests: string[];
-  preferredLanguage?: string;
-  accessibility?: string[];
-}

@@ -22,7 +22,7 @@ class ChatService:
             })
 
             # -------------------------------
-            #  MODO CONMUTADOR MOCK / FIREBASE
+            # 🔁 MODO CONMUTADOR MOCK / FIREBASE
             # -------------------------------
             user_profile = None
             if not settings.MOCK_MODE:
@@ -57,26 +57,11 @@ class ChatService:
                 'content': result['response']
             })
 
-            # ----------------------------------------------------
-            # 🔍 Extraer lugares del texto si el agente devolvió JSON_RESULT
-            # ----------------------------------------------------
-            import json, re
-            places_list = result.get('places', [])
-
-            if not places_list and "JSON_RESULT=" in result.get('response', ''):
-                try:
-                    json_match = re.search(r'JSON_RESULT\s*=\s*(\[.*?\])', result['response'], re.DOTALL)
-                    if json_match:
-                        places_list = json.loads(json_match.group(1))
-                        logger.info(f"✅ Lugares extraídos desde JSON_RESULT: {len(places_list)} encontrados.")
-                except Exception as e:
-                    logger.warning(f"No se pudieron parsear los lugares: {e}")
-
             # Formatear respuesta para frontend
             return ChatResponse(
                 response=result.get('response', 'Sin respuesta generada'),
                 actions=result.get('actions', []),
-                places=places_list,
+                places=result.get('places', []),
             )
 
         except Exception as e:

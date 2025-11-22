@@ -3,43 +3,94 @@ from typing import Optional, Any
 import json
 import time
 import logging
+import gzip
+import base64
 
 logger = logging.getLogger(__name__)
 
 class FirebaseCache:
-    """Sistema de caché usando Firebase Realtime Database"""
+    """Sistema de caché usando Firebase Realtime Database con compresión gzip"""
 
-    def __init__(self, default_ttl: int = 3600):
-        from app.core.config import settings
-
+    def __init__(self, default_ttl: int = 3600, enable_compression: bool = True):
+        self.firebase_service = firebase_service  # Exponer para acceso directo
+        self.db = firebase_service.realtime_db
         self.default_ttl = default_ttl
-        self.mock_mode = settings.MOCK_MODE
+        self.cache_ref = self.db.child('cache') # type: ignore
+        self.enable_compression = enable_compression
 
-        if self.mock_mode:
-            logger.warning("🧪 FirebaseCache en MOCK_MODE: usando dict local")
-            self.db = None
-            self.cache_ref = None
-            self._mock_cache = {}  # Cache en memoria
-        else:
-            self.db = firebase_service.realtime_db
-            self.cache_ref = self.db.child('cache') if self.db else None
-            self._mock_cache = None
+        # Estadísticas de compresión
+        self.compression_stats = {
+            'total_compressed': 0,
+            'total_original_bytes': 0,
+            'total_compressed_bytes': 0
+        }
     
     def _get_key_path(self, prefix: str, key: str) -> str:
         return f"{prefix}/{key}"
-    
-    def get(self, prefix: str, key: str) -> Optional[Any]:
-        if self.mock_mode:
-            path = self._get_key_path(prefix, key)
-            cached_data = self._mock_cache.get(path)
-            if not cached_data:
-                return None
-            expires_at = cached_data.get('expires_at', 0)
-            if time.time() > expires_at:
-                del self._mock_cache[path]
-                return None
-            return cached_data.get('value')
 
+    def _compress_value(self, value: Any) -> str:
+        """
+        Comprime un valor usando gzip y lo codifica en base64
+
+        Returns:
+            String base64 del valor comprimido
+        """
+        try:
+            # Convertir a JSON
+            json_str = json.dumps(value)
+            json_bytes = json_str.encode('utf-8')
+
+            # Comprimir con gzip
+            compressed = gzip.compress(json_bytes, compresslevel=6)
+
+            # Codificar en base64 para Firebase
+            compressed_b64 = base64.b64encode(compressed).decode('ascii')
+
+            # Estadísticas
+            original_size = len(json_bytes)
+            compressed_size = len(compressed)
+            ratio = (1 - compressed_size / original_size) * 100 if original_size > 0 else 0
+
+            self.compression_stats['total_compressed'] += 1
+            self.compression_stats['total_original_bytes'] += original_size
+            self.compression_stats['total_compressed_bytes'] += compressed_size
+
+            logger.debug(f"Compresión: {original_size}B → {compressed_size}B ({ratio:.1f}% reducción)")
+
+            return compressed_b64
+
+        except Exception as e:
+            logger.error(f"Error comprimiendo valor: {str(e)}")
+            raise
+
+    def _decompress_value(self, compressed_b64: str) -> Any:
+        """
+        Descomprime un valor desde base64 + gzip
+
+        Args:
+            compressed_b64: String base64 del valor comprimido
+
+        Returns:
+            Valor original deserializado
+        """
+        try:
+            # Decodificar base64
+            compressed = base64.b64decode(compressed_b64.encode('ascii'))
+
+            # Descomprimir gzip
+            json_bytes = gzip.decompress(compressed)
+
+            # Parsear JSON
+            json_str = json_bytes.decode('utf-8')
+            value = json.loads(json_str)
+
+            return value
+
+        except Exception as e:
+            logger.error(f"Error descomprimiendo valor: {str(e)}")
+            raise
+
+    def get(self, prefix: str, key: str) -> Optional[Any]:
         try:
             path = self._get_key_path(prefix, key)
             cached_data = self.cache_ref.child(path).get()
@@ -52,32 +103,57 @@ class FirebaseCache:
                 self.delete(prefix, key)
                 return None
 
-            return cached_data.get('value') # type: ignore
+            # Obtener valor (puede estar comprimido o no)
+            value_data = cached_data.get('value') # type: ignore
+            is_compressed = cached_data.get('compressed', False) # type: ignore
+
+            # Si está comprimido, descomprimir
+            if is_compressed and isinstance(value_data, str):
+                try:
+                    return self._decompress_value(value_data)
+                except Exception as e:
+                    logger.error(f"Error descomprimiendo, retornando valor raw: {str(e)}")
+                    return value_data
+
+            return value_data
 
         except Exception as e:
             logger.error(f"Error obteniendo del caché: {str(e)}")
             return None
     
     def set(self, prefix: str, key: str, value: Any, ttl: Optional[int] = None) -> bool:
-        if self.mock_mode:
-            path = self._get_key_path(prefix, key)
-            expires_at = time.time() + (ttl or self.default_ttl)
-            self._mock_cache[path] = {
-                'value': value,
-                'expires_at': expires_at,
-                'created_at': time.time()
-            }
-            return True
-
         try:
             path = self._get_key_path(prefix, key)
             expires_at = time.time() + (ttl or self.default_ttl)
 
-            cache_data = {
-                'value': value,
-                'expires_at': expires_at,
-                'created_at': time.time()
-            }
+            # Decidir si comprimir
+            should_compress = self.enable_compression
+
+            # Preparar valor (comprimir si está habilitado)
+            if should_compress:
+                try:
+                    compressed_value = self._compress_value(value)
+                    cache_data = {
+                        'value': compressed_value,
+                        'compressed': True,
+                        'expires_at': expires_at,
+                        'created_at': time.time()
+                    }
+                except Exception as e:
+                    logger.warning(f"No se pudo comprimir, guardando sin compresión: {str(e)}")
+                    cache_data = {
+                        'value': value,
+                        'compressed': False,
+                        'expires_at': expires_at,
+                        'created_at': time.time()
+                    }
+            else:
+                cache_data = {
+                    'value': value,
+                    'compressed': False,
+                    'expires_at': expires_at,
+                    'created_at': time.time()
+                }
 
             self.cache_ref.child(path).set(cache_data)
             return True
@@ -87,11 +163,6 @@ class FirebaseCache:
             return False
     
     def delete(self, prefix: str, key: str) -> bool:
-        if self.mock_mode:
-            path = self._get_key_path(prefix, key)
-            self._mock_cache.pop(path, None)
-            return True
-
         try:
             path = self._get_key_path(prefix, key)
             self.cache_ref.child(path).delete()
@@ -101,12 +172,6 @@ class FirebaseCache:
             return False
     
     def clear_prefix(self, prefix: str) -> bool:
-        if self.mock_mode:
-            keys_to_delete = [k for k in self._mock_cache.keys() if k.startswith(prefix)]
-            for k in keys_to_delete:
-                del self._mock_cache[k]
-            return True
-
         try:
             self.cache_ref.child(prefix).delete()
             return True
@@ -129,33 +194,21 @@ class FirebaseCache:
         return value
     
     def clean_expired(self, prefix: str) -> int:
-        if self.mock_mode:
-            current_time = time.time()
-            keys_to_delete = []
-            for path, data in self._mock_cache.items():
-                if path.startswith(prefix):
-                    expires_at = data.get('expires_at', 0)
-                    if current_time > expires_at:
-                        keys_to_delete.append(path)
-            for k in keys_to_delete:
-                del self._mock_cache[k]
-            return len(keys_to_delete)
-
         try:
             entries = self.cache_ref.child(prefix).get()
             if not entries:
                 return 0
-
+            
             deleted_count = 0
             current_time = time.time()
-
+            
             for key, data in entries.items(): # type: ignore
                 if isinstance(data, dict):
                     expires_at = data.get('expires_at', 0)
                     if current_time > expires_at:
                         self.delete(prefix, key)
                         deleted_count += 1
-
+            
             logger.info(f"Limpiadas {deleted_count} entradas expiradas de {prefix}")
             return deleted_count
 
@@ -163,4 +216,28 @@ class FirebaseCache:
             logger.error(f"Error limpiando expirados: {str(e)}")
             return 0
 
-firebase_cache = FirebaseCache(default_ttl=3600)
+    def get_compression_stats(self) -> dict:
+        """
+        Obtiene estadísticas de compresión
+
+        Returns:
+            {
+                'total_compressed': int,
+                'total_original_bytes': int,
+                'total_compressed_bytes': int,
+                'compression_ratio': float,
+                'space_saved_percent': float
+            }
+        """
+        stats = self.compression_stats.copy()
+
+        if stats['total_original_bytes'] > 0:
+            stats['compression_ratio'] = stats['total_compressed_bytes'] / stats['total_original_bytes']
+            stats['space_saved_percent'] = (1 - stats['compression_ratio']) * 100
+        else:
+            stats['compression_ratio'] = 0.0
+            stats['space_saved_percent'] = 0.0
+
+        return stats
+
+firebase_cache = FirebaseCache(default_ttl=3600, enable_compression=True)

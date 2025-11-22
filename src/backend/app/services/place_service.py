@@ -1,31 +1,7 @@
-from typing import Optional, List, Dict
-from app.models.place import Place
+from app.repositories.place_repository import place_repository
 from app.services.external.google_places import GooglePlacesFacade
-from app.utils.cache import firebase_cache
-from app.core.config import settings
-import logging
-
-from pydantic import BaseModel
-
-class PlaceSearchParams(BaseModel):
-    query: Optional[str] = None
-    category: Optional[str] = None
-    min_rating: Optional[float] = None
-    max_price_level: Optional[int] = None
-    limit: int = 10
-
-from pydantic import BaseModel
-
-class PlaceDetails(BaseModel):
-    name: str
-    address: Optional[str] = None
-    rating: Optional[float] = None
-    phone_number: Optional[str] = None
-    website: Optional[str] = None
-    types: Optional[List[str]] = []
-    location: Optional[Dict[str, float]] = None
-    source: Optional[str] = "google"
-
+from app.models.place import Place, PlaceDetails, PlaceSearchParams
+from typing import List, Optional
 
 class PlaceService:
     def search_places(self, params: PlaceSearchParams) -> List[Place]:

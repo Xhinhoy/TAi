@@ -1,4 +1,3 @@
-# ==================== app/services/chat_service.py ====================
 from app.repositories.chat_repository import chat_repository
 from app.services.llm.agent import TravelAgent
 from app.services.user_service import user_service
@@ -13,63 +12,55 @@ class ChatService:
     
     async def send_message(self, request: ChatRequest) -> ChatResponse:
         """Procesa un mensaje del usuario"""
-        from app.core.config import settings
-        import time
-
         try:
-            # MODO MOCK: respuesta simple sin Firebase/LLM
-            if settings.MOCK_MODE:
-                logger.info(f"🧪 MOCK_MODE: respondiendo con mock para mensaje: {request.message}")
-                # Simular pequeño delay (100ms) para realismo
-                time.sleep(0.1)
-                return ChatResponse(
-                    response=f"[MOCK] Recibí tu mensaje: '{request.message}'. Estoy funcionando correctamente en modo prueba.",
-                    conversation_id=request.session_id,
-                    suggestions=["¿Qué lugares me recomiendas?", "Crea un itinerario de 3 días"],
-                    actions=[],
-                    places=[]
-                )
-
             # Guardar mensaje del usuario
-            chat_repository.save_message(request.session_id, {
-                'role': 'user',
-                'content': request.message
-            })
-
-            # Obtener perfil (crear uno básico si no existe)
+            chat_repository.save_message(
+                request.session_id,
+                {
+                    'role': 'user',
+                    'content': request.message
+                },
+                owner_uid=request.user_id
+            )
+            
+            # Obtener perfil
             user_profile = user_service.get_profile(request.user_id)
             if not user_profile:
-                logger.warning(f"Usuario {request.user_id} no existe, creando perfil básico")
-                from app.models.user import UserProfile
-                user_profile = UserProfile(
-                    uid=request.user_id,
-                    email=f"{request.user_id}@temp.com",
-                    display_name="Usuario Temporal",
-                    interests=["turismo", "cultura", "gastronomía"],
-                    budget="medium"
-                )
-                user_service.create_profile(request.user_id, user_profile)
+                raise ValueError("Usuario no encontrado")
 
-            # Crear agente
-            agent = TravelAgent(user_profile.model_dump())
-
+            # Crear agente con user_id para historial persistente
+            agent = TravelAgent(
+                user_profile=user_profile.model_dump(),
+                user_id=request.user_id  # UID de Firebase
+            )
+            
             # Obtener respuesta
             result = await agent.chat(request.message)
 
+            # Si se guardó un itinerario, avisar explícitamente al usuario
+            if result.get("saved_itinerary_id"):
+                save_notice = (
+                    f"\n\n💾 Itinerario guardado con ID: {result['saved_itinerary_id']} "
+                    "Lo puedes ver en tus itinerarios."
+                )
+                result["response"] = f"{result.get('response','')}{save_notice}"
+            
             # Guardar respuesta
-            chat_repository.save_message(request.session_id, {
-                'role': 'assistant',
-                'content': result['response']
-            })
-
-            result['conversation_id'] = request.session_id
+            chat_repository.save_message(
+                request.session_id,
+                {
+                    'role': 'assistant',
+                    'content': result['response']
+                },
+                owner_uid=request.user_id
+            )
+            
             return ChatResponse(**result)
-
+            
         except Exception as e:
-            logger.error(f"❌ Error en chat: {str(e)}", exc_info=True)
+            logger.error(f"Error en chat: {str(e)}")
             return ChatResponse(
                 response=f"Lo siento, ocurrió un error: {str(e)}",
-                conversation_id=request.session_id,
                 actions=[],
                 places=[]
             )
@@ -77,5 +68,13 @@ class ChatService:
     def get_conversation_history(self, session_id: str, limit: int = 50) -> List[dict]:
         """Obtiene el historial de conversación"""
         return chat_repository.get_conversation(session_id, limit)
+
+    def get_user_sessions(self, user_id: str) -> List[dict]:
+        """Obtiene todas las sesiones de chat de un usuario"""
+        return chat_repository.get_user_sessions(user_id)
+
+    def delete_session(self, session_id: str) -> bool:
+        """Elimina una sesión de chat"""
+        return chat_repository.delete_session(session_id)
 
 chat_service = ChatService()

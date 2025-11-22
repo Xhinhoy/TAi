@@ -188,16 +188,30 @@ export class RecommendationsService {
   ): Promise<PlaceRecommendation[]> {
     try {
       // Call the backend API for personalized recommendations
-      const recommendations = await recommendationsService.getPersonalized({
+      const response = await recommendationsService.generate({
         user_id: userId,
         location,
         limit,
         categories: preferences.interests,
       });
 
-      // Convert to PlaceRecommendation format
-      return recommendations.map(rec =>
-        this.convertToPlaceRecommendation(rec.place, rec.score, rec.reasoning)
+      // Handle both { recommendations: [...] } and array responses defensively
+      const list = Array.isArray(response?.recommendations)
+        ? response.recommendations
+        : Array.isArray(response)
+          ? response
+          : [];
+
+      if (list.length === 0) {
+        return this.getFallbackRecommendations(preferences, limit);
+      }
+
+      return list.map(rec =>
+        this.convertToPlaceRecommendation(
+          rec.place || rec,
+          rec.score ?? 1,
+          rec.reasoning || response?.reasoning || 'Recomendado'
+        )
       );
     } catch (error) {
       console.error('Error getting personalized recommendations:', error);

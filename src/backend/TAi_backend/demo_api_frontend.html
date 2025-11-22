@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAi API - Simulación Frontend</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .config-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-left: 4px solid #667eea;
+        }
+
+        .config-section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .endpoint-section {
+            margin-bottom: 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .endpoint-header {
+            background: #667eea;
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .endpoint-header:hover {
+            background: #5568d3;
+        }
+
+        .endpoint-header h3 {
+            font-size: 1.2em;
+        }
+
+        .method-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .method-get { background: #28a745; }
+        .method-post { background: #007bff; }
+        .method-put { background: #ffc107; color: #333; }
+        .method-delete { background: #dc3545; }
+
+        .endpoint-body {
+            padding: 20px;
+            display: none;
+        }
+
+        .endpoint-body.active {
+            display: block;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .response-box {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .response-box.error {
+            background: #3a1f1f;
+            color: #ff6b6b;
+        }
+
+        .response-box.success {
+            background: #1f3a1f;
+            color: #51cf66;
+        }
+
+        .code-block {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .flex-row .input-group {
+            flex: 1;
+            min-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 TAi Backend API</h1>
+            <p class="subtitle">Simulación de consumo desde el Frontend</p>
+        </header>
+
+        <div class="content">
+            <!-- Configuración Global -->
+            <div class="config-section">
+                <h2>⚙️ Configuración</h2>
+                <div class="input-group">
+                    <label>Base URL:</label>
+                    <input type="text" id="baseUrl" value="http://localhost:8000">
+                </div>
+                <div class="input-group">
+                    <label>Firebase Token (simulado):</label>
+                    <input type="text" id="authToken" value="eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.simulado">
+                    <small style="color: #666; font-size: 0.85em;">En producción, obtener desde Firebase Auth</small>
+                </div>
+                <div class="input-group">
+                    <label>User ID:</label>
+                    <input type="text" id="userId" value="test-user-123">
+                </div>
+            </div>
+
+            <!-- 1. Health Check -->
+            <div class="endpoint-section">
+                <div class="endpoint-header" onclick="toggleEndpoint('health')">
+                    <div>
+                        <span class="method-badge method-get">GET</span>
+                        <span>/health - Verificar estado del servidor</span>
+                    </div>
+                    <span>▼</span>
+                </div>
+                <div class="endpoint-body" id="health-body">
+                    <div class="info-box">
+                        <strong>Propósito:</strong> Verificar que el servidor está funcionando correctamente
+                    </div>
+
+                    <button onclick="testHealthCheck()">🔍 Probar Health Check</button>
+
+                    <div class="loading" id="health-loading">
+                        <div class="spinner"></div>
+                        <p>Verificando servidor...</p>
+                    </div>
+
+                    <div id="health-response"></div>
+
+                    <h4 style="margin-top: 20px;">Código de ejemplo (React/JS):</h4>
+                    <div class="code-block">
+const checkHealth = async () => {
+  const response = await fetch('http://localhost:8000/health');
+  const data = await response.json();
+  console.log(data);
+  // { status: "healthy", firebase: "connected", llm: "Google AI (...)" }
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Obtener Perfil de Usuario -->
+            <div class="endpoint-section">
+                <div class="endpoint-header" onclick="toggleEndpoint('profile')">
+                    <div>
+                        <span class="method-badge method-get">GET</span>
+                        <span>/api/v1/users/{uid}/profile - Obtener perfil</span>
+                    </div>
+                    <span>▼</span>
+                </div>
+                <div class="endpoint-body" id="profile-body">
+                    <div class="info-box">
+                        <strong>Propósito:</strong> Obtener el perfil completo del usuario (intereses, preferencias, ubicación)
+                    </div>
+
+                    <button onclick="testGetProfile()">👤 Obtener Perfil</button>
+
+                    <div class="loading" id="profile-loading">
+                        <div class="spinner"></div>
+                        <p>Obteniendo perfil...</p>
+                    </div>
+
+                    <div id="profile-response"></div>
+
+                    <h4 style="margin-top: 20px;">Código de ejemplo (React/JS):</h4>
+                    <div class="code-block">
+const getProfile = async (uid, token) => {
+  const response = await fetch(
+    `http://localhost:8000/api/v1/users/${uid}/profile`,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  );
+  const profile = await response.json();
+  return profile;
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Chat con el Agente -->
+            <div class="endpoint-section">
+                <div class="endpoint-header" onclick="toggleEndpoint('chat')">
+                    <div>
+                        <span class="method-badge method-post">POST</span>
+                        <span>/api/v1/chat/message - Chat con agente IA</span>
+                    </div>
+                    <span>▼</span>
+                </div>
+                <div class="endpoint-body" id="chat-body">
+                    <div class="info-box">
+                        <strong>Propósito:</strong> Conversación natural con el agente de viajes. El agente tiene acceso a herramientas (Google Places, TripAdvisor) y recuerda el contexto de la conversación.
+                    </div>
+
+                    <div class="input-group">
+                        <label>Mensaje:</label>
+                        <textarea id="chatMessage" rows="3" placeholder="Ej: ¿Qué lugares me recomiendas visitar en Santiago de Chile?">¿Qué lugares me recomiendas visitar en Santiago de Chile?</textarea>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Session ID:</label>
+                        <input type="text" id="sessionId" value="session-001">
+                        <small style="color: #666; font-size: 0.85em;">Mantén el mismo session_id para conversaciones continuas</small>
+                    </div>
+
+                    <button onclick="testChat()">💬 Enviar Mensaje</button>
+
+                    <div class="loading" id="chat-loading">
+                        <div class="spinner"></div>
+                        <p>El agente está pensando y consultando APIs...</p>
+                    </div>
+
+                    <div id="chat-response"></div>
+
+                    <h4 style="margin-top: 20px;">Código de ejemplo (React/JS):</h4>
+                    <div class="code-block">
+const sendChatMessage = async (message, userId, sessionId, token) => {
+  const response = await fetch(
+    'http://localhost:8000/api/v1/chat/message',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        user_id: userId,
+        session_id: sessionId,
+        message: message
+      })
+    }
+  );
+  const data = await response.json();
+  return data;
+  // { response: "...", actions: [], places: [] }
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Generar Itinerario -->
+            <div class="endpoint-section">
+                <div class="endpoint-header" onclick="toggleEndpoint('itinerary')">
+                    <div>
+                        <span class="method-badge method-post">POST</span>
+                        <span>/api/v1/itineraries/generate - Generar itinerario con IA</span>
+                    </div>
+                    <span>▼</span>
+                </div>
+                <div class="endpoint-body" id="itinerary-body">
+                    <div class="info-box">
+                        <strong>Propósito:</strong> Genera un itinerario completo usando el agente IA con herramientas. El agente consulta Google Places y TripAdvisor para crear un plan realista basado en el perfil del usuario.
+                    </div>
+
+                    <div class="warning-box">
+                        <strong>⚠️ Nota:</strong> Este endpoint puede tardar 30-60 segundos porque el agente razona, usa herramientas y genera un plan detallado.
+                    </div>
+
+                    <div class="flex-row">
+                        <div class="input-group">
+                            <label>Ciudad:</label>
+                            <input type="text" id="itineraryCity" value="Santiago de Chile">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Días:</label>
+                            <input type="number" id="itineraryDays" value="3" min="1" max="14">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Título (opcional):</label>
+                        <input type="text" id="itineraryTitle" placeholder="Ej: Aventura en Santiago">
+                    </div>
+
+                    <button onclick="testGenerateItinerary()">🗺️ Generar Itinerario</button>
+
+                    <div class="loading" id="itinerary-loading">
+                        <div class="spinner"></div>
+                        <p>Generando itinerario con IA... Esto puede tardar hasta 60 segundos</p>
+                        <p style="font-size: 0.9em; margin-top: 10px;">El agente está:</p>
+                        <ul style="text-align: left; max-width: 400px; margin: 10px auto;">
+                            <li>Razonando sobre tus intereses</li>
+                            <li>Buscando lugares en Google Places</li>
+                            <li>Consultando reviews en TripAdvisor</li>
+                            <li>Optimizando la ruta</li>
+                            <li>Generando el plan final</li>
+                        </ul>
+                    </div>
+
+                    <div id="itinerary-response"></div>
+
+                    <h4 style="margin-top: 20px;">Código de ejemplo (React/JS):</h4>
+                    <div class="code-block">
+const generateItinerary = async (city, days, title, token) => {
+  const response = await fetch(
+    'http://localhost:8000/api/v1/itineraries/generate',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        city: city,
+        days: days,
+        title: title || null
+      })
+    }
+  );
+  const itinerary = await response.json();
+  return itinerary;
+  // { id: "...", title: "...", city: "...", days: 3, items: [...] }
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Listar Itinerarios del Usuario -->
+            <div class="endpoint-section">
+                <div class="endpoint-header" onclick="toggleEndpoint('list-itineraries')">
+                    <div>
+                        <span class="method-badge method-get">GET</span>
+                        <span>/api/v1/itineraries/user/{user_id} - Listar itinerarios</span>
+                    </div>
+                    <span>▼</span>
+                </div>
+                <div class="endpoint-body" id="list-itineraries-body">
+                    <div class="info-box">
+                        <strong>Propósito:</strong> Obtener todos los itinerarios guardados del usuario
+                    </div>
+
+                    <button onclick="testListItineraries()">📋 Listar Mis Itinerarios</button>
+
+                    <div class="loading" id="list-itineraries-loading">
+                        <div class="spinner"></div>
+                        <p>Obteniendo itinerarios...</p>
+                    </div>
+
+                    <div id="list-itineraries-response"></div>
+
+                    <h4 style="margin-top: 20px;">Código de ejemplo (React/JS):</h4>
+                    <div class="code-block">
+const getUserItineraries = async (userId, token) => {
+  const response = await fetch(
+    `http://localhost:8000/api/v1/itineraries/user/${userId}`,
+    {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    }
+  );
+  const itineraries = await response.json();
+  return itineraries; // Array de itinerarios
+}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Actualizar Intereses -->
+            <div class="endpoint-section">
+                <div class="endpoint-header" onclick="toggleEndpoint('interests')">
+                    <div>
+                        <span class="method-badge method-put" style="background: #ff9800;">PATCH</span>
+                        <span>/api/v1/users/{uid}/interests - Actualizar intereses</span>
+                    </div>
+                    <span>▼</span>
+                </div>
+                <div class="endpoint-body" id="interests-body">
+                    <div class="info-box">
+                        <strong>Propósito:</strong> Actualizar los intereses del usuario para personalizar recomendaciones
+                    </div>
+
+                    <div class="input-group">
+                        <label>Intereses (separados por coma):</label>
+                        <input type="text" id="userInterests" value="museos, gastronomía, naturaleza, historia">
+                    </div>
+
+                    <button onclick="testUpdateInterests()">🎯 Actualizar Intereses</button>
+
+                    <div class="loading" id="interests-loading">
+                        <div class="spinner"></div>
+                        <p>Actualizando intereses...</p>
+                    </div>
+
+                    <div id="interests-response"></div>
+
+                    <h4 style="margin-top: 20px;">Código de ejemplo (React/JS):</h4>
+                    <div class="code-block">
+const updateInterests = async (userId, interests, token) => {
+  const response = await fetch(
+    `http://localhost:8000/api/v1/users/${userId}/interests`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(interests) // Array de strings
+    }
+  );
+  const data = await response.json();
+  return data; // { success: true, interests: [...] }
+}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleEndpoint(id) {
+            const body = document.getElementById(id + '-body');
+            body.classList.toggle('active');
+        }
+
+        function getConfig() {
+            return {
+                baseUrl: document.getElementById('baseUrl').value,
+                token: document.getElementById('authToken').value,
+                userId: document.getElementById('userId').value
+            };
+        }
+
+        function showLoading(id) {
+            document.getElementById(id + '-loading').classList.add('active');
+            const responseEl = document.getElementById(id + '-response');
+            if (responseEl) responseEl.innerHTML = '';
+        }
+
+        function hideLoading(id) {
+            document.getElementById(id + '-loading').classList.remove('active');
+        }
+
+        function showResponse(id, data, isError = false) {
+            hideLoading(id);
+            const responseEl = document.getElementById(id + '-response');
+            const className = isError ? 'error' : 'success';
+            responseEl.innerHTML = `
+                <div class="response-box ${className}">
+${JSON.stringify(data, null, 2)}
+                </div>
+            `;
+        }
+
+        async function testHealthCheck() {
+            const { baseUrl } = getConfig();
+            showLoading('health');
+
+            try {
+                const response = await fetch(`${baseUrl}/health`);
+                const data = await response.json();
+                showResponse('health', data);
+            } catch (error) {
+                showResponse('health', { error: error.message }, true);
+            }
+        }
+
+        async function testGetProfile() {
+            const { baseUrl, token, userId } = getConfig();
+            showLoading('profile');
+
+            try {
+                const response = await fetch(`${baseUrl}/api/v1/users/${userId}/profile`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    showResponse('profile', error, true);
+                    return;
+                }
+
+                const data = await response.json();
+                showResponse('profile', data);
+            } catch (error) {
+                showResponse('profile', { error: error.message }, true);
+            }
+        }
+
+        async function testChat() {
+            const { baseUrl, token, userId } = getConfig();
+            const message = document.getElementById('chatMessage').value;
+            const sessionId = document.getElementById('sessionId').value;
+
+            showLoading('chat');
+
+            try {
+                const response = await fetch(`${baseUrl}/api/v1/chat/message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        session_id: sessionId,
+                        message: message
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    showResponse('chat', error, true);
+                    return;
+                }
+
+                const data = await response.json();
+                showResponse('chat', data);
+            } catch (error) {
+                showResponse('chat', { error: error.message }, true);
+            }
+        }
+
+        async function testGenerateItinerary() {
+            const { baseUrl, token } = getConfig();
+            const city = document.getElementById('itineraryCity').value;
+            const days = parseInt(document.getElementById('itineraryDays').value);
+            const title = document.getElementById('itineraryTitle').value;
+
+            showLoading('itinerary');
+
+            try {
+                const response = await fetch(`${baseUrl}/api/v1/itineraries/generate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        city: city,
+                        days: days,
+                        title: title || null
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    showResponse('itinerary', error, true);
+                    return;
+                }
+
+                const data = await response.json();
+                showResponse('itinerary', data);
+            } catch (error) {
+                showResponse('itinerary', { error: error.message }, true);
+            }
+        }
+
+        async function testListItineraries() {
+            const { baseUrl, token, userId } = getConfig();
+            showLoading('list-itineraries');
+
+            try {
+                const response = await fetch(`${baseUrl}/api/v1/itineraries/user/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    showResponse('list-itineraries', error, true);
+                    return;
+                }
+
+                const data = await response.json();
+                showResponse('list-itineraries', data);
+            } catch (error) {
+                showResponse('list-itineraries', { error: error.message }, true);
+            }
+        }
+
+        async function testUpdateInterests() {
+            const { baseUrl, token, userId } = getConfig();
+            const interests = document.getElementById('userInterests').value
+                .split(',')
+                .map(i => i.trim())
+                .filter(i => i);
+
+            showLoading('interests');
+
+            try {
+                const response = await fetch(`${baseUrl}/api/v1/users/${userId}/interests`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(interests)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    showResponse('interests', error, true);
+                    return;
+                }
+
+                const data = await response.json();
+                showResponse('interests', data);
+            } catch (error) {
+                showResponse('interests', { error: error.message }, true);
+            }
+        }
+
+        // Auto-expandir el primer endpoint al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            toggleEndpoint('health');
+        });
+    </script>
+</body>
+</html>

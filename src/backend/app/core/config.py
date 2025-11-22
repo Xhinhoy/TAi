@@ -4,15 +4,13 @@ from typing import List, Optional, Literal, ClassVar
 from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-#  Ruta absoluta hacia el .env
+# 🧭 Ruta absoluta hacia el .env
 env_path = os.path.join(os.path.dirname(__file__), "..", "..", "TAi_backend", ".env")
 
 class Settings(BaseSettings):
     ...
     MOCK_MODE: bool = Field(default=False, description="Usar Firebase mock (sin conexión real)")
 
-    TRIPADVISOR_API_KEY: str | None = None
-    TRIPADVISOR_RATE_LIMIT: int = 60
 
     # Firebase
     FIREBASE_CREDENTIALS_PATH: Optional[str] = None
@@ -81,12 +79,10 @@ class Settings(BaseSettings):
 # Instancia única exportada por el módulo
 settings = Settings()  # type: ignore
 
-#  (opcional) verificación de carga
+# 👇 (opcional) verificación de carga
 print(f"✅ .env cargado desde: {env_path}")
 print(f"📄 FIREBASE_CREDENTIALS_PATH: {settings.FIREBASE_CREDENTIALS_PATH}")
-#  Mensaje informativo sobre el modelo Groq activo
+# 👇 Mensaje informativo sobre el modelo Groq activo
 current_model = settings.GROQ_MODEL
 mode_label = "🧪 MODO DESARROLLO" if settings.GROQ_DEV_MODE else "🚀 MODO PRODUCCIÓN"
 print(f"{mode_label} → Usando modelo Groq: {current_model}")
-
-

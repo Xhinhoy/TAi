@@ -20,7 +20,8 @@ class ChatAction(BaseModel):
 
 class ChatResponse(BaseModel):
     response: str
-    conversation_id: Optional[str] = None
-    suggestions: Optional[List[str]] = []
+    format: str = "markdown"
     actions: List[ChatAction] = []
     places: List[Place] = []
+    itinerary: Optional[Dict] = None  # Itinerario generado si existe
+    saved_itinerary_id: Optional[str] = None  # ID del itinerario guardado en Firestore

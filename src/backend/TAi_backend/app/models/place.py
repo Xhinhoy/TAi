@@ -14,7 +14,8 @@ class Place(BaseModel):
     address: Optional[str] = None
     price_level: Optional[int] = None
     photos: List[str] = []
-    source: str = "google"
+    sources: List[str] = ["google", "tripadvisor"]  # Siempre consulta ambas APIs
+    tripadvisor: Optional[Dict] = None  # Datos de TripAdvisor (puede ser None si no existe)
     categories: List[str] = []
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None

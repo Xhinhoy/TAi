@@ -5,6 +5,8 @@ from app.core.config import settings
 from app.core.firebase import firebase_service
 from app.api.v1.router import api_router
 import logging
+from fastapi import Request
+from starlette.middleware.base import BaseHTTPMiddleware
 
 logging.basicConfig(
     level=getattr(logging, settings.LOG_LEVEL),
@@ -33,16 +35,28 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    lifespan=lifespan  # ← Nuevo parámetro
+    lifespan=lifespan,  # ← Nuevo parámetro
+    # Asegurar encoding UTF-8 en responses
+    responses={
+        200: {"content": {"application/json": {"charset": "utf-8"}}}
+    }
 )
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
+    allow_origins=settings.cors_origins_list if settings.CORS_ORIGINS != "*" else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Middleware simple para debugging
+class DebugMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        logger.info(f"🌐 Incoming {request.method} request to: {request.url.path}")
+        response = await call_next(request)
+        logger.info(f"Response status code: {response.status_code}")
+        return response
 
 @app.get("/")
 async def root():
@@ -57,7 +71,7 @@ async def health_check():
     return {
         "status": "healthy",
         "firebase": "connected",
-        "llm": f"Groq ({settings.GROQ_MODEL})"
+        "llm": f"Google AI ({settings.GOOGLE_MODEL})"
     }
 
 app.include_router(api_router)
