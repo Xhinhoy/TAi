@@ -37,6 +37,25 @@ interface Message extends ChatMessage {
   itinerary?: any;  // Itinerario generado por la IA
 }
 
+// Normaliza cualquier valor a un string seguro para renderizar
+const normalizeContent = (value: any): string => {
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'string') return value;
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) {
+    return value.map(normalizeContent).filter(Boolean).join(' ');
+  }
+  if (typeof value === 'object') {
+    if (typeof (value as any).content === 'string') return (value as any).content;
+    try {
+      return JSON.stringify(value);
+    } catch {
+      return String(value);
+    }
+  }
+  return String(value);
+};
+
 // Función para extraer texto limpio de respuestas del backend
 const extractCleanContent = (content: any): string => {
   // Si ya es un string, devolverlo
@@ -265,6 +284,59 @@ const SafeMarkdown: React.FC<{ content: string; style: any }> = ({ content, styl
   }
 };
 
+// Error boundary ligero para mensajes: si algo falla en Markdown, caer a texto plano
+class MessageContent extends React.Component<{
+  content: any;
+  isUser: boolean;
+}> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: any) {
+    console.error('Message render error:', error);
+  }
+
+  render() {
+    const contentStr = normalizeContent(this.props.content);
+
+    if (this.props.isUser) {
+      return (
+        <Text
+          style={[
+            styles.messageText,
+            styles.userMessageText,
+          ]}
+        >
+          {contentStr}
+        </Text>
+      );
+    }
+
+    if (this.state.hasError) {
+      return (
+        <Text
+          style={[
+            styles.messageText,
+            styles.assistantMessageText,
+          ]}
+        >
+          {contentStr}
+        </Text>
+      );
+    }
+
+    return (
+      <SafeMarkdown
+        content={contentStr}
+        style={markdownStyles}
+      />
+    );
+  }
+}
+
 // Componente de puntos animados para typing indicator
 const TypingDots: React.FC = () => {
   const dot1Opacity = useRef(new Animated.Value(0.3)).current;
@@ -351,7 +423,7 @@ const ChatScreen: React.FC = () => {
             const formattedMessages: Message[] = history.map((msg, idx) => ({
               id: `${idx}`,
               role: msg.role,
-              content: msg.content,
+              content: normalizeContent(msg.content),
               isUser: msg.role === 'user',
             }));
             setMessages(formattedMessages);
@@ -408,12 +480,7 @@ const ChatScreen: React.FC = () => {
             } else if (data.response) {
               console.log('📦 Mensaje WebSocket recibido:', data);
 
-              // Extraer contenido limpio (por si el backend devuelve objeto LangChain)
-              let cleanResponse = data.response;
-              if (typeof data.response === 'object' && data.response.content) {
-                console.log('⚠️ WebSocket: Backend devolvió objeto LangChain, extrayendo contenido...');
-                cleanResponse = data.response.content;
-              }
+              const cleanResponse = normalizeContent(data.response);
 
               const assistantMessage: Message = {
                 id: Date.now().toString(),
@@ -500,7 +567,7 @@ const ChatScreen: React.FC = () => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputText,
+      content: normalizeContent(inputText),
       isUser: true,
     };
 
@@ -534,12 +601,7 @@ const ChatScreen: React.FC = () => {
 
       console.log('📦 Respuesta del chat:', response);
 
-      // Extraer contenido limpio (por si el backend devuelve objeto LangChain)
-      let cleanResponse = response.response;
-      if (typeof response.response === 'object' && response.response.content) {
-        console.log('⚠️ Backend devolvió objeto LangChain, extrayendo contenido...');
-        cleanResponse = response.response.content;
-      }
+      const cleanResponse = normalizeContent(response.response);
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
@@ -643,7 +705,7 @@ const ChatScreen: React.FC = () => {
         const formattedMessages: Message[] = history.map((msg, idx) => ({
           id: `${idx}`,
           role: msg.role,
-          content: msg.content,
+          content: normalizeContent(msg.content),
           isUser: msg.role === 'user',
         }));
         setMessages(formattedMessages);
@@ -1007,25 +1069,14 @@ const ChatScreen: React.FC = () => {
                 )}
                 <View
                   style={[
-                    styles.messageContent,
-                    message.isUser ? styles.userMessageContent : styles.assistantMessageContent,
-                  ]}
-                >
-                  {message.isUser ? (
-                    <Text
-                      style={[
-                        styles.messageText,
-                        styles.userMessageText,
-                      ]}
-                    >
-                      {message.content}
-                    </Text>
-                  ) : (
-                    <SafeMarkdown
-                      content={message.content}
-                      style={markdownStyles}
-                    />
-                  )}
+                  styles.messageContent,
+                  message.isUser ? styles.userMessageContent : styles.assistantMessageContent,
+                ]}
+              >
+                  <MessageContent
+                    content={message.content}
+                    isUser={message.isUser}
+                  />
                 </View>
               </View>
 

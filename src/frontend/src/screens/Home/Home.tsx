@@ -30,8 +30,6 @@ import { usePreferences } from '../../contexts/PreferencesContext';
 import { localRecommendationsService, PlaceRecommendation } from '../../services/recommendations.service';
 import { TOURIST_INTERESTS } from '../../components/ui/InterestSelector';
 import { itinerariesService, usersService, placesService } from '../../api/services';
-import { NotificationBubble } from '../../components/Notifications/NotificationBubble';
-import { useNotifications } from '../../hooks/useNotifications';
 import * as Location from 'expo-location';
 import { ReviewModal } from '../../components/ReviewModal';
 import { reviewsService } from '../../services/reviews.service';
@@ -309,20 +307,6 @@ const HomeScreen: React.FC = () => {
   // Use new preferences system
   const { preferences } = usePreferences();
   const interests = preferences.interests;
-
-  // Hook de notificaciones
-  const {
-    notifications,
-    markAsRead,
-    dismiss,
-    clearAll,
-  } = useNotifications({
-    userId: user?.uid,
-    userLocation: userLocation || undefined,
-    userInterests: preferences.interests,
-    enableItineraryReminders: true,
-    enableNearbyRecommendations: true,
-  });
 
   // Load itineraries from backend
   const loadItineraries = async (userId: string) => {
@@ -1073,27 +1057,13 @@ useEffect(() => {
                 <Text style={styles.reasoningText}>{selectedItinerary.reasoning}</Text>
               </View>
             )}
-          </ScrollView>
-        </SafeAreaView>
-      </Modal>
+      </ScrollView>
+    </SafeAreaView>
+  </Modal>
 
-      {/* Burbuja de Notificaciones Flotante */}
-      <NotificationBubble
-        notifications={notifications}
-        onNotificationPress={(notification) => {
-          markAsRead(notification.id);
-          // Manejar navegación según tipo de notificación
-          if (notification.onAction) {
-            notification.onAction();
-          }
-        }}
-        onNotificationDismiss={dismiss}
-        onClearAll={clearAll}
-      />
-
-      {/* Modal ver todos los favoritos */}
-      <Modal
-        animationType="slide"
+  {/* Modal ver todos los favoritos */}
+  <Modal
+    animationType="slide"
         transparent={false}
         visible={allFavoritesVisible}
         onRequestClose={() => setAllFavoritesVisible(false)}

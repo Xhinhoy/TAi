@@ -54,11 +54,6 @@ export default function Login({ navigation }: any) {
     try {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
 
-      if (!userCred.user.emailVerified) {
-        Alert.alert("Correo no verificado", "Revisa tu bandeja de entrada y confirma tu correo antes de ingresar.");
-        return;
-      }
-
       Alert.alert("Bienvenido", `Hola ${userCred.user.displayName || "usuario"}`);
       navigation.replace("Home");
     } catch (e: any) {
