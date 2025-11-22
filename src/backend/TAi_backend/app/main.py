@@ -74,6 +74,41 @@ async def health_check():
         "llm": f"Google AI ({settings.GOOGLE_MODEL})"
     }
 
+@app.get("/test-google-api")
+async def test_google_api():
+    """Test endpoint para verificar si la API key de Google Places funciona"""
+    import requests
+
+    api_key = settings.GOOGLE_PLACES_API_KEY
+    if hasattr(api_key, 'get_secret_value'):
+        api_key = api_key.get_secret_value()
+
+    test_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+    params = {
+        'location': '-33.4489,70.6693',  # Santiago, Chile
+        'radius': 1000,
+        'key': api_key
+    }
+
+    try:
+        response = requests.get(test_url, params=params, timeout=10)
+        data = response.json()
+
+        return {
+            "api_key_length": len(api_key),
+            "api_key_preview": f"{api_key[:10]}...{api_key[-4:]}",
+            "status_code": response.status_code,
+            "google_status": data.get('status'),
+            "error_message": data.get('error_message'),
+            "results_count": len(data.get('results', [])),
+            "full_response": data if data.get('status') != 'OK' else None
+        }
+    except Exception as e:
+        return {
+            "error": str(e),
+            "api_key_length": len(api_key)
+        }
+
 app.include_router(api_router)
 
 if __name__ == "__main__":

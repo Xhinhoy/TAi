@@ -33,6 +33,8 @@ import { itinerariesService, usersService, placesService } from '../../api/servi
 import { NotificationBubble } from '../../components/Notifications/NotificationBubble';
 import { useNotifications } from '../../hooks/useNotifications';
 import * as Location from 'expo-location';
+import { ReviewModal } from '../../components/ReviewModal';
+import { reviewsService } from '../../services/reviews.service';
 
 // TypeScript interfaces
 
@@ -299,6 +301,11 @@ const HomeScreen: React.FC = () => {
   const [selectedPlaceDetails, setSelectedPlaceDetails] = useState<any>(null);
   const [loadingReviews, setLoadingReviews] = useState(false);
 
+  // Write review modal state
+  const [writeReviewModalVisible, setWriteReviewModalVisible] = useState(false);
+  const [reviewPlaceId, setReviewPlaceId] = useState<string>('');
+  const [reviewPlaceName, setReviewPlaceName] = useState<string>('');
+
   // Use new preferences system
   const { preferences } = usePreferences();
   const interests = preferences.interests;
@@ -448,6 +455,7 @@ const HomeScreen: React.FC = () => {
 
         const mapped: PlaceRecommendation[] = (results || []).map((place: any) => ({
           id: place.id || place.place_id || place.name,
+          place_id: place.place_id || place.id, // Guardar el place_id de Google
           name: place.name,
           description: place.address || place.formatted_address || '',
           category: placeType || place.types?.[0] || place.categories?.[0] || 'spot',
@@ -618,11 +626,21 @@ useEffect(() => {
   };
 
   const showPlaceReview = async (
-    placeData: { id?: string; placeId?: string; place_id?: string; name?: string },
+    placeData: { id?: string; placeId?: string; place_id?: string; google_place_id?: string; name?: string },
     fallbackTitle?: string
   ) => {
-    const placeId = placeData.placeId || placeData.place_id || placeData.id;
+    // Priorizar place_id de Google sobre otros IDs
+    const placeId = placeData.place_id || placeData.placeId || placeData.google_place_id || placeData.id;
     const title = placeData.name || fallbackTitle || 'Lugar';
+
+    console.log('🔍 showPlaceReview - placeData:', {
+      id: placeData.id,
+      placeId: placeData.placeId,
+      place_id: placeData.place_id,
+      google_place_id: placeData.google_place_id,
+      name: placeData.name,
+      selectedPlaceId: placeId
+    });
 
     if (!placeId) {
       Alert.alert('Lugar sin detalles', 'No se encontró un id para consultar reseñas.');
@@ -633,10 +651,25 @@ useEffect(() => {
     setReviewsModalVisible(true);
 
     try {
+      console.log('📡 Consultando detalles del lugar:', placeId);
+
+      // Obtener detalles del lugar desde Google Places
       const details = await placesService.getDetails(placeId);
+
+      // Obtener reseñas combinadas (Google + internas)
+      let combinedReviews = details.reviews || [];
+      try {
+        const reviewsData = await reviewsService.getPlaceReviews(placeId);
+        combinedReviews = reviewsData.reviews || [];
+      } catch (reviewError) {
+        console.log('No se pudieron cargar reseñas internas, usando solo Google:', reviewError);
+      }
+
       setSelectedPlaceDetails({
         ...details,
         displayTitle: details?.name || title,
+        reviews: combinedReviews,
+        place_id: placeId, // Guardar para poder escribir reseñas
       });
       setLoadingReviews(false);
     } catch (error: any) {
@@ -654,6 +687,36 @@ useEffect(() => {
         });
       }
       console.error('Error obteniendo detalles del lugar:', error);
+    }
+  };
+
+  // Handler para abrir modal de escritura de reseña
+  const handleOpenWriteReview = () => {
+    if (!selectedPlaceDetails?.place_id) {
+      Alert.alert('Error', 'No se puede escribir una reseña para este lugar.');
+      return;
+    }
+
+    setReviewPlaceId(selectedPlaceDetails.place_id);
+    setReviewPlaceName(selectedPlaceDetails.displayTitle || selectedPlaceDetails.name || 'Lugar');
+    setWriteReviewModalVisible(true);
+  };
+
+  // Handler para cuando se cierra el modal de escritura de reseña
+  const handleReviewModalClose = async (refreshReviews: boolean) => {
+    setWriteReviewModalVisible(false);
+
+    // Si se escribió una reseña, recargar las reseñas del lugar
+    if (refreshReviews && selectedPlaceDetails?.place_id) {
+      try {
+        const reviewsData = await reviewsService.getPlaceReviews(selectedPlaceDetails.place_id);
+        setSelectedPlaceDetails({
+          ...selectedPlaceDetails,
+          reviews: reviewsData.reviews || [],
+        });
+      } catch (error) {
+        console.error('Error recargando reseñas:', error);
+      }
     }
   };
 
@@ -1261,7 +1324,20 @@ useEffect(() => {
 
                     {/* Reseñas */}
                     <View style={styles.reviewsSection}>
-                      <Text style={styles.reviewsSectionTitle}>Reseñas</Text>
+                      <View style={styles.reviewsSectionHeader}>
+                        <Text style={styles.reviewsSectionTitle}>Reseñas</Text>
+                        <AnimatedPressable
+                          style={styles.writeReviewButton}
+                          onPress={handleOpenWriteReview}
+                        >
+                          <MaterialCommunityIcons
+                            name="pencil"
+                            size={16}
+                            color={theme.colors.primary.main}
+                          />
+                          <Text style={styles.writeReviewButtonText}>Escribir</Text>
+                        </AnimatedPressable>
+                      </View>
                       {(() => {
                         const reviews = selectedPlaceDetails.reviews || selectedPlaceDetails.tripadvisor_reviews || [];
                         if (!Array.isArray(reviews) || reviews.length === 0) {
@@ -1282,9 +1358,16 @@ useEffect(() => {
                         return reviews.map((review: any, index: number) => (
                           <View key={index} style={styles.reviewCard}>
                             <View style={styles.reviewHeader}>
-                              <Text style={styles.reviewAuthor}>
-                                {review.author_name || review.user?.name || 'Usuario anónimo'}
-                              </Text>
+                              <View style={styles.reviewAuthorContainer}>
+                                <Text style={styles.reviewAuthor}>
+                                  {review.author_name || review.user_name || review.user?.name || 'Usuario anónimo'}
+                                </Text>
+                                {review.source === 'internal' && (
+                                  <View style={styles.internalBadge}>
+                                    <Text style={styles.internalBadgeText}>App</Text>
+                                  </View>
+                                )}
+                              </View>
                               {review.rating && (
                                 <View style={styles.reviewRating}>
                                   <MaterialCommunityIcons
@@ -1315,6 +1398,14 @@ useEffect(() => {
           </ScrollView>
         </SafeAreaView>
       </Modal>
+
+      {/* Modal de escritura de reseñas */}
+      <ReviewModal
+        visible={writeReviewModalVisible}
+        onClose={handleReviewModalClose}
+        placeId={reviewPlaceId}
+        placeName={reviewPlaceName}
+      />
     </SafeAreaView>
   );
 };
@@ -1960,11 +2051,32 @@ const styles = StyleSheet.create({
   reviewsSection: {
     marginTop: theme.spacing.lg,
   },
+  reviewsSectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: theme.spacing.md,
+  },
   reviewsSectionTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: theme.colors.text.primary,
-    marginBottom: theme.spacing.md,
+  },
+  writeReviewButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.xs,
+    backgroundColor: theme.colors.primary[50],
+    borderRadius: theme.radius.sm,
+    borderWidth: 1,
+    borderColor: theme.colors.primary.main,
+  },
+  writeReviewButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: theme.colors.primary.main,
   },
   noReviewsContainer: {
     alignItems: 'center',
@@ -1991,11 +2103,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: theme.spacing.xs,
   },
+  reviewAuthorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    flex: 1,
+  },
   reviewAuthor: {
     fontSize: 14,
     fontWeight: '600',
     color: theme.colors.text.primary,
-    flex: 1,
+  },
+  internalBadge: {
+    backgroundColor: theme.colors.accent.main,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: theme.radius.xs,
+  },
+  internalBadgeText: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: theme.colors.text.inverse,
   },
   reviewRating: {
     flexDirection: 'row',

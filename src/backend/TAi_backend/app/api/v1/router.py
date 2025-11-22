@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from . import users, places, recommendations, itineraries, chat, cache, exploration, cache_management, experience_validation
+from . import users, places, recommendations, itineraries, chat, cache, exploration, cache_management, experience_validation, reviews
 
 api_router = APIRouter(prefix="/api/v1")
 
@@ -12,4 +12,5 @@ api_router.include_router(cache.router)
 api_router.include_router(exploration.router)
 api_router.include_router(cache_management.router)
 api_router.include_router(experience_validation.router)
+api_router.include_router(reviews.router)
 

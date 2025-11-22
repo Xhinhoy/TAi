@@ -9,75 +9,56 @@ class PlaceService:
         self.google_places = google_places_facade
 
     def search_places(self, params: PlaceSearchParams) -> List[Place]:
-        # 1) Google Places
+        # Limitar radio máximo a 5km
+        max_radius = 5000  # 5km máximo
+        search_radius = min(params.radius, max_radius)
+
+        # 1) Google Places - búsqueda principal
         results = self.google_places.search_nearby(
             location={'latitude': params.location.latitude, 'longitude': params.location.longitude},
-            radius=params.radius,
+            radius=search_radius,
             place_type=params.place_type,
             keyword=params.query
         )
-        
+
         places: List[Place] = []
         for result in results:
-            place_repository.save_place(result)
-            places.append(Place(**result))
+            # Solo agregar si tiene place_id válido (empieza con ChIJ o similar)
+            if result.get('place_id') and len(result.get('place_id', '')) > 10:
+                place_repository.save_place(result)
+                places.append(Place(**result))
 
-        # 1b) Reintento amplio si Google devolvió vacío: sin place_type y con keyword genérico
+        # 1b) Reintento sin filtro de tipo si Google devolvió vacío
         if len(places) == 0:
             fallback_query = params.query or "tourist attraction"
             retry_results = self.google_places.search_nearby(
                 location={'latitude': params.location.latitude, 'longitude': params.location.longitude},
-                radius=max(params.radius, 8000),
+                radius=search_radius,  # Mantener mismo radio (máx 5km)
                 place_type=None,
                 keyword=fallback_query
             )
             for result in retry_results:
-                place_repository.save_place(result)
-                places.append(Place(**result))
+                # Solo agregar si tiene place_id válido
+                if result.get('place_id') and len(result.get('place_id', '')) > 10:
+                    place_repository.save_place(result)
+                    places.append(Place(**result))
 
-        # 1c) Fallback a text_search si aún está vacío (para API key legacy habilitada)
+        # 1c) Fallback a text_search si aún está vacío
         if len(places) == 0:
             text_query = params.query or "puntos de interés"
             text_results = self.google_places.text_search(
                 query=text_query,
                 location={'latitude': params.location.latitude, 'longitude': params.location.longitude},
-                radius=max(params.radius, 5000),
+                radius=search_radius,  # Mantener mismo radio (máx 5km)
             )
             for result in text_results:
-                place_repository.save_place(result)
-                places.append(Place(**result))
+                # Solo agregar si tiene place_id válido
+                if result.get('place_id') and len(result.get('place_id', '')) > 10:
+                    place_repository.save_place(result)
+                    places.append(Place(**result))
 
-        # 2) Fallback con TripAdvisor si Google no devolvió nada
-        if len(places) == 0:
-            fallback_query = params.query or "lugares de interés"
-            ta_results = tripadvisor_facade.search_location(
-                query=fallback_query,
-                lat=params.location.latitude,
-                lng=params.location.longitude
-            )
-
-            for ta in ta_results:
-                try:
-                    place_dict = {
-                        "id": ta.get("location_id") or ta.get("id") or ta.get("name"),
-                        "name": ta.get("name") or "Lugar recomendado",
-                        "coords": {
-                            "latitude": float(ta.get("latitude") or params.location.latitude),
-                            "longitude": float(ta.get("longitude") or params.location.longitude)
-                        },
-                        "rating": float(ta.get("rating")) if ta.get("rating") else None,
-                        "address": ta.get("address_obj", {}).get("address_string") or ta.get("address"),
-                        "price_level": None,
-                        "photos": [],
-                        "sources": ["tripadvisor"],
-                        "tripadvisor": ta,
-                        "categories": [c.get("name") for c in ta.get("category", [])] if isinstance(ta.get("category"), list) else []
-                    }
-                    place_repository.save_place(place_dict)
-                    places.append(Place(**place_dict))
-                except Exception as e:
-                    # Si algún campo falta, continuar con los demás
-                    continue
+        # NO usar TripAdvisor - solo lugares reales de Google Places
+        # Si Google Places no devuelve nada, mejor retornar vacío
 
         return places
     

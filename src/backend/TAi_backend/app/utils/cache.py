@@ -5,8 +5,18 @@ import time
 import logging
 import gzip
 import base64
+from datetime import datetime
+from google.cloud.firestore_v1._helpers import DatetimeWithNanoseconds
 
 logger = logging.getLogger(__name__)
+
+
+class DateTimeEncoder(json.JSONEncoder):
+    """Custom JSON encoder que maneja datetime y DatetimeWithNanoseconds"""
+    def default(self, obj):
+        if isinstance(obj, (datetime, DatetimeWithNanoseconds)):
+            return obj.isoformat()
+        return super().default(obj)
 
 class FirebaseCache:
     """Sistema de caché usando Firebase Realtime Database con compresión gzip"""
@@ -36,8 +46,8 @@ class FirebaseCache:
             String base64 del valor comprimido
         """
         try:
-            # Convertir a JSON
-            json_str = json.dumps(value)
+            # Convertir a JSON usando el encoder personalizado para datetime
+            json_str = json.dumps(value, cls=DateTimeEncoder)
             json_bytes = json_str.encode('utf-8')
 
             # Comprimir con gzip

@@ -2,10 +2,12 @@
 
 export type Place = {
   id: string;
+  place_id?: string; // Google Places ID (ChIJ...)
   name: string;
   coords: GeoPoint;
   rating?: number;
   address?: string;
+  description?: string;
   priceLevel?: 0|1|2|3|4;
   photos?: string[];
   source: "google"|"tripadvisor"|"hybrid";

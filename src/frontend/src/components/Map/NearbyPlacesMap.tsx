@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, TouchableOpacity, ScrollView } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { theme } from '../../styles/theme';
 import { placesService } from '../../api/services';
@@ -14,12 +15,14 @@ interface NearbyPlacesMapProps {
   userLocation: { latitude: number; longitude: number } | null;
   radius?: number; // Radio en metros
   onPlaceSelect?: (place: Place) => void;
+  customPlaces?: Place[]; // Lugares personalizados (opcional)
 }
 
 export const NearbyPlacesMap: React.FC<NearbyPlacesMapProps> = ({
   userLocation,
   radius = 1000,
   onPlaceSelect,
+  customPlaces,
 }) => {
   const [nearbyPlaces, setNearbyPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(false);
@@ -35,11 +38,15 @@ export const NearbyPlacesMap: React.FC<NearbyPlacesMapProps> = ({
     { id: 'tourist_attraction', name: 'Atracciones', icon: 'star' },
   ];
 
+  // Si hay lugares personalizados, usarlos directamente
   useEffect(() => {
-    if (userLocation) {
+    if (customPlaces) {
+      setNearbyPlaces(customPlaces);
+      setLoading(false);
+    } else if (userLocation) {
       loadNearbyPlaces();
     }
-  }, [userLocation, selectedCategory]);
+  }, [userLocation, selectedCategory, customPlaces]);
 
   const loadNearbyPlaces = async () => {
     if (!userLocation) return;
@@ -87,78 +94,112 @@ export const NearbyPlacesMap: React.FC<NearbyPlacesMapProps> = ({
 
   return (
     <View style={styles.container}>
-      {/* Categorías */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        style={styles.categoriesContainer}
-        contentContainerStyle={styles.categoriesContent}
-      >
-        <TouchableOpacity
-          style={[
-            styles.categoryChip,
-            selectedCategory === null && styles.categoryChipActive,
-          ]}
-          onPress={() => setSelectedCategory(null)}
+      {/* Categorías - Solo mostrar si NO hay lugares personalizados */}
+      {!customPlaces && (
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoriesContainer}
+          contentContainerStyle={styles.categoriesContent}
         >
-          <MaterialCommunityIcons
-            name="all-inclusive"
-            size={16}
-            color={selectedCategory === null ? theme.colors.primary.main : theme.colors.text.secondary}
-          />
-          <Text
-            style={[
-              styles.categoryText,
-              selectedCategory === null && styles.categoryTextActive,
-            ]}
-          >
-            Todos
-          </Text>
-        </TouchableOpacity>
-
-        {categories.map((category) => (
           <TouchableOpacity
-            key={category.id}
             style={[
               styles.categoryChip,
-              selectedCategory === category.id && styles.categoryChipActive,
+              selectedCategory === null && styles.categoryChipActive,
             ]}
-            onPress={() => setSelectedCategory(category.id)}
+            onPress={() => setSelectedCategory(null)}
           >
             <MaterialCommunityIcons
-              name={category.icon as any}
+              name="all-inclusive"
               size={16}
-              color={
-                selectedCategory === category.id
-                  ? theme.colors.primary.main
-                  : theme.colors.text.secondary
-              }
+              color={selectedCategory === null ? theme.colors.primary.main : theme.colors.text.secondary}
             />
             <Text
               style={[
                 styles.categoryText,
-                selectedCategory === category.id && styles.categoryTextActive,
+                selectedCategory === null && styles.categoryTextActive,
               ]}
             >
-              {category.name}
+              Todos
             </Text>
           </TouchableOpacity>
-        ))}
-      </ScrollView>
 
-      {/* Mapa Placeholder (aquí irá el mapa real de Leaflet) */}
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category.id}
+              style={[
+                styles.categoryChip,
+                selectedCategory === category.id && styles.categoryChipActive,
+              ]}
+              onPress={() => setSelectedCategory(category.id)}
+            >
+              <MaterialCommunityIcons
+                name={category.icon as any}
+                size={16}
+                color={
+                  selectedCategory === category.id
+                    ? theme.colors.primary.main
+                    : theme.colors.text.secondary
+                }
+              />
+              <Text
+                style={[
+                  styles.categoryText,
+                  selectedCategory === category.id && styles.categoryTextActive,
+                ]}
+              >
+                {category.name}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      )}
+
+      {/* Mapa con marcadores */}
       <View style={styles.mapContainer}>
-        <MaterialCommunityIcons
-          name="map"
-          size={48}
-          color={theme.colors.primary.main}
-        />
-        <Text style={styles.mapPlaceholderText}>
-          Ubicación: {userLocation.latitude.toFixed(4)}, {userLocation.longitude.toFixed(4)}
-        </Text>
-        <Text style={styles.mapNote}>
-          💡 Mapa interactivo con {nearbyPlaces.length} lugares cercanos
-        </Text>
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          style={styles.map}
+          initialRegion={{
+            latitude: userLocation.latitude,
+            longitude: userLocation.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+          showsUserLocation
+          showsMyLocationButton
+        >
+          {/* Marcadores de lugares */}
+          {nearbyPlaces.map((place, index) => {
+            const coords = place.coords || place.coordinates || { lat: 0, lng: 0 };
+            const latitude = coords.lat || coords.latitude || 0;
+            const longitude = coords.lng || coords.longitude || 0;
+
+            // Validar que las coordenadas sean válidas
+            if (!latitude || !longitude) return null;
+
+            return (
+              <Marker
+                key={place.id || place.place_id || index}
+                coordinate={{
+                  latitude,
+                  longitude,
+                }}
+                title={String(place.name || 'Lugar')}
+                description={String(place.description || place.address || 'Sin descripción')}
+                onPress={() => onPlaceSelect && onPlaceSelect(place)}
+              >
+                <View style={styles.markerContainer}>
+                  <MaterialCommunityIcons
+                    name="map-marker"
+                    size={32}
+                    color={theme.colors.primary.main}
+                  />
+                </View>
+              </Marker>
+            );
+          })}
+        </MapView>
       </View>
 
       {/* Lista de Lugares Cercanos */}
@@ -196,9 +237,9 @@ export const NearbyPlacesMap: React.FC<NearbyPlacesMapProps> = ({
         </View>
       ) : (
         <ScrollView style={styles.placesList}>
-          {nearbyPlaces.map((place) => (
+          {nearbyPlaces.map((place, index) => (
             <TouchableOpacity
-              key={place.id}
+              key={place.id || place.place_id || index}
               style={styles.placeCard}
               onPress={() => onPlaceSelect?.(place)}
             >
@@ -211,11 +252,13 @@ export const NearbyPlacesMap: React.FC<NearbyPlacesMapProps> = ({
               </View>
               <View style={styles.placeInfo}>
                 <Text style={styles.placeName} numberOfLines={1}>
-                  {place.name}
+                  {place.name || 'Lugar sin nombre'}
                 </Text>
-                <Text style={styles.placeAddress} numberOfLines={1}>
-                  {place.address}
-                </Text>
+                {place.address && (
+                  <Text style={styles.placeAddress} numberOfLines={1}>
+                    {place.address}
+                  </Text>
+                )}
                 {place.rating && (
                   <View style={styles.placeRating}>
                     <MaterialCommunityIcons
@@ -290,22 +333,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   mapContainer: {
-    height: 200,
-    backgroundColor: theme.colors.surface.secondary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: 300,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.secondary,
   },
-  mapPlaceholderText: {
-    fontSize: 12,
-    color: theme.colors.text.secondary,
-    marginTop: theme.spacing.sm,
+  map: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
   },
-  mapNote: {
-    fontSize: 11,
-    color: theme.colors.text.tertiary,
-    marginTop: theme.spacing.xs,
+  markerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   placesList: {
     flex: 1,

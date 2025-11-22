@@ -10,7 +10,6 @@ langchain-google-genai
 # Firebase
 firebase-admin
 # APIs externas
-googlemaps
 requests
 
 # Utils

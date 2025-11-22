@@ -13,7 +13,7 @@ default:
 setup:
   @echo "Instalando dependencias..."
   cd {{frontend_dir}} && npm install
-  cd src/backend && pip install -r requirements.txt
+  cd Proyectos/TAi-1/src/
   @echo "Setup completado. Revisa .env"
 
 # Levanta frontend + backend en paralelo

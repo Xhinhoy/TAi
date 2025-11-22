@@ -5,6 +5,7 @@ import { Place } from '../types/domain';
 
 export interface PlaceRecommendation {
   id: string;
+  place_id?: string; // Google Places ID
   name: string;
   description: string;
   category: string;
@@ -64,6 +65,7 @@ export class RecommendationsService {
   ): PlaceRecommendation {
     return {
       id: place.id,
+      place_id: place.place_id || place.id, // Asegurar que se incluya el Google Place ID
       name: place.name,
       description: place.description || '',
       category: place.categories?.[0] || 'other',
@@ -178,7 +180,7 @@ export class RecommendationsService {
 
   /**
    * Generate recommendations based on user preferences
-   * Now using the backend AI-powered recommendation engine
+   * Using REAL Google Places nearby search - NO MOCK DATA
    */
   public async generateRecommendations(
     preferences: UserPreferences,
@@ -187,37 +189,55 @@ export class RecommendationsService {
     limit: number = 10
   ): Promise<PlaceRecommendation[]> {
     try {
-      // Call the backend API for personalized recommendations
-      const response = await recommendationsService.generate({
-        user_id: userId,
-        location,
-        limit,
-        categories: preferences.interests,
-      });
-
-      // Handle both { recommendations: [...] } and array responses defensively
-      const list = Array.isArray(response?.recommendations)
-        ? response.recommendations
-        : Array.isArray(response)
-          ? response
-          : [];
-
-      if (list.length === 0) {
-        return this.getFallbackRecommendations(preferences, limit);
+      // Si no hay ubicación, no podemos buscar lugares cercanos reales
+      if (!location) {
+        console.warn('No location provided - cannot generate real recommendations');
+        return [];
       }
 
-      return list.map(rec =>
+      // Usar búsqueda de lugares cercanos REALES de Google Places
+      // NO usar el endpoint de recomendaciones que genera datos fake
+      const placesService = await import('../api/places.api');
+      const nearbyPlaces = await placesService.getNearbyPlaces(
+        location.latitude,
+        location.longitude,
+        5000, // 5km radius máximo
+        undefined // Sin filtro de categoría inicial
+      );
+
+      if (nearbyPlaces.length === 0) {
+        console.warn('No nearby places found from Google Places');
+        return [];
+      }
+
+      // Calcular match score para cada lugar según intereses del usuario
+      const scoredPlaces = nearbyPlaces
+        .map(place => {
+          const score = this.calculateMatchScore(place, preferences.interests);
+          const reason = this.generateRecommendationReason(place, preferences.interests);
+
+          return {
+            place,
+            score,
+            reason
+          };
+        })
+        .filter(item => item.score > 0) // Solo lugares que matchean con intereses
+        .sort((a, b) => b.score - a.score) // Ordenar por score
+        .slice(0, limit); // Limitar cantidad
+
+      return scoredPlaces.map(item =>
         this.convertToPlaceRecommendation(
-          rec.place || rec,
-          rec.score ?? 1,
-          rec.reasoning || response?.reasoning || 'Recomendado'
+          item.place,
+          item.score,
+          item.reason
         )
       );
     } catch (error) {
-      console.error('Error getting personalized recommendations:', error);
+      console.error('Error getting real nearby recommendations:', error);
 
-      // Fallback to local mock data if backend fails
-      return this.getFallbackRecommendations(preferences, limit);
+      // NO RETORNAR MOCK DATA - retornar array vacío
+      return [];
     }
   }
 

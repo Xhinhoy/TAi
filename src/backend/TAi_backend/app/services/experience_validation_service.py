@@ -47,7 +47,7 @@ class ExperienceValidationService:
             max_tokens=8000
         )
 
-        self.google_places = GooglePlacesFacade
+        self.google_places = GooglePlacesFacade()
         self.tripadvisor = tripadvisor_facade
 
         logger.info("ExperienceValidationService inicializado")
@@ -147,52 +147,46 @@ class ExperienceValidationService:
         try:
             logger.info(f"🔍 Buscando en Google Places: '{place_info.query_busqueda}'")
 
-            # Usar la búsqueda de texto de Google Places (importar directamente googlemaps)
-            import googlemaps
-            gmaps = googlemaps.Client(key=settings.GOOGLE_PLACES_API_KEY)
-
-            # Búsqueda textual
-            places_result = gmaps.places(
-                query=place_info.query_busqueda,
-                language='es'
+            # Usar la nueva Places API a través del facade
+            places_result = self.google_places.text_search(
+                query=place_info.query_busqueda
             )
 
-            if not places_result.get('results'):
+            if not places_result or len(places_result) == 0:
                 logger.warning("⚠️ No se encontraron resultados en Google Places")
                 return None
 
             # Tomar el primer resultado (más relevante)
-            place = places_result['results'][0]
-            place_id = place['place_id']
+            place = places_result[0]
+            place_id = place.get('place_id') or place.get('id')
 
             logger.info(f"📍 Lugar encontrado: {place.get('name')} (ID: {place_id})")
 
-            # Obtener detalles completos
-            place_details = gmaps.place(
-                place_id=place_id,
-                fields=[
-                    'name', 'formatted_address', 'rating', 'user_ratings_total',
-                    'reviews', 'photo', 'price_level', 'type', 'geometry',
-                    'opening_hours', 'website', 'formatted_phone_number'
-                ],
-                language='es'
-            )
+            # Obtener detalles completos usando el facade
+            place_details = self.google_places.get_place_details(place_id)
 
-            result = place_details['result']
+            if not place_details:
+                logger.warning("⚠️ No se pudieron obtener detalles del lugar")
+                return None
 
-            # Formatear datos
+            # Formatear datos para compatibilidad con el código existente
             formatted_data = {
                 'place_id': place_id,
-                'name': result.get('name'),
-                'formatted_address': result.get('formatted_address'),
-                'rating': result.get('rating'),
-                'user_ratings_total': result.get('user_ratings_total', 0),
-                'price_level': result.get('price_level'),
-                'types': result.get('type', []),  # 'type' en la API, pero lo guardamos como 'types'
-                'reviews': result.get('reviews', [])[:20],  # Últimas 20
-                'geometry': result.get('geometry'),
-                'website': result.get('website'),
-                'phone': result.get('formatted_phone_number')
+                'name': place_details.get('name'),
+                'formatted_address': place_details.get('formatted_address'),
+                'rating': place_details.get('rating'),
+                'user_ratings_total': place_details.get('user_ratings_total', 0),
+                'price_level': place_details.get('price_level'),
+                'types': place_details.get('categories', []),
+                'reviews': place_details.get('reviews', [])[:20],  # Últimas 20
+                'geometry': {
+                    'location': {
+                        'lat': place_details.get('coords', {}).get('latitude'),
+                        'lng': place_details.get('coords', {}).get('longitude')
+                    }
+                },
+                'website': place_details.get('website'),
+                'phone': place_details.get('formatted_phone_number')
             }
 
             logger.info(f"✅ Datos de Google obtenidos: rating={formatted_data['rating']}, reviews={len(formatted_data['reviews'])}")
@@ -349,9 +343,6 @@ RESEÑAS DE TRIPADVISOR:
 
             logger.info(f"🔍 Buscando alternativas (score original: {score_original})...")
 
-            import googlemaps
-            gmaps = googlemaps.Client(key=settings.GOOGLE_PLACES_API_KEY)
-
             lat = google_data['geometry']['location']['lat']
             lng = google_data['geometry']['location']['lng']
 
@@ -367,19 +358,19 @@ RESEÑAS DE TRIPADVISOR:
             }
             google_type = type_mapping.get(place_type, 'point_of_interest')
 
-            # Buscar lugares cercanos
-            nearby_search = gmaps.places_nearby(
-                location=(lat, lng),
+            # Buscar lugares cercanos usando la nueva API
+            nearby_results = self.google_places.search_nearby(
+                location={'latitude': lat, 'longitude': lng},
                 radius=2000,  # 2km
-                type=google_type,
-                rank_by='prominence'
+                place_type=google_type
             )
 
             alternatives = []
 
-            for place in nearby_search.get('results', [])[:5]:
+            for place in nearby_results[:5]:
                 # Saltar el lugar original
-                if place['place_id'] == google_data['place_id']:
+                place_id = place.get('place_id') or place.get('id')
+                if place_id == google_data['place_id']:
                     continue
 
                 # Filtrar por rating mínimo
@@ -388,19 +379,21 @@ RESEÑAS DE TRIPADVISOR:
 
                 # Obtener detalles básicos
                 try:
-                    details = gmaps.place(
-                        place_id=place['place_id'],
-                        fields=['name', 'rating', 'user_ratings_total', 'price_level', 'formatted_address', 'geometry']
-                    )['result']
+                    details = self.google_places.get_place_details(place_id)
+                    if not details:
+                        continue
 
                     # Calcular distancia
-                    alt_lat = place['geometry']['location']['lat']
-                    alt_lng = place['geometry']['location']['lng']
-                    distance_km = self._calculate_distance(lat, lng, alt_lat, alt_lng)
+                    alt_lat = details.get('coords', {}).get('latitude')
+                    alt_lng = details.get('coords', {}).get('longitude')
+                    if alt_lat and alt_lng:
+                        distance_km = self._calculate_distance(lat, lng, alt_lat, alt_lng)
+                    else:
+                        distance_km = 0
 
                     alternatives.append({
-                        'place_id': place['place_id'],
-                        'nombre': details['name'],
+                        'place_id': place_id,
+                        'nombre': details.get('name'),
                         'porque_es_mejor': f"Rating más alto ({details.get('rating', 0)}/5) y mejor valorado en la zona",
                         'rating_google': details.get('rating', 0),
                         'total_reviews': details.get('user_ratings_total', 0),
