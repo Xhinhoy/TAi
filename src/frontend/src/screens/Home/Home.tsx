@@ -479,40 +479,46 @@ const HomeScreen: React.FC = () => {
     }, [user])
   );
 
-// Generate recommendations when user/interests are ready
-useEffect(() => {
-  if (!user || interests.length === 0) {
-    setRecommendations([]);
-    return;
-  }
-
-  let cancelled = false;
-
-  const generateRecommendations = async () => {
-    try {
-      const recs = await localRecommendationsService.generateRecommendations(
-        preferences,
-        user.uid,
-        undefined,
-        10
-      );
-      if (!cancelled) {
-        setRecommendations(recs);
-      }
-    } catch (error) {
-      console.error('Error generating recommendations:', error);
-      if (!cancelled) {
-        setRecommendations([]);
-      }
+  // Generate recommendations when user/interests/location are ready
+  useEffect(() => {
+    if (!user || interests.length === 0) {
+      setRecommendations([]);
+      return;
     }
-  };
 
-  const timeout = setTimeout(() => generateRecommendations(), 300);
-  return () => {
-    cancelled = true;
-    clearTimeout(timeout);
-  };
-}, [user, interests]);
+    // Sin ubicación no podemos obtener recomendaciones reales
+    if (!userLocation) {
+      setRecommendations([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const generateRecommendations = async () => {
+      try {
+        const recs = await localRecommendationsService.generateRecommendations(
+          preferences,
+          user.uid,
+          userLocation,
+          10
+        );
+        if (!cancelled) {
+          setRecommendations(recs);
+        }
+      } catch (error) {
+        console.error('Error generating recommendations:', error);
+        if (!cancelled) {
+          setRecommendations([]);
+        }
+      }
+    };
+
+    const timeout = setTimeout(() => generateRecommendations(), 300);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeout);
+    };
+  }, [user, interests, userLocation]);
 
 
   const setupUserData = async (user: FirebaseUser) => {

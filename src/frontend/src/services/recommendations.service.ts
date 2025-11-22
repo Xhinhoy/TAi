@@ -210,6 +210,20 @@ export class RecommendationsService {
         return [];
       }
 
+      // Si el usuario no tiene intereses, devolver los más valorados cerca
+      if (preferences.interests.length === 0) {
+        return nearbyPlaces
+          .sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0))
+          .slice(0, limit)
+          .map(place =>
+            this.convertToPlaceRecommendation(
+              place,
+              0,
+              'Cerca de tu ubicación'
+            )
+          );
+      }
+
       // Calcular match score para cada lugar según intereses del usuario
       const scoredPlaces = nearbyPlaces
         .map(place => {
@@ -225,6 +239,21 @@ export class RecommendationsService {
         .filter(item => item.score > 0) // Solo lugares que matchean con intereses
         .sort((a, b) => b.score - a.score) // Ordenar por score
         .slice(0, limit); // Limitar cantidad
+
+      // Si no hay coincidencias con intereses, devolver top cerca (reales)
+      if (scoredPlaces.length === 0) {
+        console.warn('No matched nearby places; returning top nearby');
+        return nearbyPlaces
+          .sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0))
+          .slice(0, limit)
+          .map(place =>
+            this.convertToPlaceRecommendation(
+              place,
+              0,
+              'Cerca de tu ubicación'
+            )
+          );
+      }
 
       return scoredPlaces.map(item =>
         this.convertToPlaceRecommendation(
